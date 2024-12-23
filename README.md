@@ -19,34 +19,56 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 
 ## Installation
 
-Using [packer.nvim](https://github.com/wbthomason/packer.nvim):
-
-```lua
-use 'riodelphino/mql-compiler.nvim'
-```
-
 Using [Lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 return {
-    'riodelphino/mql-compiler.nvim',
-    opts = {
-       metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe',
-       include_path = '',
-       wine_drive_letter = 'Z',
-       timeout = 5000, -- msec
-    },
-    keys = {
-        {'<leader>mc', 'require("mql_compiler").compile_mql5()'},
-    },
+   'riodelphino/mql-compiler.nvim',
+   lazy = false,
+   -- ft = { 'cpp', 'c' }, -- Not recommend
+   opts = {
+      metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe',
+      include_path = '',
+      wine_drive_letter = 'Z',
+      timeout = 5000, -- msec
+   },
+   keys = {
+       {'<leader>mc', 'require("mql_compiler").compile_mql5()'},
+   },
+   configs = true,
+   keys = {
+      { '<leader>mc', 'require("mql_compiler").compile_mql5()' },
+   },
+   commands = {
+      { 'MQLCompilerSetSourcePath', 'MQLCompilerCompile' },
+   },
 }
 ```
 
-## Usage
 
-Still working with this ...
+## Commands
+```vim
+" Set mql5 path
+:MQLCompilerSetSource MyEA.mq5
+" Compile set path
+:MQLCompiler
 ```
+or
+```vim
+" Compile with path
+:MQLCompiler MyEA.mq5
+```
+## Lua func
+
+Below lua functions also work.
+```vim
+:lua require('mql_compiler').set_source_path("MyEA.mq5")
+:lua require('mql_compiler').compile_mql5()
+```
+or
+```vim
 :lua require('mql_compiler').compile_mql5("MyEA.mq5")
+
 ```
 
 ## TO-DO
@@ -54,7 +76,6 @@ Still working with this ...
 > [!Important]
 > Need quick add
 
-- [ ] Options (MT5's path, Include path, enable quickfix, wine's drive letter)
 - [ ] Require fugitive
 - [ ] '%' or 'no arg' also can compile current mql5 file
 - [ ] Detect git root
@@ -64,6 +85,7 @@ Still working with this ...
 - [ ] Show fugitive message on progress & success or error
 - [ ] Adoopt to MT5 on Windows
 - [x] Convert given macOS's path to Windows path
+- [x] Options (MT5's path, Include path, enable quickfix, wine's drive letter)
 
 > [!Note]
 > Hope to add in future

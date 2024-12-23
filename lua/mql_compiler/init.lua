@@ -22,6 +22,24 @@ function M.setup(opts)
 
    g_opts.metaeditor_path = vim.fn.expand(g_opts.metaeditor_path)
    g_opts.include_path = vim.fn.expand(g_opts.include_path)
+
+   -- :MQLCompilerSetSourcePath コマンドを登録
+   vim.api.nvim_create_user_command(
+      "MQLCompilerSetSource",
+      function(opts)
+         M.set_source_path(opts.args)
+      end,
+      { nargs = 1 } -- 引数を 1 つ指定
+   )
+
+   -- :MQLCompilerCompile コマンドを登録
+   vim.api.nvim_create_user_command(
+      "MQLCompiler",
+      function(opts)
+         M.compile_mql5(opts.args ~= "" and opts.args or nil)
+      end,
+      { nargs = "?" } -- 引数は任意
+   )
 end
 
 function M.set_source_path(path)
@@ -32,6 +50,16 @@ function M.compile_mql5(source_path)
    -- ex.) compile_mql5('/path/to/your/file.mq5')
    if (source_path ~= '' and source_path ~= nil) then
       g_source_path = source_path
+   end
+   if (g_source_path == '' ) then
+      -- Check current buffer is mql5 or not
+      local filepath = vim.api.nvim_buf_get_name(0)
+      if filepath:match("%.mq5$") then
+          g_source_path = filepath
+      else
+          print('No source path is set. and current buffer is not *.mq5' )
+          return
+      end
    end
    --
    -- Wine用のパスを設定
