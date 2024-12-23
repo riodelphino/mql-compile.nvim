@@ -1,17 +1,36 @@
 local M = {}
 
-function M.setup()
-    print("MQL Compiler plugin loaded!")
-    -- 必要な初期化処理を記述
+local g_opts = {}
+
+local default_opts = {
+   -- metaeditor_path = vim.fn.expand('~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe'),
+   metaeditor_path = '',
+   include_path = vim.fn.expand(''),
+   wine_drive_letter = 'Z',
+   timeout = 5000, -- ミリ秒
+}
+
+function M.setup(opts)
+   if loaded then
+      return
+   end
+
+   loaded = true
+
+   g_opts = vim.tbl_deep_extend("force", default_opts, opts or {})
+
+   g_opts.metaeditor_path = vim.fn.expand(g_opts.metaeditor_path)
+   g_opts.include_path = vim.fn.expand(g_opts.include_path)
 end
 
 function M.compile_mql5(source_path)
    -- ex.) compile_mql5('/path/to/your/file.mq5')
    --
    -- Wine用のパスを設定
-   local metaeditor_path = vim.fn.expand('~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe')
+   -- local metaeditor_path = vim.fn.expand('~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe')
+   local metaeditor_path = vim.fn.expand(g_opts.metaeditor_path)
    local win_log_path = source_path:gsub('%.mq5$', '.log')
-   local mac_log_path = win_log_path:gsub('^Z:', ''):gsub('\\', '/')
+   local mac_log_path = win_log_path:gsub('^'..g_opts.wine_drive_letter..':', ''):gsub('\\', '/')
    local quickfix_output = mac_log_path:gsub('%.log$', '.quickfix')
 
    -- コンパイル実行
