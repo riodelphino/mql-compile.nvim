@@ -35,7 +35,10 @@ return {
        include_path = '',
        wine_drive_letter = 'Z',
        timeout = 5000, -- msec
-    }
+    },
+    keys = {
+        {'<leader>mc', 'require("mql_compiler").compile_mql5()'},
+    },
 }
 ```
 

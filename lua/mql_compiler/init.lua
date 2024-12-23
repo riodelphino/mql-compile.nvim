@@ -1,6 +1,7 @@
 local M = {}
 
 local g_opts = {}
+local g_source_path = ''
 
 local default_opts = {
    -- metaeditor_path = vim.fn.expand('~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe'),
@@ -23,13 +24,20 @@ function M.setup(opts)
    g_opts.include_path = vim.fn.expand(g_opts.include_path)
 end
 
+function M.set_source_path(path)
+   g_source_path = path
+end
+
 function M.compile_mql5(source_path)
    -- ex.) compile_mql5('/path/to/your/file.mq5')
+   if (source_path ~= '' and source_path ~= nil) then
+      g_source_path = source_path
+   end
    --
    -- Wine用のパスを設定
    -- local metaeditor_path = vim.fn.expand('~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe')
    local metaeditor_path = vim.fn.expand(g_opts.metaeditor_path)
-   local win_log_path = source_path:gsub('%.mq5$', '.log')
+   local win_log_path = g_source_path:gsub('%.mq5$', '.log')
    local mac_log_path = win_log_path:gsub('^'..g_opts.wine_drive_letter..':', ''):gsub('\\', '/')
    local quickfix_output = mac_log_path:gsub('%.log$', '.quickfix')
 
