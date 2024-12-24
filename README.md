@@ -15,9 +15,9 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 - Compile MQL5
 - Show errors in quickfix (& jump to the position)
 - Auto detect mql5/mql4 by given source path
-- Works on MacOS + wine
+- Works on `MacOS + wine(wineskin)`
 
-**In future**
+**Not implemented**
 - Compile MQL4 (in future)
 - Works on Windows (in future)
 
@@ -37,7 +37,7 @@ return {
    opts = {
       default = 'mql5', -- 'mql5' | 'mql4'
       quickfix = {
-         alert_keys = { 'error', 'warning' }, -- Alert keywords showen in quickfix
+         alert_keys = { 'error', 'warning' }, -- Alert keywords shown in quickfix
          extension = 'qfix',
       },
       log = {
@@ -129,14 +129,15 @@ or
 > Need quick add
 
 - [ ] nvim freezes for seconds, until finishing compile
+- [ ] Add 'information' to be shown on notify? (Almost including message)
 - [ ] Show just 'Result: errors x, warnings x (...)' message, remove others.
-- [ ] Require fugitive
 - [ ] Detect git root
 - [ ] List up & select from git root's mql5 files 
 - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] Adoopt to MT5 on Windows
 - [ ] Organize & split codes to functions
+- [ ] 'timeout' to work
 - [x] Convert given macOS's path to Windows path
 - [x] Options (MT5's path, Include path, enable quickfix, wine's drive letter)
 - [x] '%' or 'no arg' also can compile current mql5 file
@@ -146,4 +147,3 @@ or
 > Hope to add in future
 
 - [ ] MQL4 compiling
-
