@@ -29,7 +29,8 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 - MT5 (only via wine, for now)
 
 **Optional**
-- [kevinhwang91/nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) (Strongly recommended! Super easy to use quickfix)
+- [kevinhwang91/nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) (Super easy to use quickfix)
+- [rcarriga/nvim-notify](https://github.com/rcarriga/nvim-notify) (Nice style notify messages)
 
 ## Installation
 
@@ -136,11 +137,11 @@ or
 > Need quick add
 
 - [ ] `:MQLCompile` does not work ?
+- [ ] Keymapipng compile does not work
+- [ ] ❗️Async compile
 - [ ] Show 'Result: errors x, warnings x (...)' message
-- [ ] Remove other messages
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
-- [ ] nvim freezes for seconds, until finishing compile
-- [ ] Add 'information' to be shown on notify? (Almost including message)
+- [ ] Add 'information' to be shown. On notify/quickfix? (Almost about '#include')
 - [ ] Detect git root
 - [ ] List up & select from git root's mql5 files 
 - [ ] If only one mql5 on git root, compile without prompt
@@ -152,6 +153,7 @@ or
 - [x] Options (MT5's path, Include path, enable quickfix, wine's drive letter)
 - [x] '%' or 'no arg' also can compile current mql5 file
 - [x] Remove ^M from quickfix (encoding problem)
+- [x] Move some messages to notify
 
 > [!Note]
 > Hope to add in future

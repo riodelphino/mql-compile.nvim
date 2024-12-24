@@ -240,7 +240,8 @@ function M.compile_mql(source_path)
       os.remove(log_path .. '.utf8')
    end
 
-   print('Quickfix file created: ' .. quickfix_path)
+   msg = 'Quickfix file created: ' .. quickfix_path
+   vim.notify(msg, vim.log.levels.INFO, { title = 'mql-compile' })
 
    -- Open quickfix
    vim.cmd('cfile ' .. quickfix_path)
