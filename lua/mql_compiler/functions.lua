@@ -1,6 +1,9 @@
 local M = {}
-package.path = package.path .. ";../?.lua"
-local _ = require('mql_compiler')
+
+-- -- local _ = require('mql_compiler')
+-- local mql = {}
+-- local os_type
+local opt = require('mql_compiler.options')
 
 function M.file_exists(path)
    local file=io.open(path,"r")
@@ -56,20 +59,18 @@ function M.convert_encoding(path)
    end
 end
 
-function M.log_to_qf(log_path, qf_path)
+function M.log_to_qf(log_path, qf_path, alert_keys)
    local log_file = io.open(log_path, 'r')
    local qf_lines = {}
-   local mql = _._mql
-   local os_type = _._os_type
 
    for line in log_file:lines() do
       -- Filter alert lines
-      for _, alert_key in pairs(_._opts.quickfix.alert_keys) do
+      for _, alert_key in pairs(alert_keys) do
          if line:match(' : ' .. alert_key) then
             local file, line_num, col_num, code, msg
 
             file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. alert_key .. ' (%d+): (.*)$')
-            file = M.convert_path_to_os(file, mql.wine_drive_letter, os_type)
+            file = M.convert_path_to_os(file, opt._mql.wine_drive_letter, opt._os_type)
 
             -- Output as quickfix format
             table.insert(qf_lines, string.format('%s:%s:%s: ' .. alert_key .. ' %s: %s', file, line_num, col_num, code, msg))
@@ -92,28 +93,30 @@ end
 
 function M.get_source(source_path)
    -- Automatically change mql5/4 by source_path's extension
-   local mql
-   local opts = _._opts
+   local mql = {}
 
    source_path = vim.fn.expand(source_path)
 
-   if (source_path == nil or source_path == '') then -- Get default mql
-      if (opts.default == 'mql5') then
-         mql = opts.mql5
-      elseif (opts.default == 'mql4') then
-         mql = opts.mql4
+   if (source_path == 'v:null' or source_path == nil or source_path == '') then
+      source_path = ''
+   end
+
+   if (source_path == '') then -- Get default mql
+      if (opt._opts.default == 'mql5') then
+         mql = opt._opts.mql5
+      elseif (opt._opts.default == 'mql4') then
+         mql = opt._opts.mql4
       end
       source_path = mql.source_path
    else -- Get mql by extension
-      if source_path:match('%.'.. opts.mql5.extension .. '$') then
-         mql = opts.mql5
-      elseif source_path:match('%.'.. opts.mql4.extension .. '$') then
-         mql = opts.mql4
+      if source_path:match('%.'.. opt._opts.mql5.extension .. '$') then
+         mql = opt._opts.mql5
+      elseif source_path:match('%.'.. opt._opts.mql4.extension .. '$') then
+         mql = opt._opts.mql4
       -- else
       --    error("Invalid file extension")
       end
    end
-
    -- Set current file path to source_path
    if (mql.source_path == '' and source_path == nil) then -- if no specifications
       local current_file_path = vim.api.nvim_buf_get_name(0)

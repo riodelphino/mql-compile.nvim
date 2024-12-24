@@ -4,9 +4,6 @@ local fn = require('mql_compiler.functions')
 local opt = require('mql_compiler.options')
 local cmd = require('mql_compiler.commands')
 
-local _opts = {}
-local _os_type = ''
-local _mql = {}
 local _loaded = false
 
 
@@ -17,9 +14,9 @@ function M.setup(opts)
 
    _loaded = true
 
-   _os_type = fn.get_os_type()
+   opt._os_type = fn.get_os_type()
 
-   _opts = opt.merge(opts)
+   opt._opts = opt.merge(opts)
 
    cmd.create_commands()
 end

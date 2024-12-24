@@ -1,7 +1,7 @@
 local M = {}
 
-local _ = require('mql_compiler')
 local fn = require('mql_compiler.functions')
+local opt = require('mql_compiler.options')
 local cmp = require('mql_compiler.compile')
 
 function M.create_commands()
@@ -23,12 +23,20 @@ function M.create_commands()
       { nargs = "?" }
    )
 
+   -- :MQLCompilerPrintOptions
+   vim.api.nvim_create_user_command(
+      "MQLCompilerPrintOptions",
+      function()
+         print(vim.inspect(opt._opts))
+      end,
+      { nargs = 0 }
+   )
+
 end
 
 
 function M.set_source_path(path)
    local msg = ''
-   local opts = _._opts
 
    path = vim.fn.expand(path) -- for % ~ 
    local extension = path:match('%.(.*)$')
@@ -40,12 +48,12 @@ function M.set_source_path(path)
    end
 
    -- Determin mql by extension
-   if extension == opts.mql5.extension then
-       opts.mql5.source_path = path
+   if extension == opt._opts.mql5.extension then
+       opt._opts.mql5.source_path = path
        msg = 'MQL5 source path set to: ' .. path
        fn.notify(msg, vim.log.levels.INFO)
-   elseif extension == opts.mql4.extension then
-       opts.mql4.source_path = path
+   elseif extension == opt._opts.mql4.extension then
+       opt._opts.mql4.source_path = path
        msg = 'MQL4 source path set to: ' .. path
        fn.notify(msg, vim.log.levels.INFO)
    else

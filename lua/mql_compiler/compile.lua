@@ -1,6 +1,6 @@
 local M = {}
 
-local _ = require('mql_compiler')
+local opt = require('mql_compiler.options')
 local fn = require('mql_compiler.functions')
 
 function M.do_compile(metaeditor_path, source_path, log_path)
@@ -26,13 +26,14 @@ end
 
 function M.compile(source_path)
    local msg = ''
+   local mql
    -- ex.) compile_mql('/path/to/your/file.mq5')
 
-   source_path, _._mql = fn.get_source(source_path)
+   source_path, mql = fn.get_source(source_path)
 
-   local mql = _._mql
-   local opts = _._opts
-   local os_type = _._os_type
+   local opts = opt._opts
+   opt._mql = mql
+   local os_type = opt._os_type
 
    msg = "Compiling '" .. source_path .. "'"
    fn.notify(msg, vim.log.levels.INFO)
@@ -45,7 +46,7 @@ function M.compile(source_path)
    local qf_path = log_path:gsub('%.log$', '.' .. opts.quickfix.extension)
 
    -- Compile
-   M.compile(metaeditor_path, source_path, log_path)
+   M.do_compile(metaeditor_path, source_path, log_path)
 
    -- Convert encoding for mac
    if (os_type == 'macos') then
@@ -53,7 +54,7 @@ function M.compile(source_path)
    end
 
    -- Convert log to quickfix format
-   fn.log_to_qf(log_path, qf_path)
+   fn.log_to_qf(log_path, qf_path, opts.quickfix.alert_keys)
 
    -- Open quickfix
    vim.cmd('cfile ' .. qf_path)

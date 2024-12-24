@@ -1,5 +1,8 @@
 local M = {}
 
+M._opts = {}
+M._os_type = ''
+
 M.default = {
    default_ft = 'mql5',
    quickfix = {
@@ -41,6 +44,8 @@ function M.merge(user_opts)
 
    opts.mql5.extension = opts.mql5 and opts.mql5.extension or "mq5" -- Set default
    opts.mql4.extension = opts.mql4 and opts.mql4.extension or "mq4"
+
+   M._opts = opts
 
    return opts
 end
