@@ -1,5 +1,5 @@
 local M = {}
-
+package.path = package.path .. ";../?.lua"
 local _ = require('mql_compiler')
 
 function M.file_exists(path)
