@@ -7,7 +7,7 @@ function M.do_compile(metaeditor_path, source_path, log_path)
    local msg = ''
    -- Compile
    local compile_cmd = string.format('wine "%s" /compile:"%s" /log:"%s"', metaeditor_path, source_path, log_path)
-   local compile_result = vim.fn.system(compile_cmd)
+   local result = vim.fn.system(compile_cmd)
 
    -- Check result
    local source_filename = source_path:match("([^/\\]+)$")

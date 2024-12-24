@@ -68,7 +68,6 @@ return {
       },
    },
    keys = {
-       -- {'<F7>', '<cmd>MQLCompiler<cr>'},
        {'<F7>', function() require('mql_compiler').compile() end},
    },
    cmds = {
@@ -116,6 +115,13 @@ This plugin auto-detects mql5/mql4 by extension given in source path.
 ```
 or
 ```vim
+" Set current file path
+:MQLCompilerSetSource
+" Compile it
+:MQLCompiler
+```
+or
+```vim
 " Compile with path
 :MQLCompiler MyEA.mq5
 ```
@@ -126,6 +132,12 @@ Below lua functions also available. (with auto-detection by the extension)
 :lua require('mql_compiler').set_source_path("MyEA.mq5")
 :lua require('mql_compiler').compile()
 ```
+or
+```vim
+:lua require('mql_compiler').set_source_path() -- set current file path
+:lua require('mql_compiler').compile()
+```
+
 or
 ```vim
 :lua require('mql_compiler').compile("MyEA.mq5")
@@ -140,6 +152,7 @@ or
 - [ ] Keymapipng compile does not work
 - [ ] Check file exists before compile
 - [ ] ❗️Async compile
+- [ ] error on ... source_path is not set & :MQLCompile (as keymap) on non-mql4/5 files or empty buffer
 - [ ] Show 'Result: errors x, warnings x (...)' message
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] Add 'information' to be shown. On notify/quickfix? (Almost about '#include')

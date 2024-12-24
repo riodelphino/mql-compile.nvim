@@ -9,9 +9,9 @@ function M.create_commands()
    vim.api.nvim_create_user_command(
       "MQLCompilerSetSource",
       function(opts)
-         M.set_source_path(opts.args)
+         M.set_source_path(opts.args ~= "" and opts.args or nil)
       end,
-      { nargs = 1 }
+      { nargs = "?" }
    )
 
    -- :MQLCompiler
@@ -37,6 +37,10 @@ end
 
 function M.set_source_path(path)
    local msg = ''
+
+   if (path == 'v:null' or path == nil or path == '') then
+      path = vim.api.nvim_buf_get_name(0) -- get current file path
+   end
 
    path = vim.fn.expand(path) -- for % ~ 
    local extension = path:match('%.(.*)$')
