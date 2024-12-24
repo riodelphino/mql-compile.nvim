@@ -33,17 +33,6 @@ local default_opts = {
    },
 }
 
-local function get_os_type()
-    if vim.fn.has('win32') == 1 then
-        return 'windows'
-    elseif vim.fn.has('macunix') == 1 then
-        return 'macos'
-    else
-        return 'linux'
-    end
-end
-
-
 
 function M.setup(_opts)
    if loaded then
@@ -52,7 +41,7 @@ function M.setup(_opts)
 
    loaded = true
 
-   os_type = get_os_type()
+   os_type = fn.get_os_type()
 
    opts = vim.tbl_deep_extend("force", default_opts, _opts or {})
 
