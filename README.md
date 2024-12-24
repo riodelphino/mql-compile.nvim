@@ -15,15 +15,22 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 - Compile MQL5
 - Show errors in quickfix (& jump to the position)
 - Auto detect mql5/mql4 by given source path
-- Works on MacOS + wine
+- Works on `MacOS + wine(wineskin)`
 
-**In future**
+**Not implemented**
 - Compile MQL4 (in future)
 - Works on Windows (in future)
+- Works on Linux (just not tested)
 
 
 ## Requirement
-- MT5 installed (on wine)
+**Mandatory**
+- nvim v0.10.2 (My environment. It seems to work a little older versions.)
+- MT5 (only via wine, for now)
+
+**Optional**
+- [kevinhwang91/nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) (Super easy to use quickfix)
+- [rcarriga/nvim-notify](https://github.com/rcarriga/nvim-notify) (Nice style notify messages)
 
 ## Installation
 
@@ -37,7 +44,7 @@ return {
    opts = {
       default = 'mql5', -- 'mql5' | 'mql4'
       quickfix = {
-         alert_keys = { 'error', 'warning' }, -- Alert keywords showen in quickfix
+         alert_keys = { 'error', 'warning' }, -- Alert keywords shown in quickfix
          extension = 'qfix',
       },
       log = {
@@ -61,9 +68,9 @@ return {
       },
    },
    keys = {
-       {'<F7>', '<cmd>MQLCompiler<cr>'},
+       {'<F7>', function() require('mql_compiler').compile() end},
    },
-   cmd = {
+   cmds = {
       { 'MQLCompiler', 'MQLCompilerSetSource', },
    },
 }
@@ -108,6 +115,13 @@ This plugin auto-detects mql5/mql4 by extension given in source path.
 ```
 or
 ```vim
+" Set current file path
+:MQLCompilerSetSource
+" Compile it
+:MQLCompiler
+```
+or
+```vim
 " Compile with path
 :MQLCompiler MyEA.mq5
 ```
@@ -116,11 +130,17 @@ or
 Below lua functions also available. (with auto-detection by the extension)
 ```vim
 :lua require('mql_compiler').set_source_path("MyEA.mq5")
-:lua require('mql_compiler').compile_mql()
+:lua require('mql_compiler').compile()
 ```
 or
 ```vim
-:lua require('mql_compiler').compile_mql("MyEA.mq5")
+:lua require('mql_compiler').set_source_path() -- set current file path
+:lua require('mql_compiler').compile()
+```
+
+or
+```vim
+:lua require('mql_compiler').compile("MyEA.mq5")
 ```
 
 ## TO-DO
@@ -128,22 +148,28 @@ or
 > [!Important]
 > Need quick add
 
-- [ ] nvim freezes for seconds, until finishing compile
-- [ ] Show just 'Result: errors x, warnings x (...)' message, remove others.
-- [ ] Require fugitive
+- [ ] `:MQLCompile` does not work ?
+- [ ] Keymapipng compile does not work
+- [ ] Check file exists before compile
+- [ ] ❗️Async compile
+- [ ] error on ... source_path is not set & :MQLCompile (as keymap) on non-mql4/5 files or empty buffer
+- [ ] Show 'Result: errors x, warnings x (...)' message
+- [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
+- [ ] Add 'information' to be shown. On notify/quickfix? (Almost about '#include')
 - [ ] Detect git root
 - [ ] List up & select from git root's mql5 files 
 - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] Adoopt to MT5 on Windows
 - [ ] Organize & split codes to functions
+- [ ] 'timeout' to work
 - [x] Convert given macOS's path to Windows path
 - [x] Options (MT5's path, Include path, enable quickfix, wine's drive letter)
 - [x] '%' or 'no arg' also can compile current mql5 file
 - [x] Remove ^M from quickfix (encoding problem)
+- [x] Move some messages to notify
 
 > [!Note]
 > Hope to add in future
 
 - [ ] MQL4 compiling
-
