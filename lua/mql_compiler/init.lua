@@ -1,123 +1,228 @@
 local M = {}
 
-local g_opts = {}
-local g_source_path = ''
+local opts = {}
+local os_type = ''
+local loaded = false
 
 local default_opts = {
-   -- metaeditor_path = vim.fn.expand('~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe'),
-   metaeditor_path = '',
-   include_path = vim.fn.expand(''),
-   wine_drive_letter = 'Z',
-   timeout = 5000, -- ミリ秒
+   default = 'mql5',
+   quickfix = {
+      alert_keys = { 'error', 'warning' },
+      extension = 'qfix',
+   },
+   log = {
+      extension = 'log',
+   },
+   mql5 = {
+      metaeditor_path = '',
+      include_path = '',
+      source_path = '',
+      extension = 'mq5',
+      wine_drive_letter = 'Z:',
+      timeout = 5000,
+   },
+   mql4 = {
+      metaeditor_path = '',
+      include_path = '',
+      source_path = '',
+      extension = 'mq4',
+      wine_drive_letter = 'Z:',
+      timeout = 5000,
+   },
 }
 
-function M.setup(opts)
+local function get_os_type()
+    if vim.fn.has('win32') == 1 then
+        return 'windows'
+    elseif vim.fn.has('macunix') == 1 then
+        return 'macos'
+    else
+        return 'linux'
+    end
+end
+
+
+function M.setup(_opts)
    if loaded then
       return
    end
 
    loaded = true
 
-   g_opts = vim.tbl_deep_extend("force", default_opts, opts or {})
+   os_type = get_os_type()
 
-   g_opts.metaeditor_path = vim.fn.expand(g_opts.metaeditor_path)
-   g_opts.include_path = vim.fn.expand(g_opts.include_path)
+   opts = vim.tbl_deep_extend("force", default_opts, _opts or {})
 
-   -- :MQLCompilerSetSourcePath コマンドを登録
+   opts.mql5.metaeditor_path = vim.fn.expand(opts.mql5.metaeditor_path) -- expand path for % ~ 
+   opts.mql5.include_path = vim.fn.expand(opts.mql5.include_path)
+   opts.mql5.source_path = vim.fn.expand(opts.mql5.source_path)
+
+   opts.mql4.metaeditor_path = vim.fn.expand(opts.mql4.metaeditor_path)
+   opts.mql4.include_path = vim.fn.expand(opts.mql4.include_path)
+   opts.mql4.source_path = vim.fn.expand(opts.mql4.source_path)
+
+   opts.mql5.extension = opts.mql5 and opts.mql5.extension or "mq5" -- Set default
+   opts.mql4.extension = opts.mql4 and opts.mql4.extension or "mq4"
+
+
+   -- Set Commands
+   -- :MQLCompilerSetSourc
    vim.api.nvim_create_user_command(
       "MQLCompilerSetSource",
-      function(opts)
-         M.set_source_path(opts.args)
+      function(cmd_opts)
+         M.set_source_path(cmd_opts.args)
       end,
-      { nargs = 1 } -- 引数を 1 つ指定
+      { nargs = 1 }
    )
 
-   -- :MQLCompilerCompile コマンドを登録
+   -- :MQLCompiler
    vim.api.nvim_create_user_command(
       "MQLCompiler",
-      function(opts)
-         M.compile_mql5(opts.args ~= "" and opts.args or nil)
+      function(cmd_opts)
+         M.compile_mql(opts.args ~= "" and cmd_opts.args or nil)
       end,
-      { nargs = "?" } -- 引数は任意
+      { nargs = "?" }
    )
+end
+
+
+function M.convert_path_to_os(path, drive_letter)
+   if (os_type == 'macos') then
+      return path:gsub('^' .. drive_letter, ''):gsub('\\', '/')
+   end
 end
 
 function M.set_source_path(path)
-   g_source_path = path
+   path = vim.fn.expand(path) -- for % ~ 
+   local extension = path:match('%.(.*)$')
+   if not extension then
+       error("Invalid path: no extension found.")
+       return
+   end
+
+   -- Determin mql by extension
+   if extension == opts.mql5.extension then
+       opts.mql5.source_path = path
+       print('MQL5 source path set to: ' .. path)
+   elseif extension == opts.mql4.extension then
+       opts.mql4.source_path = path
+       print('MQL4 source path set to: ' .. path)
+   else
+       error('Unknown file type: ' .. extension .. ". Type must be in 'opts.[mql5/mql4].extension'.")
+   end
 end
 
-function M.compile_mql5(source_path)
-   -- ex.) compile_mql5('/path/to/your/file.mq5')
-   if (source_path ~= '' and source_path ~= nil) then
-      g_source_path = source_path
-   end
-   if (g_source_path == '' ) then
-      -- Check current buffer is mql5 or not
-      local filepath = vim.api.nvim_buf_get_name(0)
-      if filepath:match("%.mq5$") then
-          g_source_path = filepath
-      else
-          print('No source path is set. and current buffer is not *.mq5' )
-          return
-      end
-   end
-   --
-   -- Wine用のパスを設定
-   -- local metaeditor_path = vim.fn.expand('~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe')
-   local metaeditor_path = vim.fn.expand(g_opts.metaeditor_path)
-   local win_log_path = g_source_path:gsub('%.mq5$', '.log')
-   local mac_log_path = win_log_path:gsub('^'..g_opts.wine_drive_letter..':', ''):gsub('\\', '/')
-   local quickfix_output = mac_log_path:gsub('%.log$', '.quickfix')
-
-   -- コンパイル実行
-   local compile_cmd = string.format('wine "%s" /compile:"%s" /log:"%s"', metaeditor_path, source_path, win_log_path)
+function M.compile(metaeditor_path, source_path, log_path)
+   -- Compile
+   local compile_cmd = string.format('wine "%s" /compile:"%s" /log:"%s"', metaeditor_path, source_path, log_path)
    local compile_result = vim.fn.system(compile_cmd)
 
-   -- コンパイル結果を確認
+   -- Check result
+   local source_filename = source_path:match("([^/\\]+)$")
    if vim.v.shell_error == 0 then
-      print('Compilation finished. Log saved to ' .. mac_log_path)
-   else
-      print('Compilation failed. Log saved to ' .. mac_log_path)
+      print("Finished compile '" .. source_filename .. "'. Log saved to " .. log_path)
+   elseif vim.v.shell_error == 1 then
+      print("Finished compile '" .. source_filename .. "' with warnings. Log saved to " .. log_path)
+   elseif vim.v.shell_error == 2 then
+      error("Failed compile '" .. source_filename .. "'. Log saved to " .. log_path)
+   end
+end
+
+function M.compile_mql(source_path)
+   -- ex.) compile_mql('/path/to/your/file.mq5')
+   source_path = vim.fn.expand(source_path)
+
+   -- Automatically change mql5/4 by source_path's extension
+   local mql
+   if (source_path == nil or source_path == '') then -- Get default mql
+      if (opts.default == 'mql5') then
+         mql = opts.mql5
+      elseif (opts.default == 'mql4') then
+         mql = opts.mql4
+      end
+      source_path = mql.source_path
+   else -- Get mql by extension
+      if source_path:match('%.'.. opts.mql5.extension .. '$') then
+         mql = opts.mql5
+      elseif source_path:match('%.'.. opts.mql4.extension .. '$') then
+         mql = opts.mql4
+      else
+         error("Invalid file extension")
+      end
    end
 
-   -- ファイルの文字エンコーディングを変換
-   local convert_cmd = string.format('iconv -f UTF-16LE -t UTF-8 %s > %s.utf8 || iconv -f WINDOWS-1252 -t UTF-8 %s > %s.utf8 || cp %s %s.utf8', mac_log_path, mac_log_path, mac_log_path, mac_log_path, mac_log_path, mac_log_path)
-   vim.fn.system(convert_cmd)
+   -- Set current file path to source_path
+   if (mql.source_path == '' and source_path == nil) then -- if no specifications
+      local current_file_path = vim.api.nvim_buf_get_name(0)
+      if (current_file_path:match('%.'.. mql.extension .. '$')) then
+         source_path = current_file_path
+      else
+         error('No source path is set. and current buffer is not *.' .. mql.extension )
+         return
+      end
+   end
 
-   -- ログファイルを読み込み、Quickfix形式に変換
-   local log_file = io.open(mac_log_path .. '.utf8', 'r')
+   -- Set paths
+   local metaeditor_path = vim.fn.expand(mql.metaeditor_path)
+   local log_path = source_path:gsub('%.' .. mql.extension .. '$', '.' .. opts.log.extension)
+   log_path = M.convert_path_to_os(log_path, mql.wine_drive_letter)
+   local quickfix_path = log_path:gsub('%.log$', '.' .. opts.quickfix.extension)
+
+   -- Compile
+   M.compile(metaeditor_path, source_path, log_path)
+
+   -- Convert encoding for mac
+   if os_type == 'macos' then
+      local utf8_path = log_path .. ".utf8" -- the path converted UTF-8
+      local convert_cmd = string.format(
+         [[
+         iconv -f UTF-16LE -t UTF-8 "%s" > "%s" 2>/dev/null || iconv -f WINDOWS-1252 -t UTF-8 "%s" > "%s" 2>/dev/null || cp "%s" "%s" && tr -d '\r' < "%s" > "%s.tmp" && mv "%s.tmp" "%s"
+         ]],
+         log_path, utf8_path, -- UTF-16LE → UTF-8
+         log_path, utf8_path, -- WINDOWS-1252 → UTF-8
+         log_path, utf8_path, -- Copy the file as is
+         utf8_path, utf8_path, -- Remove line break code
+         utf8_path, utf8_path  -- Overwrite from temporary file
+      )
+      vim.fn.system(convert_cmd)
+   end
+
+   -- Convert log to quickfix format
+   local log_file = io.open(log_path .. '.utf8', 'r')
    local quickfix_lines = {}
 
    for line in log_file:lines() do
-      -- エラー行だけを抽出
-      if line:match(' : error') then
-         local win_file, line_num, col_num, error_code, error_msg
+      -- Filter alert lines
+      for _, alert_key in pairs(opts.quickfix.alert_keys) do
+         if line:match(' : ' .. alert_key) then
+            local file, line_num, col_num, code, msg
 
-         win_file, line_num, col_num, error_code, error_msg = line:match('^(.*)%((%d+),(%d+)%) : error (%d+): (.*)$')
+            file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. alert_key .. ' (%d+): (.*)$')
+            file = M.convert_path_to_os(file, mql.wine_drive_letter)
 
-         -- ファイル名をmacOS形式に変換
-         local mac_file = win_file:gsub('^Z:', ''):gsub('\\', '/')
-
-         -- Quickfix形式で出力（macOS形式のパスを使用）
-         table.insert(quickfix_lines, string.format('%s:%s:%s: Error %s: %s', mac_file, line_num, col_num, error_code, error_msg))
+            -- Output as quickfix format
+            table.insert(quickfix_lines, string.format('%s:%s:%s: ' .. alert_key .. ' %s: %s', file, line_num, col_num, code, msg))
+         end
       end
    end
    log_file:close()
 
-   -- Quickfixファイルに保存
-   local quickfix_file = io.open(quickfix_output, 'w')
+   -- Save to quickfix
+   local quickfix_file = io.open(quickfix_path, 'w')
    for _, line in ipairs(quickfix_lines) do
       quickfix_file:write(line .. '\n')
    end
    quickfix_file:close()
 
-   -- 一時ファイルを削除
-   os.remove(mac_log_path .. '.utf8')
+   -- Delete tmp file for mac
+   if (os_type == 'macos') then
+      os.remove(log_path .. '.utf8')
+   end
 
-   print('Quickfix file created: ' .. quickfix_output)
+   print('Quickfix file created: ' .. quickfix_path)
 
-   -- NeovimでQuickfixを直接開く
-   vim.cmd('cfile ' .. quickfix_output)
+   -- Open quickfix
+   vim.cmd('cfile ' .. quickfix_path)
    vim.cmd('copen')
 end
 
