@@ -129,6 +129,7 @@ function M.compile(metaeditor_path, source_path, log_path)
 end
 
 function M.compile_mql(source_path)
+   local msg = ''
    -- ex.) compile_mql('/path/to/your/file.mq5')
    source_path = vim.fn.expand(source_path)
 
@@ -146,8 +147,8 @@ function M.compile_mql(source_path)
          mql = opts.mql5
       elseif source_path:match('%.'.. opts.mql4.extension .. '$') then
          mql = opts.mql4
-      else
-         error("Invalid file extension")
+      -- else
+      --    error("Invalid file extension")
       end
    end
 
@@ -161,6 +162,12 @@ function M.compile_mql(source_path)
          return
       end
    end
+
+   -- require('notify').notify(, 1,
+   -- {title = 'mql-compiler', icon = 'o', timeout = 5000})
+   msg = "Now compile '" .. source_path .. "'"
+   vim.notify(msg, vim.log.levels.INFO, { title = 'mql-compiler' })
+
 
    -- Set paths
    local metaeditor_path = vim.fn.expand(mql.metaeditor_path)

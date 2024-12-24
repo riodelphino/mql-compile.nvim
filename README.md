@@ -20,10 +20,16 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 **Not implemented**
 - Compile MQL4 (in future)
 - Works on Windows (in future)
+- Works on Linux (just not tested)
 
 
 ## Requirement
-- MT5 installed (on wine)
+**Mandatory**
+- nvim v0.10.2 (My environment. It seems to work a little older versions.)
+- MT5 (only via wine, for now)
+
+**Optional**
+- [kevinhwang91/nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) (Strongly recommended! Super easy to use quickfix)
 
 ## Installation
 
@@ -61,7 +67,8 @@ return {
       },
    },
    keys = {
-       {'<F7>', '<cmd>MQLCompiler<cr>'},
+       -- {'<F7>', '<cmd>MQLCompiler<cr>'},
+       {'<F7>', function() require('mql_compiler').compile_mql() end},
    },
    cmd = {
       { 'MQLCompiler', 'MQLCompilerSetSource', },
@@ -128,9 +135,12 @@ or
 > [!Important]
 > Need quick add
 
+- [ ] `:MQLCompile` does not work ?
+- [ ] Show 'Result: errors x, warnings x (...)' message
+- [ ] Remove other messages
+- [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] nvim freezes for seconds, until finishing compile
 - [ ] Add 'information' to be shown on notify? (Almost including message)
-- [ ] Show just 'Result: errors x, warnings x (...)' message, remove others.
 - [ ] Detect git root
 - [ ] List up & select from git root's mql5 files 
 - [ ] If only one mql5 on git root, compile without prompt
