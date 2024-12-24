@@ -1,4 +1,4 @@
-# mql-compiler.nvim
+# mql-compile.nvim
 
 A Neovim plugin for compiling MQL5 scripts.  
 Without heavy MetaEditor GUI (Compiles on command-line).
@@ -38,7 +38,7 @@ Using [Lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 return {
-   'riodelphino/mql-compiler.nvim',
+   'riodelphino/mql-compile.nvim',
    lazy = false,
    -- ft = { 'cpp', 'c' }, -- Not recommend
    opts = {
@@ -68,10 +68,10 @@ return {
       },
    },
    keys = {
-       {'<F7>', function() require('mql_compiler').compile() end},
+       {'<F7>', function() require('mql_compile').compile() end},
    },
    cmds = {
-      { 'MQLCompiler', 'MQLCompilerSetSource', },
+      { 'MQLCompile', 'MQLCompileSetSource', },
    },
 }
 ```
@@ -109,38 +109,38 @@ Default path for MetaEditor64.exe(MT5) or metaeditor.exe(MT4).
 This plugin auto-detects mql5/mql4 by extension given in source path.
 ```vim
 " Set mql5 path
-:MQLCompilerSetSource MyEA.mq5
+:MQLCompileSetSource MyEA.mq5
 " Compile it
-:MQLCompiler
+:MQLCompile
 ```
 or
 ```vim
 " Set current file path
-:MQLCompilerSetSource
+:MQLCompileSetSource
 " Compile it
-:MQLCompiler
+:MQLCompile
 ```
 or
 ```vim
 " Compile with path
-:MQLCompiler MyEA.mq5
+:MQLCompile MyEA.mq5
 ```
 ## Lua functions
 
 Below lua functions also available. (with auto-detection by the extension)
 ```vim
-:lua require('mql_compiler').set_source_path("MyEA.mq5")
-:lua require('mql_compiler').compile()
+:lua require('mql_compile').set_source_path("MyEA.mq5")
+:lua require('mql_compile').compile()
 ```
 or
 ```vim
-:lua require('mql_compiler').set_source_path() -- set current file path
-:lua require('mql_compiler').compile()
+:lua require('mql_compile').set_source_path() -- set current file path
+:lua require('mql_compile').compile()
 ```
 
 or
 ```vim
-:lua require('mql_compiler').compile("MyEA.mq5")
+:lua require('mql_compile').compile("MyEA.mq5")
 ```
 
 ## TO-DO
@@ -161,13 +161,13 @@ or
 - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] Adoopt to MT5 on Windows
-- [ ] Organize & split codes to functions
 - [ ] 'timeout' to work
 - [x] Convert given macOS's path to Windows path
 - [x] Options (MT5's path, Include path, enable quickfix, wine's drive letter)
 - [x] '%' or 'no arg' also can compile current mql5 file
 - [x] Remove ^M from quickfix (encoding problem)
 - [x] Move some messages to notify
+- [x] Organize & split codes to functions
 
 > [!Note]
 > Hope to add in future

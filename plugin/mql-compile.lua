@@ -1,4 +1,4 @@
 -- Entry point for plugin
 -- If you use lazy.nvim or packer, you can call it manually so it is not necessary.
 --
--- require("mql_compiler").setup()
+-- require("mql_compile").setup()

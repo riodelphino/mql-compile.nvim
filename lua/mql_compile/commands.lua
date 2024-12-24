@@ -1,31 +1,31 @@
 local M = {}
 
-local fn = require('mql_compiler.functions')
-local opt = require('mql_compiler.options')
-local cmp = require('mql_compiler.compile')
+local fn = require('mql_compile.functions')
+local opt = require('mql_compile.options')
+local cmp = require('mql_compile.compile')
 
 function M.create_commands()
-   -- :MQLCompilerSetSourc
+   -- :MQLCompileSetSourc
    vim.api.nvim_create_user_command(
-      "MQLCompilerSetSource",
+      "MQLCompileSetSource",
       function(opts)
          M.set_source_path(opts.args ~= "" and opts.args or nil)
       end,
       { nargs = "?" }
    )
 
-   -- :MQLCompiler
+   -- :MQLCompile
    vim.api.nvim_create_user_command(
-      "MQLCompiler",
+      "MQLCompile",
       function(opts)
          cmp.compile(opts.args ~= "" and opts.args or nil)
       end,
       { nargs = "?" }
    )
 
-   -- :MQLCompilerPrintOptions
+   -- :MQLCompilePrintOptions
    vim.api.nvim_create_user_command(
-      "MQLCompilerPrintOptions",
+      "MQLCompilePrintOptions",
       function()
          print(vim.inspect(opt._opts))
       end,
