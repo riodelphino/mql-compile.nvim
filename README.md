@@ -124,11 +124,11 @@ or
 Below lua functions also available. (with auto-detection by the extension)
 ```vim
 :lua require('mql_compiler').set_source_path("MyEA.mq5")
-:lua require('mql_compiler').compile_mql()
+:lua require('mql_compiler').compile()
 ```
 or
 ```vim
-:lua require('mql_compiler').compile_mql("MyEA.mq5")
+:lua require('mql_compiler').compile("MyEA.mq5")
 ```
 
 ## TO-DO

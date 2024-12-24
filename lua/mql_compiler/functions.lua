@@ -1,5 +1,7 @@
 local M = {}
 
+local _ = require('mql_compiler')
+
 function M.file_exists(path)
    local file=io.open(path,"r")
    if file ~= nil then
@@ -20,7 +22,111 @@ function M.get_os_type()
     end
 end
 
+function M.notify(msg, level)
+   vim.notify(msg, level, { title = 'mql-compiler' })
+end
 
+function M.convert_path_to_os(path, drive_letter, os_type)
+   if (os_type == 'macos') then
+      return path:gsub('^' .. drive_letter, ''):gsub('\\', '/')
+   end
+end
+
+
+function M.convert_encoding(path)
+   local utf8_path = path .. ".utf8" -- the path converted UTF-8
+   local convert_cmd = string.format(
+      [[
+      iconv -f UTF-16LE -t UTF-8 "%s" > "%s" 2>/dev/null || iconv -f WINDOWS-1252 -t UTF-8 "%s" > "%s" 2>/dev/null || cp "%s" "%s" && tr -d '\r' < "%s" > "%s.tmp" && mv "%s.tmp" "%s"
+      ]],
+      path, utf8_path, -- UTF-16LE → UTF-8
+      path, utf8_path, -- WINDOWS-1252 → UTF-8
+      path, utf8_path, -- Copy the file as is
+      utf8_path, utf8_path, -- Remove line break code
+      utf8_path, utf8_path  -- Overwrite from temporary file
+   )
+   vim.fn.system(convert_cmd)
+
+   -- rename tmp utf8_path file as path
+   local success, err = os.rename(utf8_path, path)
+   if success then
+       M.notify("Converted successfully", vim.log.levels.INFO)
+   else
+       M.notify("Error rename file:", err, vim.log.levels.ERROR)
+   end
+end
+
+function M.log_to_qf(log_path, qf_path)
+   local log_file = io.open(log_path, 'r')
+   local qf_lines = {}
+   local mql = _._mql
+   local os_type = _._os_type
+
+   for line in log_file:lines() do
+      -- Filter alert lines
+      for _, alert_key in pairs(_._opts.quickfix.alert_keys) do
+         if line:match(' : ' .. alert_key) then
+            local file, line_num, col_num, code, msg
+
+            file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. alert_key .. ' (%d+): (.*)$')
+            file = M.convert_path_to_os(file, mql.wine_drive_letter, os_type)
+
+            -- Output as quickfix format
+            table.insert(qf_lines, string.format('%s:%s:%s: ' .. alert_key .. ' %s: %s', file, line_num, col_num, code, msg))
+         end
+      end
+   end
+   log_file:close()
+
+   -- Save to quickfix
+   local qf_file = io.open(qf_path, 'w')
+   for _, line in ipairs(qf_lines) do
+      qf_file:write(line .. '\n')
+   end
+   qf_file:close()
+
+   msg = 'Quickfix file created: ' .. qf_path
+   M.notify(msg, vim.log.levels.INFO)
+
+end
+
+function M.get_source(source_path)
+   -- Automatically change mql5/4 by source_path's extension
+   local mql
+   local opts = _._opts
+
+   source_path = vim.fn.expand(source_path)
+
+   if (source_path == nil or source_path == '') then -- Get default mql
+      if (opts.default == 'mql5') then
+         mql = opts.mql5
+      elseif (opts.default == 'mql4') then
+         mql = opts.mql4
+      end
+      source_path = mql.source_path
+   else -- Get mql by extension
+      if source_path:match('%.'.. opts.mql5.extension .. '$') then
+         mql = opts.mql5
+      elseif source_path:match('%.'.. opts.mql4.extension .. '$') then
+         mql = opts.mql4
+      -- else
+      --    error("Invalid file extension")
+      end
+   end
+
+   -- Set current file path to source_path
+   if (mql.source_path == '' and source_path == nil) then -- if no specifications
+      local current_file_path = vim.api.nvim_buf_get_name(0)
+      if (current_file_path:match('%.'.. mql.extension .. '$')) then
+         source_path = current_file_path
+      else
+         msg = 'No source path is set. and current buffer is not *.' .. mql.extension
+         M.notify(msg, vim.log.levels.ERROR)
+         return
+      end
+   end
+   return source_path, mql
+end
 
 return M
 
