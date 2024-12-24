@@ -93,26 +93,35 @@ function M.convert_path_to_os(path, drive_letter)
 end
 
 function M.set_source_path(path)
+   local msg = ''
+
    path = vim.fn.expand(path) -- for % ~ 
    local extension = path:match('%.(.*)$')
+
    if not extension then
-       error("Invalid path: no extension found.")
+       msg = 'Invalid path: no extension found.'
+       vim.notify(msg, vim.log.level.ERROR, { title = 'mql-compiler' })
        return
    end
 
    -- Determin mql by extension
    if extension == opts.mql5.extension then
        opts.mql5.source_path = path
-       print('MQL5 source path set to: ' .. path)
+       msg = 'MQL5 source path set to: ' .. path
+       vim.notify(msg, vim.log.level.INFO, { title = 'mql-compiler' })
    elseif extension == opts.mql4.extension then
        opts.mql4.source_path = path
-       print('MQL4 source path set to: ' .. path)
+       msg = 'MQL4 source path set to: ' .. path
+       vim.notify(msg, vim.log.level.INFO, { title = 'mql-compiler' })
    else
-       error('Unknown file type: ' .. extension .. ". Type must be in 'opts.[mql5/mql4].extension'.")
+       msg = 'Unknown file type: ' .. extension .. ". Type must be in 'opts.[mql5/mql4].extension'."
+       vim.notify(msg, vim.log.level.ERROR, { titile = 'mql-compiler' })
+       return
    end
 end
 
 function M.compile(metaeditor_path, source_path, log_path)
+   local msg = ''
    -- Compile
    local compile_cmd = string.format('wine "%s" /compile:"%s" /log:"%s"', metaeditor_path, source_path, log_path)
    local compile_result = vim.fn.system(compile_cmd)
@@ -120,11 +129,15 @@ function M.compile(metaeditor_path, source_path, log_path)
    -- Check result
    local source_filename = source_path:match("([^/\\]+)$")
    if vim.v.shell_error == 0 then
-      print("Finished compile '" .. source_filename .. "'. Log saved to " .. log_path)
+      msg = "Finished compile '" .. source_filename .. "'. Log saved to " .. log_path
+      vim.notify(msg, vim.log.level.INFO, { title = 'mql-compiler' })
    elseif vim.v.shell_error == 1 then
-      print("Finished compile '" .. source_filename .. "' with warnings. Log saved to " .. log_path)
+      msg = "Finished compile '" .. source_filename .. "' with warnings. Log saved to " .. log_path
+      vim.notify(msg, vim.log.level.INFO, { title = 'mql-compiler' })
    elseif vim.v.shell_error == 2 then
-      error("Failed compile '" .. source_filename .. "'. Log saved to " .. log_path)
+      msg = "Failed compile '" .. source_filename .. "'. Log saved to " .. log_path
+      vim.notify(msg, vim.log.level.ERROR, { title = 'mql-compiler' })
+      return
    end
 end
 
@@ -158,7 +171,8 @@ function M.compile_mql(source_path)
       if (current_file_path:match('%.'.. mql.extension .. '$')) then
          source_path = current_file_path
       else
-         error('No source path is set. and current buffer is not *.' .. mql.extension )
+         msg = 'No source path is set. and current buffer is not *.' .. mql.extension
+         vim.notify(msg, vim.log.level.ERROR, { title = 'mql-compiler' })
          return
       end
    end
