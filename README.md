@@ -27,20 +27,28 @@ return {
    lazy = false,
    -- ft = { 'cpp', 'c' }, -- Not recommend
    opts = {
-      metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe',
-      include_path = '',
-      wine_drive_letter = 'Z',
-      timeout = 5000, -- msec
-   },
-   keys = {
-       {'<leader>mc', 'require("mql_compiler").compile_mql5()'},
+      os = 'macos',
+      mql5 = {
+         metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe',
+         include_path = vim.fn.expand(''),
+         extention = 'mq5',
+         wine_drive_letter = 'Z:',
+         timeout = 5000,
+      },
+       mql4 = {
+          metaeditor_path = '',
+          include_path = vim.fn.expand(''),
+          extention = 'mq4',
+          wine_drive_letter = 'Z:',
+          timeout = 5000,
+       },
    },
    configs = true,
    keys = {
-      { '<leader>mc', 'require("mql_compiler").compile_mql5()' },
+       {'<F7>', '<cmd>MQLCompiler5<cr>'},
    },
    commands = {
-      { 'MQLCompilerSetSourcePath', 'MQLCompilerCompile' },
+      { 'MQLCompiler', 'MQLCompilerSetSource', },
    },
 }
 ```
@@ -63,11 +71,11 @@ or
 Below lua functions also work.
 ```vim
 :lua require('mql_compiler').set_source_path("MyEA.mq5")
-:lua require('mql_compiler').compile_mql5()
+:lua require('mql_compiler').compile_mql()
 ```
 or
 ```vim
-:lua require('mql_compiler').compile_mql5("MyEA.mq5")
+:lua require('mql_compiler').compile_mql("MyEA.mq5")
 
 ```
 
