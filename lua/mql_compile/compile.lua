@@ -1,7 +1,7 @@
 local M = {}
 
-local opt = require('mql_compiler.options')
-local fn = require('mql_compiler.functions')
+local opt = require('mql_compile.options')
+local fn = require('mql_compile.functions')
 
 function M.do_compile(metaeditor_path, source_path, log_path)
    local msg = ''

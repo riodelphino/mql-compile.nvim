@@ -1,9 +1,9 @@
 local M = {}
 
--- -- local _ = require('mql_compiler')
+-- -- local _ = require('mql_compile')
 -- local mql = {}
 -- local os_type
-local opt = require('mql_compiler.options')
+local opt = require('mql_compile.options')
 
 function M.file_exists(path)
    local file=io.open(path,"r")
