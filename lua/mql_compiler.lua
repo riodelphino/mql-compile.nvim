@@ -1,5 +1,7 @@
 local M = {}
 
+local fn = require('mql_compiler.functions')
+
 local opts = {}
 local os_type = ''
 local loaded = false
@@ -40,6 +42,7 @@ local function get_os_type()
         return 'linux'
     end
 end
+
 
 
 function M.setup(_opts)

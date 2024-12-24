@@ -138,6 +138,7 @@ or
 
 - [ ] `:MQLCompile` does not work ?
 - [ ] Keymapipng compile does not work
+- [ ] Check file exists
 - [ ] ❗️Async compile
 - [ ] Show 'Result: errors x, warnings x (...)' message
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
