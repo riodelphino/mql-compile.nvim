@@ -69,9 +69,9 @@ return {
    },
    keys = {
        -- {'<F7>', '<cmd>MQLCompiler<cr>'},
-       {'<F7>', function() require('mql_compiler').compile_mql() end},
+       {'<F7>', function() require('mql_compiler').compile() end},
    },
-   cmd = {
+   cmds = {
       { 'MQLCompiler', 'MQLCompilerSetSource', },
    },
 }
@@ -138,7 +138,7 @@ or
 
 - [ ] `:MQLCompile` does not work ?
 - [ ] Keymapipng compile does not work
-- [ ] Check file exists
+- [ ] Check file exists before compile
 - [ ] ❗️Async compile
 - [ ] Show 'Result: errors x, warnings x (...)' message
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?

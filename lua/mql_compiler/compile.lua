@@ -12,13 +12,13 @@ function M.do_compile(metaeditor_path, source_path, log_path)
    -- Check result
    local source_filename = source_path:match("([^/\\]+)$")
    if vim.v.shell_error == 0 then
-      msg = "Finished compile '" .. source_filename .. "'.\rLog: " .. log_path
+      msg = "Compiled '" .. source_filename .. "'.\nLog: " .. log_path
       fn.notify(msg, vim.log.levels.INFO)
    elseif vim.v.shell_error == 1 then
-      msg = "Finished compile '" .. source_filename .. "' with warnings.\rLog: " .. log_path
+      msg = "Compiled '" .. source_filename .. "' with warnings.\nLog: " .. log_path
       fn.notify(msg, vim.log.levels.INFO)
    elseif vim.v.shell_error == 2 then
-      msg = "Failed compile '" .. source_filename .. "' with errors.\rLog: " .. log_path
+      msg = "Failed compile '" .. source_filename .. "' with errors.\nLog: " .. log_path
       fn.notify(msg, vim.log.levels.ERROR)
       return
    end
@@ -35,7 +35,7 @@ function M.compile(source_path)
    opt._mql = mql
    local os_type = opt._os_type
 
-   msg = "Compiling '" .. source_path .. "'"
+   msg = "Compiling '" .. source_path .. "' ..."
    fn.notify(msg, vim.log.levels.INFO)
 
 

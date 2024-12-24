@@ -52,10 +52,8 @@ function M.convert_encoding(path)
 
    -- rename tmp utf8_path file as path
    local success, err = os.rename(utf8_path, path)
-   if success then
-       M.notify("Converted successfully", vim.log.levels.INFO)
-   else
-       M.notify("Error rename file:", err, vim.log.levels.ERROR)
+   if not success then
+       M.notify(err, vim.log.levels.ERROR)
    end
 end
 
@@ -86,8 +84,8 @@ function M.log_to_qf(log_path, qf_path, alert_keys)
    end
    qf_file:close()
 
-   msg = 'Quickfix file created: ' .. qf_path
-   M.notify(msg, vim.log.levels.INFO)
+   -- msg = 'Quickfix file created: ' .. qf_path
+   -- M.notify(msg, vim.log.levels.INFO)
 
 end
 
