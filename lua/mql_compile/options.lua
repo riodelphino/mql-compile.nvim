@@ -11,15 +11,17 @@ M.default = {
    },
    quickfix = {
       extension = 'qfix',
+      -- keywords = { 'error' }, --  'error' | 'warning'
       keywords = { 'error', 'warning', }, --  'error' | 'warning'
       auto_open = {
          enabled = true, -- Open qfix after compile
+         -- open_with = { },
          open_with = { 'error', 'warning' },
       },
       delete_after_load = true,
    },
    information = {
-      notify = false,
+      show_notify = false,
       extension = 'info',
       keywords = { 'including', }, -- 'compiling' | 'including'
    },
@@ -77,6 +79,7 @@ function M.get_os_type()
 end
 
 function M.deep_merge(default, user)
+   fn = require('mql_compile.functions')
    -- If `user` is not a table, use the `default` value
    if type(user) ~= "table" then
       return default
@@ -88,8 +91,12 @@ function M.deep_merge(default, user)
          -- If the key is missing in the user table, use the default value
          user[key] = default_value
       elseif type(default_value) == "table" then
-         -- If the value is a table, recurse
-         user[key] = M.deep_merge(default_value, user[key])
+         if fn.is_array(default[key]) then -- If the value is a array, just overwrite all by user
+            user[key] = user[key]
+         else
+            -- If the value is a table, recurse
+            user[key] = M.deep_merge(default_value, user[key])
+         end
       end
    end
    return user

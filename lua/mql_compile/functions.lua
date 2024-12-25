@@ -102,7 +102,7 @@ function M.log_to_qf(log_path, qf_path, keywords)
    end
    qf_file:close()
 
-   -- notify
+   -- notify 'quickfix.on_saved'
    if (opts.notify.quickfix.on_saved) then
       msg = "Saved quickfix: '" .. qf_path .. "'"
       M.notify(msg, vim.log.levels.INFO)
@@ -137,22 +137,22 @@ function M.log_to_info(log_path, info_path, keywords)
             file = M.convert_path_to_os(file, opt._mql.wine_drive_letter, opt._os_type)
             if (M.in_table(keywords, key)) then -- Check for showing in info
                -- Output as infomation format
-               table.insert(info_lines, string.format('[%s] %s %s', file, action, details))
+               -- table.insert(info_lines, string.format('[%s] %s %s', file, action, details))
+               table.insert(info_lines, string.format('%s %s', action, details))
             end
          end
       end
    end
    log_file:close()
 
-   -- notify info
+   -- Show result if 'opts.information.show_notify'
    local info_content = ''
    for _, line in ipairs(info_lines) do
       info_content = info_content .. line .. '\n'
    end
-   if (opts.information.notify) then
+   if (opts.information.show_notify) then
       M.notify(info_content, vim.log.levels.INFO)
    end
-
 
    -- Save to info
    local info_file = io.open(info_path, 'w')
@@ -161,7 +161,7 @@ function M.log_to_info(log_path, info_path, keywords)
    end
    info_file:close()
 
-   -- notify
+   -- notify 'information.on_saved'
    if (opts.notify.information.on_saved) then
       msg = "Saved info: '" .. info_path .. "'"
       M.notify(msg, vim.log.levels.INFO)
@@ -214,14 +214,30 @@ function M.get_source(source_path)
 end
 
 
-function M.get_count_msg(counts)
+function M.get_count_msg(counts, key_value_separator, item_separator)
+   key_value_separator = key_value_separator or ': '
+   item_separator = item_separator or ' | '
    local msg = ''
    for key, value in pairs(counts) do
-      msg = msg .. key .. ': ' .. tostring(value) .. '\n'
+      msg = msg .. key .. key_value_separator .. tostring(value) .. item_separator
+   end
+   if msg:match(item_separator .. '$') then -- remove last item_separator
+       msg = msg:sub(1, -(#item_separator + 1))
    end
    return msg
 end
 
+
+function M.is_array(table)
+   local is_array_flg = true
+   for k, v in pairs(table) do
+      if type(k) ~= "number" or type(v) ~= "string" then
+         is_array_flg = false
+         break
+      end
+   end
+   return is_array_flg
+end
 
 return M
 

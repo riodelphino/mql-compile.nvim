@@ -8,16 +8,13 @@ local _loaded = false
 
 
 function M.setup(opts)
-   if _loaded then
-      return
-   end
-
+   -- Check already loaded or not
+   if _loaded then return end
    _loaded = true
 
+   -- Initialize plugin
    opt._os_type = fn.get_os_type()
-
    opt._opts = opt.merge(opts)
-
    cmd.create_commands()
 end
 

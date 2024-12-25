@@ -57,7 +57,7 @@ return {
          delete_after_load = true,
       },
       information = {
-         notify = true,
+         show_notify = false,
          extension = 'info',
          keywords = { 'including', }, -- 'compiling' | 'including'
       },
@@ -92,7 +92,7 @@ return {
             on_deleted = false,
             -- on_load = false,
             counts = false,
-            keywords = { 'including' }, -- 'compiling' | 'including'
+            keywords = { 'including', }, -- 'compiling' | 'including'
          },
          quickfix = {
             on_saved = false,
@@ -186,9 +186,8 @@ or
 > [!Important]
 > Urgent!!!
 
-- [ ] `:MQLCompileSetSource` without % set `/Users/username/..../EA.mq5` full path
+- [ ] `:MQLCompileSetSource` without %, set full path like `/Users/username/..../EA.mq5` -> relative path is better
 - [ ] full path cause include error like `ea.mq5 error : file 'Users\username\Projects\EA\functions.mqh' not found`
-- [ ] Keymapipng compile does not work
 - [ ] Check file exists before compile
 - [ ] ❗️Async compile
 - [ ] error on ... source_path is not set & :MQLCompile (as keymap) on non-mql4/5 files or empty buffer

@@ -28,7 +28,7 @@ function M.do_compile(metaeditor_path, source_path, log_path)
       fn.notify(msg, vim.log.levels.INFO)
    end
 
-   return compile_shell_error
+   return compile_shell_error -- 0: failed / 1: succeeded
 end
 
 function M.compile(source_path)
@@ -49,7 +49,8 @@ function M.compile(source_path)
    local info_path = log_path:gsub('%.log$', '.' .. opts.information.extension)
 
    -- Do compile
-   local compile_shell_error = M.do_compile(metaeditor_path, source_path, log_path)
+   -- local compile_shell_error = M.do_compile(metaeditor_path, source_path, log_path)
+   M.do_compile(metaeditor_path, source_path, log_path)
 
    -- Convert encoding for mac
    if (os_type == 'macos') then
@@ -62,19 +63,23 @@ function M.compile(source_path)
    -- Convert log to information format
    local info_cnt = fn.log_to_info(log_path, info_path, opts.information.keywords)
 
-   -- notify
-   if (opts.notify.log.counts) then
-      msg = fn.get_count_msg(log_cnt)
-      if (log_cnt.error > 0) then
-         fn.notify(msg, vim.log.levels.ERROR)
-      elseif (log_cnt.warning > 0) then
-         fn.notify(msg, vim.log.levels.WARN)
-      else
-         fn.notify(msg, vim.log.levels.INFO)
-      end
+   -- check log count & set base level
+   local level
+   if (log_cnt.error > 0) then
+      level = vim.log.levels.ERROR
+   elseif (log_cnt.warning > 0) then
+      level = vim.log.levels.WARN
+   else
+      level = vim.log.levels.INFO
    end
 
-   -- notify
+   -- notify 'log.counts'
+   if (opts.notify.log.counts) then
+      msg = fn.get_count_msg(log_cnt)
+      fn.notify(msg, level)
+   end
+
+   -- notify 'information.counts'
    if (opts.notify.information.counts) then
       msg = fn.get_count_msg(info_cnt)
       fn.notify(msg, vim.log.levels.INFO)
@@ -83,15 +88,15 @@ function M.compile(source_path)
    -- Check result & notify
    local source_filename = source_path:match("([^/\\]+)$")
 
-   if compile_shell_error == 0 then
+   if log_cnt.error > 0 then
       if (opts.notify.compile.on_failed) then
          msg = "Failed compiling '" .. source_filename .. "'"
-         fn.notify(msg, vim.log.levels.ERROR)
+         fn.notify(msg, level)
       end
-   elseif compile_shell_error == 1 then
+   else
       if (opts.notify.compile.on_succeeded) then
          msg = "Succeeded compiling '" .. source_filename .. "'"
-         fn.notify(msg, vim.log.levels.INFO)
+         fn.notify(msg, level)
       end
    end
 
