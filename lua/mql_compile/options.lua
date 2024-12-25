@@ -13,6 +13,7 @@ M.default = {
    },
    log = {
       extension = 'log',
+      delete_after_load = true,
    },
    wine = {
       enabled = true,

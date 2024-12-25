@@ -14,6 +14,9 @@ function M.do_compile(metaeditor_path, source_path, log_path)
       compile_cmd = string.format('%s /compile:"%s" /log:"%s"', metaeditor_path, source_path, log_path)
    end
 
+   msg = "Compiling '" .. source_path .. "' ..."
+   fn.notify(msg, vim.log.levels.INFO)
+
    local result = vim.fn.system(compile_cmd)
 
    -- Check result
@@ -36,17 +39,12 @@ end
 function M.compile(source_path)
    local msg = ''
    local mql
-   -- ex.) compile_mql('/path/to/your/file.mq5')
+   local opts = opt._opts
 
    source_path, mql = fn.get_source(source_path)
 
-   local opts = opt._opts
    opt._mql = mql
    local os_type = opt._os_type
-
-   msg = "Compiling '" .. source_path .. "' ..."
-   fn.notify(msg, vim.log.levels.INFO)
-
 
    -- Set paths
    local metaeditor_path = vim.fn.expand(mql.metaeditor_path)
@@ -54,7 +52,7 @@ function M.compile(source_path)
    log_path = fn.convert_path_to_os(log_path, mql.wine_drive_letter, os_type)
    local qf_path = log_path:gsub('%.log$', '.' .. opts.quickfix.extension)
 
-   -- Compile
+   -- Do compile
    M.do_compile(metaeditor_path, source_path, log_path)
 
    -- Convert encoding for mac
@@ -65,10 +63,20 @@ function M.compile(source_path)
    -- Convert log to quickfix format
    fn.log_to_qf(log_path, qf_path, opts.quickfix.alert_keys)
 
+   -- Delete log
+   if (opts.log.delete_after_load) then
+      vim.fn.delete(log_path)
+   end
+
    -- Open quickfix
    vim.cmd('cfile ' .. qf_path)
    if (opts.quickfix.auto_open) then
       vim.cmd('copen')
+   end
+
+   -- Delete quickfix
+   if (opts.quickfix.delete_after_load) then
+      vim.fn.delete(qf_path)
    end
 end
 

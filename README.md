@@ -47,9 +47,11 @@ return {
          alert_keys = { 'error', 'warning' }, -- Alert keywords shown in quickfix
          extension = 'qfix',
          auto_open = true, -- Open qfix after compile
+         delete_after_load = true,
       },
       log = {
          extension = 'log',
+         delete_after_load = true,
       },
       wine = {
          enabled = true,
@@ -151,7 +153,7 @@ or
 ## TO-DO
 
 > [!Important]
-> Need quick add
+> Urgent!!!
 
 - [ ] Add wine-command = 'wine' or wine = true|false option
 - [ ] Get counts errors|warnings|informations
