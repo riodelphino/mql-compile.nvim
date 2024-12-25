@@ -58,7 +58,9 @@ function M.compile(source_path)
 
    -- Open quickfix
    vim.cmd('cfile ' .. qf_path)
-   vim.cmd('copen')
+   if (opts.quickfix.auto_open) then
+      vim.cmd('copen')
+   end
 end
 
 

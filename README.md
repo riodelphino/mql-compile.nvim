@@ -46,6 +46,7 @@ return {
       quickfix = {
          alert_keys = { 'error', 'warning' }, -- Alert keywords shown in quickfix
          extension = 'qfix',
+         auto_open = true, -- Open qfix after compile
       },
       log = {
          extension = 'log',
@@ -148,6 +149,8 @@ or
 > [!Important]
 > Need quick add
 
+- [ ] `:MQLCompileSetSource` without % set `/Users/username/..../EA.mq5` full path
+- [ ] full path cause include error like `ea.mq5 error : file 'Users\username\Projects\EA\functions.mqh' not found`
 - [ ] `:MQLCompile` does not work ?
 - [ ] Keymapipng compile does not work
 - [ ] Check file exists before compile
@@ -168,6 +171,7 @@ or
 - [x] Remove ^M from quickfix (encoding problem)
 - [x] Move some messages to notify
 - [x] Organize & split codes to functions
+- [x] Add option quickfix.auto_open or not
 
 > [!Note]
 > Hope to add in future

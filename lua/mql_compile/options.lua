@@ -1,13 +1,14 @@
 local M = {}
 
-M._opts = {}
-M._os_type = ''
+M._opts = {} -- keep merged options
+M._os_type = '' -- keep os_type
 
 M.default = {
    default_ft = 'mql5',
    quickfix = {
       alert_keys = { 'error', 'warning' },
       extension = 'qfix',
+      auto_open = true,
    },
    log = {
       extension = 'log',
