@@ -5,12 +5,21 @@ local fn = require('mql_compile.functions')
 
 function M.do_compile(metaeditor_path, source_path, log_path)
    local msg = ''
+   local opts = opt._oots
+   local compile_cmd = ''
    -- Compile
-   local compile_cmd = string.format('wine "%s" /compile:"%s" /log:"%s"', metaeditor_path, source_path, log_path)
+   if (opts.wine.enabled) then
+      compile_cmd = string.format('%s "%s" /compile:"%s" /log:"%s"', opts.wine.command, metaeditor_path, source_path, log_path)
+   else
+      compile_cmd = string.format('%s /compile:"%s" /log:"%s"', metaeditor_path, source_path, log_path)
+   end
+
    local result = vim.fn.system(compile_cmd)
 
    -- Check result
    local source_filename = source_path:match("([^/\\]+)$")
+   fn.notify('vim.v.shell_error: ' .. tostring(vim.v.shell_error), vim.log.levels.DEBUG)
+   fn.notify('result: ' .. tostring(result), vim.log.levels.DEBUG)
    if vim.v.shell_error == 0 then
       msg = "Compiled '" .. source_filename .. "'.\nLog: " .. log_path
       fn.notify(msg, vim.log.levels.INFO)

@@ -51,6 +51,10 @@ return {
       log = {
          extension = 'log',
       },
+      wine = {
+         enabled = true,
+         command = 'wine',
+      },
       mql5 = {
          metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
          include_path = '',
@@ -149,6 +153,9 @@ or
 > [!Important]
 > Need quick add
 
+- [ ] Add wine-command = 'wine' or wine = true|false option
+- [ ] Get counts errors|warnings|informations
+   - [ ] Add opts.quickfix.auto_open = {errors = true, warnings = true, informations = false}
 - [ ] `:MQLCompileSetSource` without % set `/Users/username/..../EA.mq5` full path
 - [ ] full path cause include error like `ea.mq5 error : file 'Users\username\Projects\EA\functions.mqh' not found`
 - [ ] `:MQLCompile` does not work ?

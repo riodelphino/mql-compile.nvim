@@ -9,9 +9,14 @@ M.default = {
       alert_keys = { 'error', 'warning' },
       extension = 'qfix',
       auto_open = true,
+      delete_after_load = true,
    },
    log = {
       extension = 'log',
+   },
+   wine = {
+      enabled = true,
+      command = 'wine',
    },
    mql5 = {
       metaeditor_path = '',
