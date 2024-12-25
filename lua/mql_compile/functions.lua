@@ -5,6 +5,15 @@ local M = {}
 -- local os_type
 local opt = require('mql_compile.options')
 
+function M.in_table(tbl, value)
+    for _, v in pairs(tbl) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
 function M.file_exists(path)
    local file=io.open(path,"r")
    if file ~= nil then
@@ -26,7 +35,7 @@ function M.get_os_type()
 end
 
 function M.notify(msg, level)
-   vim.notify(msg, level, { title = 'mql-compiler' })
+   vim.notify(msg, level, { title = 'mql-compile' })
 end
 
 function M.convert_path_to_os(path, drive_letter, os_type)
@@ -58,20 +67,29 @@ function M.convert_encoding(path)
 end
 
 function M.log_to_qf(log_path, qf_path, keywords)
+   local opts = opt.get_opts()
    local log_file = io.open(log_path, 'r')
    local qf_lines = {}
+   local count = {
+      error = 0,
+      warning = 0,
+   }
+   local default_keywords = {'error', 'warning'}
 
    for line in log_file:lines() do
       -- Filter alert lines
-      for _, key in pairs(keywords) do
-         if line:match(' : ' .. keywords) then
+      for _, key in pairs(default_keywords) do
+
+         if line:match(' : ' .. key) then
+            count[key] = count[key] + 1
             local file, line_num, col_num, code, msg
 
             file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. key .. ' (%d+): (.*)$')
             file = M.convert_path_to_os(file, opt._mql.wine_drive_letter, opt._os_type)
-
-            -- Output as quickfix format
-            table.insert(qf_lines, string.format('%s:%s:%s: ' .. key .. ' %s: %s', file, line_num, col_num, code, msg))
+            if (M.in_table(keywords, key)) then -- Check for showing in qfix
+               -- Output as quickfix format
+               table.insert(qf_lines, string.format('%s:%s:%s: ' .. key .. ' %s: %s', file, line_num, col_num, code, msg))
+            end
          end
       end
    end
@@ -84,13 +102,79 @@ function M.log_to_qf(log_path, qf_path, keywords)
    end
    qf_file:close()
 
-   -- msg = 'Quickfix file created: ' .. qf_path
-   -- M.notify(msg, vim.log.levels.INFO)
+   -- notify
+   if (opts.notify.quickfix.on_saved) then
+      msg = "Saved quickfix: '" .. qf_path .. "'"
+      M.notify(msg, vim.log.levels.INFO)
+   end
+
+   return count
 
 end
 
+function M.log_to_info(log_path, info_path, keywords)
+   local opts = opt.get_opts()
+   local log_file = io.open(log_path, 'r')
+   local info_lines = {}
+   local count = {
+      compiling = 0,
+      including = 0,
+   }
+   local default_keywords = { 'compiling', 'including' }
+   -- local default_keywords = { 'information' }
+
+   for line in log_file:lines() do
+      -- Filter alert lines
+      for _, key in pairs(default_keywords) do
+
+         if line:match('information: ' .. key) then
+
+            count[key] = count[key] + 1
+            local file, line_num, col_num, code, msg
+
+            -- file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. key .. ' (%d+): (.*)$')
+            file, level, action, details = line:match("^(.-) : (%w+): (%w+) (.+)")
+            file = M.convert_path_to_os(file, opt._mql.wine_drive_letter, opt._os_type)
+            if (M.in_table(keywords, key)) then -- Check for showing in info
+               -- Output as infomation format
+               table.insert(info_lines, string.format('[%s] %s %s', file, action, details))
+            end
+         end
+      end
+   end
+   log_file:close()
+
+   -- notify info
+   local info_content = ''
+   for _, line in ipairs(info_lines) do
+      info_content = info_content .. line .. '\n'
+   end
+   if (opts.information.notify) then
+      M.notify(info_content, vim.log.levels.INFO)
+   end
+
+
+   -- Save to info
+   local info_file = io.open(info_path, 'w')
+   for _, line in ipairs(info_lines) do
+      info_file:write(line .. '\n')
+   end
+   info_file:close()
+
+   -- notify
+   if (opts.notify.information.on_saved) then
+      msg = "Saved info: '" .. info_path .. "'"
+      M.notify(msg, vim.log.levels.INFO)
+   end
+
+   return count
+
+end
+
+
+-- Automatically change mql5/4 by source_path's extension
 function M.get_source(source_path)
-   -- Automatically change mql5/4 by source_path's extension
+   local opts = opt.get_opts()
    local mql = {}
 
    source_path = vim.fn.expand(source_path)
@@ -100,17 +184,17 @@ function M.get_source(source_path)
    end
 
    if (source_path == '') then -- Get default mql
-      if (opt._opts.default == 'mql5') then
-         mql = opt._opts.mql5
-      elseif (opt._opts.default == 'mql4') then
-         mql = opt._opts.mql4
+      if (opts.default == 'mql5') then
+         mql = opts.mql5
+      elseif (opts.default == 'mql4') then
+         mql = opts.mql4
       end
       source_path = mql.source_path
    else -- Get mql by extension
-      if source_path:match('%.'.. opt._opts.mql5.extension .. '$') then
-         mql = opt._opts.mql5
-      elseif source_path:match('%.'.. opt._opts.mql4.extension .. '$') then
-         mql = opt._opts.mql4
+      if source_path:match('%.'.. opts.mql5.extension .. '$') then
+         mql = opts.mql5
+      elseif source_path:match('%.'.. opts.mql4.extension .. '$') then
+         mql = opts.mql4
       -- else
       --    error("Invalid file extension")
       end
@@ -129,5 +213,16 @@ function M.get_source(source_path)
    return source_path, mql
 end
 
+
+function M.get_count_msg(counts)
+   local msg = ''
+   for key, value in pairs(counts) do
+      msg = msg .. key .. ': ' .. tostring(value) .. '\n'
+   end
+   return msg
+end
+
+
 return M
+
 

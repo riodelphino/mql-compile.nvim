@@ -5,19 +5,23 @@ M._os_type = '' -- keep os_type
 
 M.default = {
    default_ft = 'mql5',
-   quickfix = {
-      extension = 'qfix',
-      auto_open = true, -- Open qfix after compile
-      delete_after_load = true,
-      keywords = { 'error', 'warning', }, -- Shown in quickfix
-      information = {
-         notify = true,
-         keywords = { 'compiling', 'including', 'code generated' },
-      },
-   },
    log = {
       extension = 'log',
       delete_after_load = true,
+   },
+   quickfix = {
+      extension = 'qfix',
+      keywords = { 'error', 'warning', }, --  'error' | 'warning'
+      auto_open = {
+         enabled = true, -- Open qfix after compile
+         open_with = { 'error', 'warning' },
+      },
+      delete_after_load = true,
+   },
+   information = {
+      notify = false,
+      extension = 'info',
+      keywords = { 'including', }, -- 'compiling' | 'including'
    },
    wine = {
       enabled = true,
@@ -40,20 +44,37 @@ M.default = {
       timeout = 5000,
    },
    notify = {
+      compile = {
+         on_start = false,
+         on_failed = true,
+         on_succeeded = true,
+      },
       information = {
-         enabled = true,
-         keywords = { 'compiling', 'including', 'code generated' },
+         on_saved = false,
+         on_deleted = false,
+         -- on_load = false,
+         counts = false,
+         keywords = { 'including' }, -- 'compiling' | 'including' | 'code generated'
       },
       quickfix = {
-         on_saved = true,
-         on_deleted = true,
+         on_saved = false,
+         on_deleted = false,
       },
       log = {
-         on_saved = true,
-         on_deleted = true,
+         on_saved = false,
+         on_deleted = false,
+         counts = true,
       },
    },
 }
+
+function M.get_opts()
+   return M._opts
+end
+
+function M.get_os_type()
+   return M._os_type
+end
 
 function M.deep_merge(default, user)
    -- If `user` is not a table, use the `default` value
@@ -97,5 +118,6 @@ function M.merge(user_opts)
 
    return opts
 end
+
 
 return M

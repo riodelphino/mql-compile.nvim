@@ -1,7 +1,7 @@
 local M = {}
 
-local fn = require('mql_compile.functions')
 local opt = require('mql_compile.options')
+local fn = require('mql_compile.functions')
 local cmd = require('mql_compile.commands')
 
 local _loaded = false
