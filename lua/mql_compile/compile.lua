@@ -24,15 +24,11 @@ function M.do_compile(metaeditor_path, source_path, log_path)
    fn.notify('vim.v.shell_error: ' .. tostring(vim.v.shell_error), vim.log.levels.DEBUG)
    fn.notify('result: ' .. tostring(result), vim.log.levels.DEBUG)
    if vim.v.shell_error == 0 then
-      msg = "Compiled '" .. source_filename .. "'.\nLog: " .. log_path
-      fn.notify(msg, vim.log.levels.INFO)
-   elseif vim.v.shell_error == 1 then
-      msg = "Compiled '" .. source_filename .. "' with warnings.\nLog: " .. log_path
-      fn.notify(msg, vim.log.levels.INFO)
-   elseif vim.v.shell_error == 2 then
-      msg = "Failed compile '" .. source_filename .. "' with errors.\nLog: " .. log_path
+      msg = "Failed compiling '" .. source_filename .. "'"
       fn.notify(msg, vim.log.levels.ERROR)
-      return
+   elseif vim.v.shell_error == 1 then
+      msg = "Finish compiling '" .. source_filename .. "'"
+      fn.notify(msg, vim.log.levels.INFO)
    end
 end
 
@@ -63,20 +59,26 @@ function M.compile(source_path)
    -- Convert log to quickfix format
    fn.log_to_qf(log_path, qf_path, opts.quickfix.alert_keys)
 
-   -- Delete log
-   if (opts.log.delete_after_load) then
-      vim.fn.delete(log_path)
-   end
-
    -- Open quickfix
    vim.cmd('cfile ' .. qf_path)
    if (opts.quickfix.auto_open) then
       vim.cmd('copen')
    end
 
+   -- Delete log
+   if (opts.log.delete_after_load) then
+      vim.fn.delete(log_path)
+   else
+      msg = 'Log: ' .. log_path
+      fn.notify(msg, vim.log.levels.INFO)
+   end
+
    -- Delete quickfix
    if (opts.quickfix.delete_after_load) then
       vim.fn.delete(qf_path)
+   else
+      msg = 'Quickfix: ' .. qf_path
+      fn.notify(msg, vim.log.levels.INFO)
    end
 end
 
