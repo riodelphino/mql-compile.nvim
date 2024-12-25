@@ -5,7 +5,7 @@ local fn = require('mql_compile.functions')
 
 function M.do_compile(metaeditor_path, source_path, log_path)
    local msg = ''
-   local opts = opt._oots
+   local opts = opt._opts
    local compile_cmd = ''
    -- Compile
    if (opts.wine.enabled) then
