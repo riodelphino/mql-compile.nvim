@@ -44,10 +44,10 @@ return {
    opts = {
       default = 'mql5', -- 'mql5' | 'mql4'
       quickfix = {
-         alert_keys = { 'error', 'warning' }, -- Alert keywords shown in quickfix
          extension = 'qfix',
          auto_open = true, -- Open qfix after compile
          delete_after_load = true,
+         keywords = { 'error', 'warning', }, -- Shown in quickfix
       },
       log = {
          extension = 'log',
@@ -72,6 +72,20 @@ return {
          extention = 'mq4',
          wine_drive_letter = 'Z:',
          timeout = 5000,
+      },
+      notify = {
+         information = {
+            enabled = true,
+            keywords = { 'compiling', 'including', 'code generated' },
+         },
+         quickfix = {
+            on_saved = true,
+            on_deleted = true,
+         },
+         log = {
+            on_saved = true,
+            on_deleted = true,
+         },
       },
    },
    keys = {

@@ -6,10 +6,14 @@ M._os_type = '' -- keep os_type
 M.default = {
    default_ft = 'mql5',
    quickfix = {
-      alert_keys = { 'error', 'warning' },
       extension = 'qfix',
-      auto_open = true,
+      auto_open = true, -- Open qfix after compile
       delete_after_load = true,
+      keywords = { 'error', 'warning', }, -- Shown in quickfix
+      information = {
+         notify = true,
+         keywords = { 'compiling', 'including', 'code generated' },
+      },
    },
    log = {
       extension = 'log',
@@ -34,6 +38,20 @@ M.default = {
       extension = 'mq4',
       wine_drive_letter = 'Z:',
       timeout = 5000,
+   },
+   notify = {
+      information = {
+         enabled = true,
+         keywords = { 'compiling', 'including', 'code generated' },
+      },
+      quickfix = {
+         on_saved = true,
+         on_deleted = true,
+      },
+      log = {
+         on_saved = true,
+         on_deleted = true,
+      },
    },
 }
 

@@ -57,7 +57,7 @@ function M.compile(source_path)
    end
 
    -- Convert log to quickfix format
-   fn.log_to_qf(log_path, qf_path, opts.quickfix.alert_keys)
+   fn.log_to_qf(log_path, qf_path, opts.quickfix.keywords)
 
    -- Open quickfix
    vim.cmd('cfile ' .. qf_path)
@@ -69,16 +69,20 @@ function M.compile(source_path)
    if (opts.log.delete_after_load) then
       vim.fn.delete(log_path)
    else
-      msg = 'Log: ' .. log_path
-      fn.notify(msg, vim.log.levels.INFO)
+      if (opts.notify.log.on_saved) then
+         msg = "Saved log: '" .. log_path .. "'"
+         fn.notify(msg, vim.log.levels.INFO)
+      end
    end
 
    -- Delete quickfix
    if (opts.quickfix.delete_after_load) then
       vim.fn.delete(qf_path)
    else
-      msg = 'Quickfix: ' .. qf_path
-      fn.notify(msg, vim.log.levels.INFO)
+      if (opts.notify.quickfix.on_saved) then
+         msg = "Saved quickfix: '" .. qf_path .. "'"
+         fn.notify(msg, vim.log.levels.INFO)
+      end
    end
 end
 

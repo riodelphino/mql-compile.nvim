@@ -57,21 +57,21 @@ function M.convert_encoding(path)
    end
 end
 
-function M.log_to_qf(log_path, qf_path, alert_keys)
+function M.log_to_qf(log_path, qf_path, keywords)
    local log_file = io.open(log_path, 'r')
    local qf_lines = {}
 
    for line in log_file:lines() do
       -- Filter alert lines
-      for _, alert_key in pairs(alert_keys) do
-         if line:match(' : ' .. alert_key) then
+      for _, key in pairs(keywords) do
+         if line:match(' : ' .. keywords) then
             local file, line_num, col_num, code, msg
 
-            file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. alert_key .. ' (%d+): (.*)$')
+            file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. key .. ' (%d+): (.*)$')
             file = M.convert_path_to_os(file, opt._mql.wine_drive_letter, opt._os_type)
 
             -- Output as quickfix format
-            table.insert(qf_lines, string.format('%s:%s:%s: ' .. alert_key .. ' %s: %s', file, line_num, col_num, code, msg))
+            table.insert(qf_lines, string.format('%s:%s:%s: ' .. key .. ' %s: %s', file, line_num, col_num, code, msg))
          end
       end
    end
