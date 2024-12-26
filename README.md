@@ -11,6 +11,7 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 
 
 ## Features
+
 **Main features**
 - Compile MQL5
 - Show errors in quickfix (& jump to the position)
@@ -19,18 +20,22 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 
 **Not implemented**
 - Compile MQL4 (in future)
+- Async compiling (in future)
 - Works on Windows (in future)
 - Works on Linux (just not tested)
 
 
 ## Requirement
+
 **Mandatory**
-- nvim v0.10.2 (My environment. It seems to work a little older versions.)
-- MT5 (only via wine, for now)
+- nvim v0.10.2 (My environment. It seems to work in a little older versions.)
+- MT5
+- wine (for now)
 
 **Optional**
-- [kevinhwang91/nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) (Super easy to use quickfix)
-- [rcarriga/nvim-notify](https://github.com/rcarriga/nvim-notify) (Nice style notify messages)
+- [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
+- [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages
+
 
 ## Installation
 
@@ -114,10 +119,10 @@ return {
 }
 ```
 
-## 'metaeditor_path' sample
+## Default 'metaeditor_path'
 
-Default path for MetaEditor64.exe(MT5) or metaeditor.exe(MT4).  
-(It depends on your settings.)
+Default path for MetaEditor exe.  
+(It depends on your settings on installing.)
 ```lua
 {
    opts = {
@@ -125,20 +130,86 @@ Default path for MetaEditor64.exe(MT5) or metaeditor.exe(MT4).
           -- MacOS (via wine)
           -- 'MT5.app' is the name of app you set on wineskin.
           metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe',
-
-          -- Windows (maybe NOT WORKS NOW, just a note)
+          -- Windows (NOT TESTED. just a note)
           metaeditor_path = 'C:/Program Files/MetaTrader 5/MetaEditor64.exe',
       },
       mql4 = {
           -- MacOS (via wine)
           -- 'MT4.app' is the name of app you set on wineskin.
           metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe',
-          -- Windows (maybe NOT WORKS NOW, just a note)
+          -- Windows (NOT TESTED. just a note)
           metaeditor_path = 'C:/Program Files (x86)/MetaTrader 4/metaeditor.exe',
       }
    }
 }
+```
 
+## Default options
+```lua
+   opts = {
+      default = 'mql5', -- 'mql5' | 'mql4'
+      log = {
+         extension = 'log',
+         delete_after_load = true,
+      },
+      quickfix = {
+         extension = 'qfix',
+         keywords = { 'error', 'warning', }, -- 'error' | 'warning'
+         auto_open = {
+            enabled = true, -- Open qfix after compile
+            open_with = { 'error', 'warning', },
+         },
+         delete_after_load = true,
+      },
+      information = {
+         show_notify = false,
+         extension = 'info',
+         keywords = { 'including', }, -- 'compiling' | 'including'
+      },
+      wine = {
+         enabled = true,
+         command = 'wine',
+      },
+      mql5 = {
+         metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
+         include_path = '',
+         source_path = '',
+         extention = 'mq5',
+         wine_drive_letter = 'Z:',
+         timeout = 5000,
+      },
+      mql4 = {
+         metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
+         include_path = '',
+         source_path = '',
+         extention = 'mq4',
+         wine_drive_letter = 'Z:',
+         timeout = 5000,
+      },
+      notify = {
+         compile = {
+            on_start = false,
+            on_failed = true,
+            on_succeeded = true,
+         },
+         information = {
+            on_saved = false,
+            on_deleted = false,
+            -- on_load = false,
+            counts = false,
+            keywords = { 'including', }, -- 'compiling' | 'including'
+         },
+         quickfix = {
+            on_saved = false,
+            on_deleted = false,
+         },
+         log = {
+            on_saved = false,
+            on_deleted = false,
+            counts = true,
+         },
+      },
+   },
 ```
 
 
@@ -147,7 +218,7 @@ Default path for MetaEditor64.exe(MT5) or metaeditor.exe(MT4).
 This plugin auto-detects mql5/mql4 by extension given in source path.
 ```vim
 " Set mql5 path
-:MQLCompileSetSource MyEA.mq5
+:MQLCompileSetSource my_ea.mq5
 " Compile it
 :MQLCompile
 ```
@@ -161,24 +232,28 @@ or
 or
 ```vim
 " Compile with path
-:MQLCompile MyEA.mq5
+:MQLCompile my_ea.mq5
 ```
 ## Lua functions
 
-Below lua functions also available. (with auto-detection by the extension)
-```vim
-:lua require('mql_compile').set_source_path("MyEA.mq5")
-:lua require('mql_compile').compile()
+Below lua functions are also available. (with auto-detection by the extension)
+```lua
+-- Set mql5 path
+require('mql_compile').set_source_path('my_ea.mq5')
+-- Compile it
+require('mql_compile').compile()
 ```
 or
-```vim
-:lua require('mql_compile').set_source_path() -- set current file path
-:lua require('mql_compile').compile()
+```lua
+-- Set current file path
+require('mql_compile').set_source_path()
+-- Compile it
+require('mql_compile').compile()
 ```
-
 or
-```vim
-:lua require('mql_compile').compile("MyEA.mq5")
+```lua
+-- Compile with path
+require('mql_compile').compile('my_ea.mq5')
 ```
 
 ## TO-DO
@@ -186,6 +261,7 @@ or
 > [!Important]
 > Urgent!!!
 
+- [ ] Add 'mql5.source_dir' option ? (for auto detection) or git root detection is needed.
 - [ ] `:MQLCompileSetSource` without %, set full path like `/Users/username/..../EA.mq5` -> relative path is better
 - [ ] full path cause include error like `ea.mq5 error : file 'Users\username\Projects\EA\functions.mqh' not found`
 - [ ] Check file exists before compile
