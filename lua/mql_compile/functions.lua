@@ -1,8 +1,5 @@
 local M = {}
 
--- -- local _ = require('mql_compile')
--- local mql = {}
--- local os_type
 local opt = require('mql_compile.options')
 
 function M.in_table(tbl, value)
@@ -237,6 +234,25 @@ function M.is_array(table)
       end
    end
    return is_array_flg
+end
+
+function M.get_git_root()
+   local git_root = vim.fn.system('git rev-parse --show-toplevel')
+   git_root = string.gsub(git_root, '\n$', '')
+   if vim.v.shell_error ~= 0 then
+      return nil
+   end
+   return git_root
+end
+
+function M.get_root(path)
+   local cwd = vim.fn.getcwd()
+   local git_root = M.get_git_root(path)
+   local current_buf = vim.fn.expand('%:p:h')
+   path = path or git_root
+   path = path or cwd
+   path = path or current_buf
+   return path
 end
 
 return M

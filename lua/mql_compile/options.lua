@@ -1,7 +1,8 @@
 local M = {}
 
-M._opts = {} -- keep merged options
-M._os_type = '' -- keep os_type
+M._opts = {}
+M._os_type = ''
+M._root = ''
 
 M.default = {
    default_ft = 'mql5',

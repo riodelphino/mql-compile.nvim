@@ -14,6 +14,7 @@ function M.setup(opts)
 
    -- Initialize plugin
    opt._os_type = fn.get_os_type()
+   opts._root = fn.get_root()
    opt._opts = opt.merge(opts)
    cmd.create_commands()
 end
