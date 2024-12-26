@@ -43,12 +43,27 @@ return {
    -- ft = { 'cpp', 'c' }, -- Not recommend
    opts = {
       default = 'mql5', -- 'mql5' | 'mql4'
-      quickfix = {
-         alert_keys = { 'error', 'warning' }, -- Alert keywords shown in quickfix
-         extension = 'qfix',
-      },
       log = {
          extension = 'log',
+         delete_after_load = true,
+      },
+      quickfix = {
+         extension = 'qfix',
+         keywords = { 'error', 'warning', }, -- 'error' | 'warning'
+         auto_open = {
+            enabled = true, -- Open qfix after compile
+            open_with = { 'error', 'warning', },
+         },
+         delete_after_load = true,
+      },
+      information = {
+         show_notify = false,
+         extension = 'info',
+         keywords = { 'including', }, -- 'compiling' | 'including'
+      },
+      wine = {
+         enabled = true,
+         command = 'wine',
       },
       mql5 = {
          metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
@@ -65,6 +80,29 @@ return {
          extention = 'mq4',
          wine_drive_letter = 'Z:',
          timeout = 5000,
+      },
+      notify = {
+         compile = {
+            on_start = false,
+            on_failed = true,
+            on_succeeded = true,
+         },
+         information = {
+            on_saved = false,
+            on_deleted = false,
+            -- on_load = false,
+            counts = false,
+            keywords = { 'including', }, -- 'compiling' | 'including'
+         },
+         quickfix = {
+            on_saved = false,
+            on_deleted = false,
+         },
+         log = {
+            on_saved = false,
+            on_deleted = false,
+            counts = true,
+         },
       },
    },
    keys = {
@@ -146,28 +184,22 @@ or
 ## TO-DO
 
 > [!Important]
-> Need quick add
+> Urgent!!!
 
-- [ ] `:MQLCompile` does not work ?
-- [ ] Keymapipng compile does not work
+- [ ] `:MQLCompileSetSource` without %, set full path like `/Users/username/..../EA.mq5` -> relative path is better
+- [ ] full path cause include error like `ea.mq5 error : file 'Users\username\Projects\EA\functions.mqh' not found`
 - [ ] Check file exists before compile
 - [ ] ❗️Async compile
 - [ ] error on ... source_path is not set & :MQLCompile (as keymap) on non-mql4/5 files or empty buffer
 - [ ] Show 'Result: errors x, warnings x (...)' message
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
-- [ ] Add 'information' to be shown. On notify/quickfix? (Almost about '#include')
-- [ ] Detect git root
-- [ ] List up & select from git root's mql5 files 
-- [ ] If only one mql5 on git root, compile without prompt
+- [ ] git
+   - [ ] Detect git root
+   - [ ] List up & select from git root's mql5 files 
+   - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] Adoopt to MT5 on Windows
 - [ ] 'timeout' to work
-- [x] Convert given macOS's path to Windows path
-- [x] Options (MT5's path, Include path, enable quickfix, wine's drive letter)
-- [x] '%' or 'no arg' also can compile current mql5 file
-- [x] Remove ^M from quickfix (encoding problem)
-- [x] Move some messages to notify
-- [x] Organize & split codes to functions
 
 > [!Note]
 > Hope to add in future
