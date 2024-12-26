@@ -181,9 +181,9 @@ function M.get_source(source_path)
    end
 
    if (source_path == '') then -- Get default mql
-      if (opts.default == 'mql5') then
+      if (opts.default_ft == 'mql5') then
          mql = opts.mql5
-      elseif (opts.default == 'mql4') then
+      elseif (opts.default_ft == 'mql4') then
          mql = opts.mql4
       end
       source_path = mql.source_path
@@ -202,9 +202,13 @@ function M.get_source(source_path)
       if (current_file_path:match('%.'.. mql.extension .. '$')) then
          source_path = current_file_path
       else
-         msg = 'No source path is set. and current buffer is not *.' .. mql.extension
-         M.notify(msg, vim.log.levels.ERROR)
-         return
+         local find = '\\*.' .. mql.extension
+         source_path = M.detect_file(M.get_root(), find)
+         if (source_path == nil or source_path == '') then
+            msg = 'Source error:\n  - Source path is not set. \n  - Current buffer is not *.' .. mql.extension .. '.\n  - Cannot detect *.' .. mql.extension .. ' in root.'
+            M.notify(msg, vim.log.levels.ERROR)
+            return
+         end
       end
    end
    return source_path, mql
@@ -252,9 +256,41 @@ function M.get_root(path)
    path = path or git_root
    path = path or cwd
    path = path or current_buf
+   -- print('cwd: ' .. cwd)
+   -- print('git_root: ' .. tostring(git_root))
+   -- print('current_buf: ' .. tostring(current_buf))
+   -- print('--> path: '.. path)
    return path
 end
 
+function M.detect_file(path, find)
+   path = path or M.get_root()
+   local find_cmd = 'find ' .. path .. ' -name ' .. find
+   local result = vim.fn.system(find_cmd)
+   if (result == nil or result == '') then return nil end
+   print(find_cmd)
+   -- print(find)
+   find_list = M.split(result, '\n')
+   -- print(#find_list)
+   if (#find_list == 0) then
+      return result
+   else
+      return find_list[1] -- just return first file
+   end
+end
+
+-- split a string
+function M.split(str, delimiter)
+   local result = {}
+   local from = 1
+   local delim_from, delim_to = string.find((str), delimiter, from, true)
+   while delim_from do
+      if delim_from ~= 1 then table.insert(result, string.sub(str, from, delim_from - 1)) end
+      from = delim_to + 1
+      delim_from, delim_to = string.find(str, delimiter, from, true)
+   end
+   if from <= #str then table.insert(result, string.sub(str, from)) end
+   return result
+end
+
 return M
-
-
