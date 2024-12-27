@@ -6,6 +6,7 @@ M._root = ''
 
 M.default = {
    default_ft = 'mql5',
+   ft_priority = { 'mql5', 'mql4' },
    log = {
       extension = 'log',
       delete_after_load = true,
