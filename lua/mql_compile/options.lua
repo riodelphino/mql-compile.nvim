@@ -3,10 +3,10 @@ local M = {}
 M._opts = {}
 M._os_type = ''
 M._root = ''
+M._source_path = ''
 
 M.default = {
-   default_ft = 'mql5',
-   ft_priority = { 'mql5', 'mql4' },
+   priority = { 'mql5', 'mql4' },
    log = {
       extension = 'log',
       delete_after_load = true,
@@ -14,7 +14,7 @@ M.default = {
    quickfix = {
       extension = 'qfix',
       -- keywords = { 'error' }, --  'error' | 'warning'
-      keywords = { 'error', 'warning', }, --  'error' | 'warning'
+      keywords = { 'error', 'warning' }, --  'error' | 'warning'
       auto_open = {
          enabled = true, -- Open qfix after compile
          -- open_with = { },
@@ -25,27 +25,27 @@ M.default = {
    information = {
       show_notify = false,
       extension = 'info',
-      keywords = { 'including', }, -- 'compiling' | 'including'
+      keywords = { 'including' }, -- 'compiling' | 'including'
    },
    wine = {
       enabled = true,
       command = 'wine',
    },
-   mql5 = {
-      metaeditor_path = '',
-      include_path = '',
-      source_path = '',
-      extension = 'mq5',
-      wine_drive_letter = 'Z:',
-      timeout = 5000,
-   },
-   mql4 = {
-      metaeditor_path = '',
-      include_path = '',
-      source_path = '',
-      extension = 'mq4',
-      wine_drive_letter = 'Z:',
-      timeout = 5000,
+   ft = {
+      mql5 = {
+         metaeditor_path = '',
+         include_path = '',
+         pattern = '*.mq5',
+         wine_drive_letter = 'Z:',
+         timeout = 5000,
+      },
+      mql4 = {
+         metaeditor_path = '',
+         include_path = '',
+         pattern = '*.mq4',
+         wine_drive_letter = 'Z:',
+         timeout = 5000,
+      },
    },
    notify = {
       compile = {
@@ -72,27 +72,21 @@ M.default = {
    },
 }
 
-function M.get_opts()
-   return M._opts
-end
+function M.get_opts() return M._opts end
 
-function M.get_os_type()
-   return M._os_type
-end
+function M.get_os_type() return M._os_type end
 
 function M.deep_merge(default, user)
    fn = require('mql_compile.functions')
    -- If `user` is not a table, use the `default` value
-   if type(user) ~= "table" then
-      return default
-   end
+   if type(user) ~= 'table' then return default end
 
    -- Iterate through all keys in the default table
    for key, default_value in pairs(default) do
       if user[key] == nil then
          -- If the key is missing in the user table, use the default value
          user[key] = default_value
-      elseif type(default_value) == "table" then
+      elseif type(default_value) == 'table' then
          if fn.is_array(default[key]) then -- If the value is a array, just overwrite all by user
             user[key] = user[key]
          else
@@ -103,7 +97,6 @@ function M.deep_merge(default, user)
    end
    return user
 end
-
 
 function M.merge(user_opts)
    local opts = {}
@@ -120,13 +113,12 @@ function M.merge(user_opts)
    opts.mql4.source_path = vim.fn.expand(opts.mql4.source_path)
 
    -- Set default
-   opts.mql5.extension = opts.mql5 and opts.mql5.extension or "mq5"
-   opts.mql4.extension = opts.mql4 and opts.mql4.extension or "mq4"
+   opts.mql5.extension = opts.mql5 and opts.mql5.extension or 'mq5'
+   opts.mql4.extension = opts.mql4 and opts.mql4.extension or 'mq4'
 
    M._opts = opts
 
    return opts
 end
-
 
 return M

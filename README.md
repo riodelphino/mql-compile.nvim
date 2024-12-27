@@ -46,70 +46,7 @@ return {
    'riodelphino/mql-compile.nvim',
    lazy = false,
    -- ft = { 'cpp', 'c' }, -- Not recommend
-   opts = {
-      default = 'mql5', -- 'mql5' | 'mql4'
-      log = {
-         extension = 'log',
-         delete_after_load = true,
-      },
-      quickfix = {
-         extension = 'qfix',
-         keywords = { 'error', 'warning', }, -- 'error' | 'warning'
-         auto_open = {
-            enabled = true, -- Open qfix after compile
-            open_with = { 'error', 'warning', },
-         },
-         delete_after_load = true,
-      },
-      information = {
-         show_notify = false,
-         extension = 'info',
-         keywords = { 'including', }, -- 'compiling' | 'including'
-      },
-      wine = {
-         enabled = true,
-         command = 'wine',
-      },
-      mql5 = {
-         metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
-         include_path = '',
-         source_path = '',
-         extention = 'mq5',
-         wine_drive_letter = 'Z:',
-         timeout = 5000,
-      },
-      mql4 = {
-         metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
-         include_path = '',
-         source_path = '',
-         extention = 'mq4',
-         wine_drive_letter = 'Z:',
-         timeout = 5000,
-      },
-      notify = {
-         compile = {
-            on_start = false,
-            on_failed = true,
-            on_succeeded = true,
-         },
-         information = {
-            on_saved = false,
-            on_deleted = false,
-            -- on_load = false,
-            counts = false,
-            keywords = { 'including', }, -- 'compiling' | 'including'
-         },
-         quickfix = {
-            on_saved = false,
-            on_deleted = false,
-         },
-         log = {
-            on_saved = false,
-            on_deleted = false,
-            counts = true,
-         },
-      },
-   },
+   opts = {},
    keys = {
        {'<F7>', function() require('mql_compile').compile() end},
    },
@@ -119,35 +56,11 @@ return {
 }
 ```
 
-## Default 'metaeditor_path'
-
-Default path for MetaEditor exe.  
-(It depends on your settings on installing.)
-```lua
-{
-   opts = {
-      mql5 = {
-          -- MacOS (via wine)
-          -- 'MT5.app' is the name of app you set on wineskin.
-          metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe',
-          -- Windows (NOT TESTED. just a note)
-          metaeditor_path = 'C:/Program Files/MetaTrader 5/MetaEditor64.exe',
-      },
-      mql4 = {
-          -- MacOS (via wine)
-          -- 'MT4.app' is the name of app you set on wineskin.
-          metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe',
-          -- Windows (NOT TESTED. just a note)
-          metaeditor_path = 'C:/Program Files (x86)/MetaTrader 4/metaeditor.exe',
-      }
-   }
-}
-```
 
 ## Default options
 ```lua
    opts = {
-      default = 'mql5', -- 'mql5' | 'mql4'
+      priority = { 'mql5', 'mql4' }, -- 'mql5' | 'mql4'
       log = {
          extension = 'log',
          delete_after_load = true,
@@ -170,21 +83,21 @@ Default path for MetaEditor exe.
          enabled = true,
          command = 'wine',
       },
-      mql5 = {
-         metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
-         include_path = '',
-         source_path = '',
-         extention = 'mq5',
-         wine_drive_letter = 'Z:',
-         timeout = 5000,
-      },
-      mql4 = {
-         metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
-         include_path = '',
-         source_path = '',
-         extention = 'mq4',
-         wine_drive_letter = 'Z:',
-         timeout = 5000,
+      ft = {
+         mql5 = {
+            metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
+            include_path = '',
+            pattern = '*.mq5',
+            wine_drive_letter = 'Z:',
+            timeout = 5000,
+         },
+         mql4 = {
+            metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
+            include_path = '',
+            pattern = '*.mq4',
+            wine_drive_letter = 'Z:',
+            timeout = 5000,
+         },
       },
       notify = {
          compile = {
@@ -210,6 +123,34 @@ Default path for MetaEditor exe.
          },
       },
    },
+```
+
+
+## Default 'metaeditor_path'
+
+Default path for MetaEditor exe.  
+(It depends on your settings on installing.)
+```lua
+{
+   opts = {
+      ft = {
+         mql5 = {
+             -- MacOS (via wine)
+             -- 'MT5.app' is the name of app you set on wineskin.
+             metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe',
+             -- Windows (NOT TESTED. just a note)
+             metaeditor_path = 'C:/Program Files/MetaTrader 5/MetaEditor64.exe',
+         },
+         mql4 = {
+             -- MacOS (via wine)
+             -- 'MT4.app' is the name of app you set on wineskin.
+             metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe',
+             -- Windows (NOT TESTED. just a note)
+             metaeditor_path = 'C:/Program Files (x86)/MetaTrader 4/metaeditor.exe',
+         },
+      },
+   },
+}
 ```
 
 
@@ -281,3 +222,4 @@ require('mql_compile').compile('my_ea.mq5')
 > Hope to add in future
 
 - [ ] MQL4 compiling
+
