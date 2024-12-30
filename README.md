@@ -154,7 +154,6 @@ Below are the default path for MetaEditor exe in `opts.ft.[mql5|mql4]`.
 ## Commands
 
 ### Compiling
-This plugin auto-detects mql5/mql4 by extension given in source path.
 ```vim
 " Set mql5 path
 :MQLCompileSetSource my_ea.mq5
@@ -175,6 +174,22 @@ or
 " Compile with file name modifier
 :MQLCompile %
 ```
+
+This plugin auto-detects mql5/mql4 by patterns given in `opts.ft.[mql5|mql4].pattern`.
+See [Auto detection rules](#auto-detection-rules).
+
+```vim
+" Set source in NO mql5/4 buffers (like *.md)
+:MQLCompileSetSource
+" Automatically detect file, and set it as source
+
+" Compiling also works same way.
+:MQLCompile
+" Automatically detect file, and compile it
+```
+
+So, `:MQLCompileSetSource` & Auto-detection allow you to compile the file anywhere in the project.
+
 
 ### Show options
 Show all current options as table. Just for checking.
@@ -206,7 +221,7 @@ require('mql_compile').compile('my_ea.mq5')
 require('mql_compile').compile('%')
 ```
 
-## Auto detection
+## Auto detection rules
 
 
 ### :MQLCompileSetSource
@@ -233,7 +248,7 @@ The compiling command without arg, like `:MQLCompile`, also detects the files in
 
 ### Lua functions
 
-And [these lua functions](#lua-functions) follow same rule.
+And [these lua functions](#lua-functions) follow same rules.
 
 
 ## notify
