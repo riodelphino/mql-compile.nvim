@@ -102,19 +102,19 @@ function M.merge(user_opts)
    local opts = {}
 
    -- opts = vim.tbl_deep_extend("force", M.default, user_opts or {})
-   opts = M.deep_merge(M.default, user_opts or {}) -- merge recursively
+   opts = M.deep_merge(M.default, user_opts or {})
 
    -- expand path for % ~
-   opts.mql5.metaeditor_path = vim.fn.expand(opts.mql5.metaeditor_path)
-   opts.mql5.include_path = vim.fn.expand(opts.mql5.include_path)
-   opts.mql5.source_path = vim.fn.expand(opts.mql5.source_path)
-   opts.mql4.metaeditor_path = vim.fn.expand(opts.mql4.metaeditor_path)
-   opts.mql4.include_path = vim.fn.expand(opts.mql4.include_path)
-   opts.mql4.source_path = vim.fn.expand(opts.mql4.source_path)
+   opts.ft.mql5.metaeditor_path = vim.fn.expand(opts.ft.mql5.metaeditor_path)
+   opts.ft.mql5.include_path = vim.fn.expand(opts.ft.mql5.include_path)
+   opts.ft.mql5.source_path = vim.fn.expand(opts.ft.mql5.source_path)
+   opts.ft.mql4.metaeditor_path = vim.fn.expand(opts.ft.mql4.metaeditor_path)
+   opts.ft.mql4.include_path = vim.fn.expand(opts.ft.mql4.include_path)
+   opts.ft.mql4.source_path = vim.fn.expand(opts.ft.mql4.source_path)
 
    -- Set default
-   opts.mql5.extension = opts.mql5 and opts.mql5.extension or 'mq5'
-   opts.mql4.extension = opts.mql4 and opts.mql4.extension or 'mq4'
+   opts.ft.mql5.extension = opts.ft.mql5 and opts.ft.mql5.extension or 'mq5'
+   opts.ft.mql4.extension = opts.ft.mql4 and opts.ft.mql4.extension or 'mq4'
 
    M._opts = opts
 

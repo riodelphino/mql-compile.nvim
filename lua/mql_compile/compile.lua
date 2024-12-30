@@ -37,13 +37,18 @@ function M.compile(source_path)
    local mql
 
    source_path, mql = fn.get_source(source_path)
+   if source_path == nil or mql == nil then
+      msg = ''
+      return
+   end
 
    opt._mql = mql
    local os_type = opt._os_type
 
    -- Set paths
    local metaeditor_path = vim.fn.expand(mql.metaeditor_path)
-   local log_path = source_path:gsub('%.' .. mql.extension .. '$', '.' .. opts.log.extension)
+   local pattern = fn.pattern_bash_to_lua(mql.pattern)
+   local log_path = source_path:gsub(pattern, '.' .. opts.log.extension) -- FIXME 拡張子ではなく *.mq5 としてるので、ファイル名ごと置換されてる？
    log_path = fn.convert_path_to_os(log_path, mql.wine_drive_letter, os_type)
    local qf_path = log_path:gsub('%.log$', '.' .. opts.quickfix.extension)
    local info_path = log_path:gsub('%.log$', '.' .. opts.information.extension)
@@ -63,6 +68,16 @@ function M.compile(source_path)
 
    -- check log count & set base level
    local level
+   if log_cnt == nil then
+      msg = 'Error on loading log file: ' .. log_path
+      vim.notify(msg, vim.log.levels.ERROR)
+      return
+   end
+   if info_cnt == nil then
+      msg = 'Error on loading log file: ' .. log_path
+      vim.notify(msg, vim.log.levels.ERROR)
+      return
+   end
    if log_cnt.error > 0 then
       level = vim.log.levels.ERROR
    elseif log_cnt.warning > 0 then
@@ -73,13 +88,13 @@ function M.compile(source_path)
 
    -- notify 'log.counts'
    if opts.notify.log.counts then
-      msg = fn.get_count_msg(log_cnt)
+      msg = fn.pairs_to_string(log_cnt)
       fn.notify(msg, level)
    end
 
    -- notify 'information.counts'
    if opts.notify.information.counts then
-      msg = fn.get_count_msg(info_cnt)
+      msg = fn.pairs_to_string(info_cnt)
       fn.notify(msg, vim.log.levels.INFO)
    end
 

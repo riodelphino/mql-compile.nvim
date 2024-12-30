@@ -34,7 +34,7 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 
 **Optional**
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
-- [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages
+- [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages (Only v3.14.0 or earlier versions work for now as its error.)
 
 
 ## Installation
@@ -44,14 +44,14 @@ Using [Lazy.nvim](https://github.com/folke/lazy.nvim):
 ```lua
 return {
    'riodelphino/mql-compile.nvim',
-   lazy = false,
-   -- ft = { 'cpp', 'c' }, -- Not recommend
+   lazy = true,
+   ft = { 'cpp', 'c' }, -- If your filetype settings read mql5 as cpp / mql4 as c.
    opts = {},
    keys = {
        {'<F7>', function() require('mql_compile').compile() end},
    },
    cmds = {
-      { 'MQLCompile', 'MQLCompileSetSource', },
+      { 'MQLCompile', 'MQLCompileSetSource', 'MQLCompileShowOptions'},
    },
 }
 ```
@@ -139,14 +139,14 @@ Default path for MetaEditor exe.
              -- 'MT5.app' is the name of app you set on wineskin.
              metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe',
              -- Windows (NOT TESTED. just a note)
-             metaeditor_path = 'C:/Program Files/MetaTrader 5/MetaEditor64.exe',
+             metaeditor_path = 'C:\\Program Files\\MetaTrader 5\\MetaEditor64.exe',
          },
          mql4 = {
              -- MacOS (via wine)
              -- 'MT4.app' is the name of app you set on wineskin.
              metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe',
              -- Windows (NOT TESTED. just a note)
-             metaeditor_path = 'C:/Program Files (x86)/MetaTrader 4/metaeditor.exe',
+             metaeditor_path = 'C:\\Program Files (x86)\\MetaTrader 4\\metaeditor.exe',
          },
       },
    },
@@ -156,6 +156,7 @@ Default path for MetaEditor exe.
 
 ## Commands
 
+**Compiling**  
 This plugin auto-detects mql5/mql4 by extension given in source path.
 ```vim
 " Set mql5 path
@@ -175,19 +176,26 @@ or
 " Compile with path
 :MQLCompile my_ea.mq5
 ```
+
+**Show options**  
+Show all current options as table.
+```vim
+:MQLCompileShowOptions
+```
+
 ## Lua functions
 
 Below lua functions are also available. (with auto-detection by the extension)
 ```lua
 -- Set mql5 path
-require('mql_compile').set_source_path('my_ea.mq5')
+require('mql_compile').set_source('my_ea.mq5')
 -- Compile it
 require('mql_compile').compile()
 ```
 or
 ```lua
 -- Set current file path
-require('mql_compile').set_source_path()
+require('mql_compile').set_source()
 -- Compile it
 require('mql_compile').compile()
 ```
@@ -197,25 +205,51 @@ or
 require('mql_compile').compile('my_ea.mq5')
 ```
 
+## Auto detection
+
+**:MQLCompileSetSource**  
+If the arg is set like `:MQLCompileSetSource %` or `:MQLCompileSetSource my_ea.mq5`, the command set it as source path preferentially.
+
+But if no args are set, like `:MQLCompileSetSource`, the commannd detect the files automatically.  
+The detection order is below.
+
+1. Current buffer (if mql5/4)
+2. First detected mql5/4 file in git root dir (recursively)
+3. First detected mql5/4 file in cwd dir (recursively)
+
+If no files are detected, the command returns `error`.
+
+**:MQLCompile**  
+The compiling command without arg, like `:MQLCompile`, also detects the files in almost same way.
+
+1. The path set by `:MQLCompileSetSource` command previousely
+2. Current buffer (if mql5/4)
+3. First detected mql5/4 file in git root dir (recursively)
+4. First detected mql5/4 file in cwd dir (recursively)
+
+**Lua functions**  
+And [these lua functions](#lua-functions) follow same rule.
+
+
 ## TO-DO
 
 > [!Important]
 > Urgent!!!
 
-- [ ] Add 'mql5.source_dir' option ? (for auto detection) or git root detection is needed.
-- [ ] `:MQLCompileSetSource` without %, set full path like `/Users/username/..../EA.mq5` -> relative path is better
-- [ ] full path cause include error like `ea.mq5 error : file 'Users\username\Projects\EA\functions.mqh' not found`
-- [ ] Check file exists before compile
+- [ ] Adoopt to Windows
+   - [ ] lfs library ?
+   - [ ] Standard library ?
+      - [ ] separator : package.config:sub(1, 1) -- "/" or "\\"
+      - [ ] homedir: vim.fn.expand("~")
+      - [ ] tmpdir : vim.fn.tempname() or vim.loop.os_tmpdir()
+      - [ ] join   : vim.fs.joinpath("folder", "subfolder", "file.txt") (nvim v0.9 or later)
 - [ ] ❗️Async compile
-- [ ] error on ... source_path is not set & :MQLCompile (as keymap) on non-mql4/5 files or empty buffer
-- [ ] Show 'Result: errors x, warnings x (...)' message
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
-- [ ] git
-   - [ ] Detect git root
+- [-] git
+   - [x] Detect git root
    - [ ] List up & select from git root's mql5 files 
    - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
-- [ ] Adoopt to MT5 on Windows
 - [ ] 'timeout' to work
 
 > [!Note]
