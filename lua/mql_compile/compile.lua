@@ -79,11 +79,12 @@ function M.compile(source_path)
       vim.notify(msg, vim.log.levels.ERROR)
       return
    end
-   if compile_shell_error == 1 then
-      msg = 'Error on compiling: ' .. source_path
-      vim.notify(msg, vim.log.levels.ERROR)
-      return
-   end
+   -- FIXME: How to get shell error ?
+   -- if compile_shell_error == 1 then
+   --    msg = 'Error on compiling: ' .. source_path
+   --    vim.notify(msg, vim.log.levels.ERROR)
+   --    return
+   -- end
 
    if log_cnt.error > 0 then
       level = vim.log.levels.ERROR

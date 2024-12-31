@@ -1,5 +1,6 @@
 # mql-compile.nvim
 
+## Concepts
 A Neovim plugin for compiling MQL5 scripts.  
 Without heavy MetaEditor GUI (Compiles on command-line).
 
@@ -8,6 +9,25 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 
 > [!Caution]
 > Currently works only in 'macOS + wine(wineskin) + MT5' environment.
+
+
+## Screen shots
+With [nvim-notify](https://github.com/rcarriga/nvim-notify)
+
+### On error
+
+![error_quickfix](./img/error_quickfix.png)
+![error_notify](./img/error_notify.png)
+
+### On warning
+
+![warning_quickfix](./img/warning_quickfix.png)
+![warning_notify](./img/warning_notify.png)
+
+### On success
+
+![success_quickfix](./img/success_quickfix.png)
+![success_notify](./img/success_notify.png)
 
 
 ## Features
@@ -45,22 +65,32 @@ Without heavy MetaEditor GUI (Compiles on command-line).
 Using [Lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
+-- Minimum config:
 return {
    'riodelphino/mql-compile.nvim',
    lazy = true,
    ft = { 'cpp', 'c' }, -- If your filetype settings read mql5 as cpp / mql4 as c.
-   opts = {},
-   keys = {
-       {'<F7>', function() require('mql_compile').compile() end},
+   opts = {
+      ft = {
+         mql5 = {
+            metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
+            wine_drive_letter = 'Z:',
+         },
+         mql4 = {
+            metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
+            wine_drive_letter = 'Z:',
+         },
+      },
    },
+   keys = {},
    cmds = {
-      { 'MQLCompile', 'MQLCompileSetSource', 'MQLCompileShowOptions'},
+      { 'MQLCompile', 'MQLCompileSetSource', 'MQLCompileShowOptions' },
    },
 }
 ```
 
-
 ## Default options
+
 ```lua
    opts = {
       priority = { 'mql5', 'mql4' }, -- priority for auto file detection
@@ -71,16 +101,16 @@ return {
       },
       quickfix = {
          extension = 'qf',
-         keywords = { 'error', 'warning', }, -- 'error' | 'warning'
+         keywords = { 'error', 'warning', }, -- Shows in quickfix. 'error' | 'warning' | 'information'
          auto_open = {
-            enabled = true, -- Open qfix after compile
+            enabled = true, -- Open quickfix after compile
             open_with = { 'error', 'warning', },
          },
          delete_after_load = true,
          format = nil,
       },
       information = {
-         show_notify = true,
+         show_notify = true, -- 'information' can be shown in notify too. (Reommend)
          extension = 'info',
          actions = { 'including' }, -- Actions to show. 'compiling' | 'including'
          parse = nil,
@@ -88,7 +118,7 @@ return {
       },
       wine = {
          enabled = true,
-         command = 'wine',
+         command = 'wine', -- Wine command path, if you installed MT4/5 with wine.
       },
       ft = {
          mql5 = {
@@ -96,14 +126,12 @@ return {
             include_path = '',
             pattern = '*.mq5',
             wine_drive_letter = 'Z:',
-            timeout = 5000,
          },
          mql4 = {
             metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
             include_path = '',
             pattern = '*.mq4',
             wine_drive_letter = 'Z:',
-            timeout = 5000,
          },
       },
       notify = { -- Timings to notify to user
@@ -145,7 +173,9 @@ Below are the default path for MetaEditor exe in `opts.ft.[mql5|mql4]`.
  -- Windows (NOT TESTED. just a note)
  metaeditor_path = 'C:\\Program Files\\MetaTrader 5\\MetaEditor64.exe'
  ```
+
 ### MT4
+
  ```lua
  -- MacOS (via wine)
  -- 'MT4.app' is the name of app you set on wineskin.
@@ -154,13 +184,13 @@ Below are the default path for MetaEditor exe in `opts.ft.[mql5|mql4]`.
  metaeditor_path = 'C:\\Program Files (x86)\\MetaTrader 4\\metaeditor.exe'
 ```
 
-### Parsing and formatting
+## Parsing and formatting
 
 You can modify parsing & formatting functions, if you need.  
 Leave 'parse' or 'format' as nil to use these default functions. 
 
 
-#### Parsing function to read log
+### Parsing function to read log
 
 Default:
 ```lua
@@ -178,7 +208,7 @@ opts = {
 },
 ```
 
-#### Formatting function to generate quickfix
+### Formatting function to generate quickfix
 
 Default:
 ```lua
@@ -196,7 +226,7 @@ opts = {
 
 ```
 
-#### Parsing and formatting function of information
+### Parsing and formatting function of information
 
 Default:
 ```lua
@@ -206,7 +236,9 @@ opts = {
          i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
          return i
       end,
-      format = function(i) return string.format('%s %s', i.action, i.details) end,
+      format = function(i)
+         return string.format('%s %s', i.action, i.details)
+      end,
    },
 },
 
@@ -281,6 +313,23 @@ require('mql_compile').compile('my_ea.mq5')
 require('mql_compile').compile('%')
 ```
 
+## Keymaps
+
+Sample:
+```lua
+keys = {
+    { '<F4>', '<cmd>MQLCompileSetSource<cr>' },
+    { '<F7>', '<cmd>MQLCompile<cr>' },
+},
+```
+or
+```lua
+keys = {
+    { '<F4>', function() require('mql_compile').set_source() end },
+    { '<F7>', function() require('mql_compile').compile() end },
+},
+```
+
 ## Auto detection rules
 
 
@@ -341,7 +390,6 @@ Then `mql-compile` shows you messages through it.
    - [ ] List up & select from git root's mql5 files 
    - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
-- [ ] 'timeout' to work
 - [ ] include path NOT WORKS for the space char in `Program Files`
 
 > [!Note]

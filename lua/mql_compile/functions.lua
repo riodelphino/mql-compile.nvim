@@ -55,6 +55,7 @@ function M.log_to_qf(log_path, qf_path, keywords)
       information = 0,
    }
    local default_keywords = { 'error', 'warning', 'information' }
+   keywords = keywords or default_keywords
 
    local log_file, err_msg, err_code = io.open(log_path, 'r')
    if log_file == nil then
@@ -65,7 +66,7 @@ function M.log_to_qf(log_path, qf_path, keywords)
    end
    for line in log_file:lines() do
       -- Filter lines
-      for _, key in pairs(default_keywords) do -- FIXME: デフォルトはおかしい
+      for _, key in pairs(keywords) do
          if line:match(' : ' .. key) then
             count[key] = count[key] + 1
             local e = {}
@@ -111,6 +112,8 @@ function M.log_to_info(log_path, info_path, actions)
    }
    -- local default_keywords = { 'compiling', 'including' }
    local default_actions = { 'compiling', 'including' }
+   actions = actions or default_actions
+
    local log_file, err_msg, err_code = io.open(log_path, 'r')
    if log_file == nil then
       err_msg = err_msg:gsub('^: ', '')
@@ -121,14 +124,14 @@ function M.log_to_info(log_path, info_path, actions)
 
    for line in log_file:lines() do
       -- Filter lines
-      for _, action in pairs(default_actions) do
+      for _, action in pairs(actions) do
          if line:match('information: ' .. action) then
             count[action] = count[action] + 1
             local i = {}
 
             i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
             i.file = M.convert_path_to_os(i.file, opt._mql.wine_drive_letter, opt._os_type)
-            if M.in_table(default_actions, i.action) then -- Check for showing in info
+            if M.in_table(actions, i.action) then -- Check for showing in info
                -- Output as infomation format
                -- table.insert(info_lines, string.format('[%s] %s %s', file, action, details))
                local formatted = opts.information.format(i)
