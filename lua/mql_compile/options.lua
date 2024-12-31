@@ -10,22 +10,44 @@ M.default = {
    log = {
       extension = 'log',
       delete_after_load = true,
+      -- Parsing function from log
+      parse = function(line, e)
+         if e.type == 'error' or e.type == 'warning' then
+            e.file, e.line, e.col, e.code, e.msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. e.type .. ' (%d+): (.*)$')
+         elseif e.type == 'information' then
+            e.file, e.msg = line:match('^(.*) : ' .. e.type .. ': (.*)$')
+         end
+         return e
+      end,
    },
    quickfix = {
-      extension = 'qfix',
+      extension = 'qf',
       -- keywords = { 'error' }, --  'error' | 'warning'
-      keywords = { 'error', 'warning' }, --  'error' | 'warning'
+      keywords = { 'error', 'warning', 'information' }, --  'error' | 'warning'
       auto_open = {
          enabled = true, -- Open qfix after compile
          -- open_with = { },
          open_with = { 'error', 'warning' },
       },
       delete_after_load = true,
+      -- Formatting function for generating quickfix
+      format = function(e)
+         if e.type == 'error' or e.type == 'warning' then
+            return string.format('%s:%d:%d: %s:%s: %s', e.file, e.line, e.col, e.type, e.code, e.msg)
+         elseif e.type == 'information' then
+            return string.format('%s:1:1: %s: %s', e.file, e.type, e.msg)
+         end
+      end,
    },
    information = {
-      show_notify = false,
+      show_notify = true,
       extension = 'info',
-      keywords = { 'including' }, -- 'compiling' | 'including'
+      actions = { 'including' }, -- 'compiling' | 'including'
+      parse = function(line, i)
+         i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
+         return i
+      end,
+      format = function(i) return string.format('%s %s', i.action, i.details) end,
    },
    wine = {
       enabled = true,
