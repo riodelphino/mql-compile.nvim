@@ -52,8 +52,9 @@ function M.log_to_qf(log_path, qf_path, keywords)
    local count = {
       error = 0,
       warning = 0,
+      information = 0,
    }
-   local default_keywords = { 'error', 'warning' }
+   local default_keywords = { 'error', 'warning', 'information' }
 
    local log_file, err_msg, err_code = io.open(log_path, 'r')
    if log_file == nil then
@@ -64,16 +65,21 @@ function M.log_to_qf(log_path, qf_path, keywords)
    end
    for line in log_file:lines() do
       -- Filter lines
-      for _, key in pairs(default_keywords) do
+      for _, key in pairs(default_keywords) do -- FIXME: デフォルトはおかしい
          if line:match(' : ' .. key) then
             count[key] = count[key] + 1
-            local file, line_num, col_num, code, msg
+            local e = {}
+            -- local file, line_num, col_num, code, msg
 
-            file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. key .. ' (%d+): (.*)$')
-            file = M.convert_path_to_os(file, opt._mql.wine_drive_letter, opt._os_type)
+            e.type = key
+            e = opts.log.parse(line, e) -- Parse log !
+
+            e.file = M.convert_path_to_os(e.file, opt._mql.wine_drive_letter, opt._os_type)
+
             if M.in_table(keywords, key) then -- Check for showing in qfix
                -- Output as quickfix format
-               table.insert(qf_lines, string.format('%s:%s:%s: ' .. key .. ' %s: %s', file, line_num, col_num, code, msg))
+               local formatted_line = opts.quickfix.format(e) -- Format log to quickfix!
+               table.insert(qf_lines, formatted_line)
             end
          end
       end
@@ -96,7 +102,7 @@ function M.log_to_qf(log_path, qf_path, keywords)
    return count
 end
 
-function M.log_to_info(log_path, info_path, keywords)
+function M.log_to_info(log_path, info_path, actions)
    local opts = opt.get_opts()
    local info_lines = {}
    local count = {
@@ -104,7 +110,7 @@ function M.log_to_info(log_path, info_path, keywords)
       including = 0,
    }
    -- local default_keywords = { 'compiling', 'including' }
-   local default_keywords = { 'information' }
+   local default_actions = { 'compiling', 'including' }
    local log_file, err_msg, err_code = io.open(log_path, 'r')
    if log_file == nil then
       err_msg = err_msg:gsub('^: ', '')
@@ -115,18 +121,18 @@ function M.log_to_info(log_path, info_path, keywords)
 
    for line in log_file:lines() do
       -- Filter lines
-      for _, key in pairs(default_keywords) do
-         if line:match('information: ' .. key) then
-            count[key] = count[key] + 1
-            local file, line_num, col_num, code, msg
+      for _, action in pairs(default_actions) do
+         if line:match('information: ' .. action) then
+            count[action] = count[action] + 1
+            local i = {}
 
-            -- file, line_num, col_num, code, msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. key .. ' (%d+): (.*)$')
-            file, level, action, details = line:match('^(.-) : (%w+): (%w+) (.+)')
-            file = M.convert_path_to_os(file, opt._mql.wine_drive_letter, opt._os_type)
-            if M.in_table(keywords, key) then -- Check for showing in info
+            i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
+            i.file = M.convert_path_to_os(i.file, opt._mql.wine_drive_letter, opt._os_type)
+            if M.in_table(default_actions, i.action) then -- Check for showing in info
                -- Output as infomation format
                -- table.insert(info_lines, string.format('[%s] %s %s', file, action, details))
-               table.insert(info_lines, string.format('%s %s', action, details))
+               local formatted = opts.information.format(i)
+               table.insert(info_lines, formatted)
             end
          end
       end
@@ -246,7 +252,7 @@ end
 
 function get_ft_list()
    local opts = opt.get_opts()
-   return opts.priority -- FIXME: this must return opts.ft 's first children
+   return opts.priority -- easier alt for getting from opts.fn
 end
 
 function get_extension_list()
@@ -261,6 +267,7 @@ end
 function M.set_source_path(path)
    local opts = opt.get_opts()
    local sep = M.get_path_separator()
+   local mql = {}
    local msg = ''
 
    if path == 'v:null' or path == nil or path == '' then
@@ -268,8 +275,8 @@ function M.set_source_path(path)
    end
 
    path = vim.fn.expand(path) -- for % ~
-   path = M.get_source(path)
-   if path == false then return end
+   path, mql = M.get_source(path)
+   if path == nil then return end
 
    -- Determin mql by extension
    for ft_key, ft in pairs(opts.ft) do

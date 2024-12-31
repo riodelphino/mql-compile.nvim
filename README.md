@@ -67,20 +67,24 @@ return {
       log = {
          extension = 'log',
          delete_after_load = true,
+         parse = nil,
       },
       quickfix = {
-         extension = 'qfix',
+         extension = 'qf',
          keywords = { 'error', 'warning', }, -- 'error' | 'warning'
          auto_open = {
             enabled = true, -- Open qfix after compile
             open_with = { 'error', 'warning', },
          },
          delete_after_load = true,
+         format = nil,
       },
       information = {
+         show_notify = true,
          extension = 'info',
-         keywords = { 'including', }, -- 'compiling' | 'including'
-         show_notify = false,
+         actions = { 'including' }, -- Actions to show. 'compiling' | 'including'
+         parse = nil,
+         format = nil,
       },
       wine = {
          enabled = true,
@@ -150,7 +154,63 @@ Below are the default path for MetaEditor exe in `opts.ft.[mql5|mql4]`.
  metaeditor_path = 'C:\\Program Files (x86)\\MetaTrader 4\\metaeditor.exe'
 ```
 
+### Parsing and formatting
 
+You can modify parsing & formatting functions, if you need.  
+Leave 'parse' or 'format' as nil to use these default functions. 
+
+
+#### Parsing function to read log
+
+Default:
+```lua
+opts = {
+   log = {
+      parse = function(line, e)
+         if e.type == 'error' or e.type == 'warning' then
+            e.file, e.line, e.col, e.code, e.msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. e.type .. ' (%d+): (.*)$')
+         elseif e.type == 'information' then
+            e.file, e.msg = line:match('^(.*) : ' .. e.type .. ': (.*)$')
+         end
+         return e
+      end,
+   },
+},
+```
+
+#### Formatting function to generate quickfix
+
+Default:
+```lua
+opts = {
+   quickfix = {
+      format = function(e)
+         if e.type == 'error' or e.type == 'warning' then
+            return string.format('%s:%d:%d: %s:%s: %s', e.file, e.line, e.col, e.type, e.code, e.msg)
+         elseif e.type == 'information' then
+            return string.format('%s:1:1: %s: %s', e.file, e.type, e.msg)
+         end
+      end,
+   },
+},
+
+```
+
+#### Parsing and formatting function of information
+
+Default:
+```lua
+opts = {
+   information = {
+      parse = function(line, i)
+         i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
+         return i
+      end,
+      format = function(i) return string.format('%s %s', i.action, i.details) end,
+   },
+},
+
+```
 ## Commands
 
 ### Compiling
@@ -276,7 +336,7 @@ Then `mql-compile` shows you messages through it.
       - [ ] join   : vim.fs.joinpath("folder", "subfolder", "file.txt") (nvim v0.9 or later)
 - [ ] ❗️Async compile
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
-- [-] git
+- [ ] git
    - [x] Detect git root
    - [ ] List up & select from git root's mql5 files 
    - [ ] If only one mql5 on git root, compile without prompt

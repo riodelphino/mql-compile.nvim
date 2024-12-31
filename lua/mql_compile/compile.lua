@@ -9,6 +9,7 @@ function M.do_compile(metaeditor_path, source_path, log_path)
    local compile_cmd = ''
    -- Compile
    if opts.wine.enabled then
+      source_path = source_path
       compile_cmd = string.format('%s "%s" /compile:"%s" /log:"%s"', opts.wine.command, metaeditor_path, source_path, log_path)
    else
       compile_cmd = string.format('%s /compile:"%s" /log:"%s"', metaeditor_path, source_path, log_path)
@@ -28,7 +29,7 @@ function M.do_compile(metaeditor_path, source_path, log_path)
       fn.notify(msg, vim.log.levels.INFO)
    end
 
-   return compile_shell_error -- 0: failed / 1: succeeded
+   return compile_shell_error -- 0: failed / 1: succeeded -- TODO: NOT CORRECT. Always return 0.
 end
 
 function M.compile(source_path)
@@ -47,15 +48,15 @@ function M.compile(source_path)
 
    -- Set paths
    local metaeditor_path = vim.fn.expand(mql.metaeditor_path)
-   local pattern = fn.pattern_bash_to_lua(mql.pattern)
-   local log_path = source_path:gsub(pattern, '.' .. opts.log.extension) -- FIXME 拡張子ではなく *.mq5 としてるので、ファイル名ごと置換されてる？
-   log_path = fn.convert_path_to_os(log_path, mql.wine_drive_letter, os_type)
-   local qf_path = log_path:gsub('%.log$', '.' .. opts.quickfix.extension)
-   local info_path = log_path:gsub('%.log$', '.' .. opts.information.extension)
+   local pattern = fn.pattern_bash_to_lua(mql.pattern) -- Convert pattern from '*.mq5' to '.*%.mq5'
+   local basename = fn.get_basename(source_path)
+   local log_path = basename .. '.' .. opts.log.extension
+   local qf_path = basename .. '.' .. opts.quickfix.extension
+   local info_path = basename .. '.' .. opts.information.extension
 
    -- Do compile
-   -- local compile_shell_error = M.do_compile(metaeditor_path, source_path, log_path)
-   M.do_compile(metaeditor_path, source_path, log_path)
+   source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
+   local compile_shell_error = M.do_compile(metaeditor_path, source_path, log_path)
 
    -- Convert encoding for mac
    if os_type == 'macos' then fn.convert_encoding(log_path) end
@@ -78,6 +79,12 @@ function M.compile(source_path)
       vim.notify(msg, vim.log.levels.ERROR)
       return
    end
+   if compile_shell_error == 1 then
+      msg = 'Error on compiling: ' .. source_path
+      vim.notify(msg, vim.log.levels.ERROR)
+      return
+   end
+
    if log_cnt.error > 0 then
       level = vim.log.levels.ERROR
    elseif log_cnt.warning > 0 then

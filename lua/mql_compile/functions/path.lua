@@ -33,7 +33,7 @@ function M.get_root(path)
    return git_root or cwd or current_buf_dir or path
 end
 
-function M.find_files_recursively(base_dir, pattern) -- FIXME: lua ? bash ?
+function M.find_files_recursively(base_dir, pattern) -- FIXME: pattern arg is lua ? bash ?
    local files = {}
    local uv = vim.loop
 
@@ -59,15 +59,21 @@ function M.find_files_recursively(base_dir, pattern) -- FIXME: lua ? bash ?
 end
 
 function M.get_relative_path(path)
-   local root_dir = M.get_root()
-   local sep = M.get_path_separator()
-   local relative_path
-   relative_path = path:gsub(root_dir .. sep, '')
-   return relative_path
+   -- local root_dir = M.get_root()
+   -- local sep = M.get_path_separator()
+   -- local relative_path
+   -- relative_path = path:gsub(root_dir .. sep, '')
+   -- return relative_path
+   return vim.fn.fnamemodify(path, ':.')
 end
 
 function M.get_filename(path)
    vim.fn.fnamemodify(path, ':~')
+   return path
+end
+
+function M.get_basename(path)
+   vim.fn.fnamemodify(path, ':r')
    return path
 end
 
