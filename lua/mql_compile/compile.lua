@@ -65,7 +65,7 @@ function M.compile(source_path)
    local log_cnt = fn.log_to_qf(log_path, qf_path, opts.quickfix.keywords)
 
    -- Convert log to information format
-   local info_cnt = fn.log_to_info(log_path, info_path, opts.information.keywords)
+   local info_cnt = fn.log_to_info(log_path, info_path, opts.information.actions)
 
    -- check log count & set base level
    local level
@@ -96,13 +96,13 @@ function M.compile(source_path)
 
    -- notify 'log.counts'
    if opts.notify.log.counts then
-      msg = fn.pairs_to_string(log_cnt)
+      msg = fn.table_to_string(log_cnt, opts.quickfix.keywords)
       fn.notify(msg, level)
    end
 
    -- notify 'information.counts'
    if opts.notify.information.counts then
-      msg = fn.pairs_to_string(info_cnt)
+      msg = fn.table_to_string(info_cnt, opts.information.actions)
       fn.notify(msg, vim.log.levels.INFO)
    end
 
@@ -141,23 +141,22 @@ function M.compile(source_path)
       end
    end
 
-   -- Delete info
-   if opts.information.delete_after_load then
-      vim.fn.delete(info_path)
-      -- notify
-      if opts.notify.infomation.on_deleted then
-         msg = "Deleted info: '" .. info_path .. "'"
-         fn.notify(msg, vim.log.levels.INFO)
-      end
-   end
-
-   -- o notify
    -- Delete quickfix
    if opts.quickfix.delete_after_load then
       vim.fn.delete(qf_path)
       -- notify
       if opts.notify.quickfix.on_deleted then
          msg = "Deleted quickfix: '" .. qf_path .. "'"
+         fn.notify(msg, vim.log.levels.INFO)
+      end
+   end
+
+   -- Delete info
+   if opts.information.delete_after_load then
+      vim.fn.delete(info_path)
+      -- notify
+      if opts.notify.information.on_deleted then
+         msg = "Deleted info: '" .. info_path .. "'"
          fn.notify(msg, vim.log.levels.INFO)
       end
    end

@@ -17,16 +17,19 @@ With [nvim-notify](https://github.com/rcarriga/nvim-notify)
 ### On error
 
 ![error_quickfix](./img/error_quickfix.png)
+
 ![error_notify](./img/error_notify.png)
 
 ### On warning
 
 ![warning_quickfix](./img/warning_quickfix.png)
+
 ![warning_notify](./img/warning_notify.png)
 
 ### On success
 
 ![success_quickfix](./img/success_quickfix.png)
+
 ![success_notify](./img/success_notify.png)
 
 
@@ -145,7 +148,7 @@ return {
             on_deleted = false,
             -- on_load = false,
             counts = false,
-            keywords = { 'including', }, -- 'compiling' | 'including'
+            actions = { 'including', }, -- 'compiling' | 'including'
          },
          quickfix = {
             on_saved = false,

@@ -23,7 +23,7 @@ M.default = {
    quickfix = {
       extension = 'qf',
       -- keywords = { 'error' }, --  'error' | 'warning'
-      keywords = { 'error', 'warning', 'information' }, --  'error' | 'warning'
+      keywords = { 'error', 'warning' }, --  'error' | 'warning' | 'information'
       auto_open = {
          enabled = true, -- Open qfix after compile
          -- open_with = { },
@@ -43,6 +43,7 @@ M.default = {
       show_notify = true,
       extension = 'info',
       actions = { 'including' }, -- 'compiling' | 'including'
+      delete_after_load = true,
       parse = function(line, i)
          i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
          return i
@@ -80,7 +81,7 @@ M.default = {
          on_deleted = false,
          -- on_load = false,
          counts = false,
-         keywords = { 'including' }, -- 'compiling' | 'including' | 'code generated'
+         actions = { 'including' }, -- 'compiling' | 'including' | 'code generated'
       },
       quickfix = {
          on_saved = false,

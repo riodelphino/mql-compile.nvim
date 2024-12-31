@@ -18,17 +18,18 @@ function M.is_array(table)
    return is_array_flg
 end
 
-function M.pairs_to_string(counts, key_value_separator, item_separator)
+function M.table_to_string(table, keys, key_value_separator, item_separator)
    key_value_separator = key_value_separator or ': '
    item_separator = item_separator or ' | '
-   local msg = ''
-   for key, value in pairs(counts) do
-      msg = msg .. key .. key_value_separator .. tostring(value) .. item_separator
+   local str = ''
+   print(vim.inspect(keys))
+   for _, key in ipairs(keys) do
+      str = str .. key .. key_value_separator .. tostring(table[key]) .. item_separator
    end
-   if msg:match(item_separator .. '$') then -- remove last item_separator
-      msg = msg:sub(1, -(#item_separator + 1))
+   if str:match(item_separator .. '$') then -- remove last item_separator
+      str = str:sub(1, -(#item_separator + 1))
    end
-   return msg
+   return str
 end
 
 return M
