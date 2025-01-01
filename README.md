@@ -116,13 +116,13 @@ return {
             enabled = true, -- Open quickfix after compile
             open_with = { 'error', 'warning', },
          },
-         delete_after_load = true,
          format = nil,
       },
       information = {
          show_notify = true, -- 'information' can be shown in notify too. (Reommend)
          extension = 'info',
          actions = { 'including' }, -- Actions to show. 'compiling' | 'including'
+         delete_after_load = true,
          parse = nil,
          format = nil,
       },
@@ -148,21 +148,19 @@ return {
             on_failed = true,
             on_succeeded = true,
          },
-         information = {
-            on_saved = false,
-            on_deleted = false,
-            -- on_load = false,
-            on_count = false,
-            actions = { 'including' }, -- 'compiling' | 'including'
-         },
-         quickfix = {
-            on_saved = false,
-            on_deleted = false,
-         },
          log = {
             on_saved = false,
             on_deleted = false,
             on_count = true,
+         },
+         quickfix = {
+            on_updated = false,
+         },
+         information = {
+            on_saved = false,
+            on_deleted = false,
+            on_count = false,
+            actions = { 'including' }, -- 'compiling' | 'including'
          },
       },
    },
@@ -205,34 +203,21 @@ Default:
 ```lua
 opts = {
    log = {
-      parse = function(line, e)
-         if e.type == 'error' or e.type == 'warning' then
-            e.file, e.line, e.col, e.code, e.msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. e.type .. ' (%d+): (.*)$')
-         elseif e.type == 'information' then
-            e.file, e.msg = line:match('^(.*) : ' .. e.type .. ': (.*)$')
+      parse = function(line, type)
+         local e = {}
+         if type == 'error' or type == 'warning' then
+            e.filename, e.lnum, e.col, e.type, e.nr, e.text = line:match('^(.*)%((%d+),(%d+)%) : (.*) (%d+): (.*)$')
+         elseif type == 'information' then
+            e.filename, e.type, e.text = line:match('^(.*) : (.*): (.*)$')
+            e.lnum = 1
+            e.col = 1
+            e.nr = 0
          end
+         e.type = e.type:sub(1, 1):upper() -- Convert type to E/W/I/H/N
          return e
       end,
    },
 },
-```
-
-### Formatting function to generate quickfix
-
-Default:
-```lua
-opts = {
-   quickfix = {
-      format = function(e)
-         if e.type == 'error' or e.type == 'warning' then
-            return string.format('%s:%d:%d: %s:%s: %s', e.file, e.line, e.col, e.type, e.code, e.msg)
-         elseif e.type == 'information' then
-            return string.format('%s:1:1: %s: %s', e.file, e.type, e.msg)
-         end
-      end,
-   },
-},
-
 ```
 
 ### Parsing and formatting function of information
@@ -392,6 +377,7 @@ Then `mql-compile` shows you messages through it.
 > [!Important]
 > Urgent!!!
 
+- [ ] actions not filterd on Quickfix generation
 - [ ] Adoopt to Windows
    - [ ] Any problems on Windows ? Tell me please.
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?

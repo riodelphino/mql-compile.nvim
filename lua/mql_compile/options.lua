@@ -21,30 +21,17 @@ M.default = {
             e.col = 1
             e.nr = 0
          end
-         -- print(vim.inspect(e))
-         e.type = e.type:sub(1, 1):upper() -- Convert to E / W / I / H / N
-         -- print(e.type)
+         e.type = e.type:sub(1, 1):upper() -- Convert type to E/W/I/H/N
          return e
       end,
    },
    quickfix = {
       extension = 'qf',
-      -- keywords = { 'error' }, --  'error' | 'warning'
       keywords = { 'error', 'warning' }, --  'error' | 'warning' | 'information'
       auto_open = {
          enabled = true, -- Open qfix after compile
-         -- open_with = { },
          open_with = { 'error', 'warning' },
       },
-      -- delete_after_load = true, -- FIXME: いらない
-      -- Formatting function for generating quickfix
-      format = function(e)
-         if e.type == 'error' or e.type == 'warning' then
-            return string.format('%s:%d:%d: %s:%s: %s', e.file, e.line, e.col, e.type, e.code, e.msg)
-         elseif e.type == 'information' then
-            return string.format('%s:1:1: %s: %s', e.file, e.type, e.msg)
-         end
-      end,
    },
    information = {
       show_notify = true,
@@ -88,7 +75,6 @@ M.default = {
       },
       quickfix = {
          on_updated = false,
-         -- on_deleted = false, -- FIXME: 不要
       },
       log = {
          on_saved = false,
