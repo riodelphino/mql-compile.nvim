@@ -55,6 +55,9 @@ With [nvim-notify](https://github.com/rcarriga/nvim-notify)
 - MT5
 - wine (for now)
 
+**Required**
+- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for async
+
 **Optional**
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages
@@ -71,6 +74,7 @@ Using [Lazy.nvim](https://github.com/folke/lazy.nvim):
 -- Minimum config:
 return {
    'riodelphino/mql-compile.nvim',
+   requires = { 'nvim-lua/plenary.nvim' },
    lazy = true,
    ft = { 'cpp', 'c' }, -- If your filetype settings read mql5 as cpp / mql4 as c.
    opts = {

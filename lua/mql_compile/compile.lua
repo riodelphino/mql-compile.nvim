@@ -48,7 +48,7 @@ function M.compile(source_path)
 
    -- Set paths
    local metaeditor_path = vim.fn.expand(mql.metaeditor_path)
-   local pattern = fn.pattern_bash_to_lua(mql.pattern) -- Convert pattern from '*.mq5' to '.*%.mq5'
+   -- local pattern = fn.pattern_bash_to_lua(mql.pattern) -- Convert pattern from '*.mq5' to '.*%.mq5'
    local basename = fn.get_basename(source_path)
    local log_path = basename .. '.' .. opts.log.extension
    local qf_path = basename .. '.' .. opts.quickfix.extension

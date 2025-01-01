@@ -63,8 +63,18 @@ function M.get_relative_path(path)
    return path
 end
 
+function M.get_absolute_path(path)
+   path = vim.fn.fnamemodify(path, ':p')
+   return path
+end
+
 function M.get_filename(path)
    path = vim.fn.fnamemodify(path, ':~')
+   return path
+end
+
+function M.get_dir(path)
+   path = vim.fn.fnamemodify(path, ':h')
    return path
 end
 
