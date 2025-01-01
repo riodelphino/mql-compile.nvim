@@ -142,7 +142,7 @@ return {
             pattern = '*.mq4',
          },
       },
-      notify = { -- Timings to notify to user
+      notify = { -- Enable/disable notify
          compile = {
             on_start = true,
             on_failed = true,
@@ -153,7 +153,7 @@ return {
             on_deleted = false,
             -- on_load = false,
             on_count = false,
-            actions = { 'including', }, -- 'compiling' | 'including'
+            actions = { 'including' }, -- 'compiling' | 'including'
          },
          quickfix = {
             on_saved = false,
