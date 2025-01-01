@@ -123,16 +123,6 @@ function M.merge(user_opts)
    -- opts = vim.tbl_deep_extend("force", M.default, user_opts or {})
    opts = M.deep_merge(M.default, user_opts or {})
 
-   -- expand path for % ~
-   -- opts.ft.mql5.metaeditor_path = vim.fn.expand(opts.ft.mql5.metaeditor_path)
-   -- opts.ft.mql5.include_path = vim.fn.expand(opts.ft.mql5.include_path)
-   -- opts.ft.mql4.metaeditor_path = vim.fn.expand(opts.ft.mql4.metaeditor_path)
-   -- opts.ft.mql4.include_path = vim.fn.expand(opts.ft.mql4.include_path)
-
-   -- Set default
-   -- opts.ft.mql5.extension = opts.ft.mql5 and opts.ft.mql5.extension or 'mq5'
-   -- opts.ft.mql4.extension = opts.ft.mql4 and opts.ft.mql4.extension or 'mq4'
-
    M._opts = opts
 
    return opts
