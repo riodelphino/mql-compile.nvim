@@ -187,6 +187,12 @@ function M.compile(source_path)
    -- Set paths
    -- local metaeditor_path = vim.fn.expand(mql.metaeditor_path)
    local metaeditor_path = fn.get_absolute_path(mql.metaeditor_path)
+   -- Check exe exists
+   if not fn.file_exists(metaeditor_path) then
+      local msg = 'Command does not exist: "' .. metaeditor_path .. '"'
+      fn.notify(msg, vim.log.levels.ERROR)
+      return
+   end
    -- local pattern = fn.pattern_bash_to_lua(mql.pattern) -- Convert pattern from '*.mq5' to '.*%.mq5'
    local basename = fn.get_basename(source_path)
    local log_path = basename .. '.' .. opts.log.extension
