@@ -19,22 +19,27 @@ If anyone encounters any problems while testing on Windows, please create an iss
 ## Screen shots
 With [nvim-notify](https://github.com/rcarriga/nvim-notify)
 
-### On error
+### Error
 
+Quickfix
 ![error_quickfix](./img/error_quickfix.png)
 
+Notify
 ![error_notify](./img/error_notify.png)
 
-### On warning
-
+### Warning
+Quickfix
 ![warning_quickfix](./img/warning_quickfix.png)
 
+Notify
 ![warning_notify](./img/warning_notify.png)
 
-### On success
+### Success
 
+Quickfix
 ![success_quickfix](./img/success_quickfix.png)
 
+Notify
 ![success_notify](./img/success_notify.png)
 
 
@@ -367,6 +372,22 @@ For those who want to have nicer messages, follow this.
 Then `mql-compile` shows you messages through it.
 
 
+## Highlights
+
+Using these highlight groups in quickfix list.  
+(Not complete)
+
+```txt
+qfFileName
+qfSeparatorLeft
+qfLnum
+qfCol
+qfError / qfWarning / qfInfo
+qfCode
+qfSeparatorRight
+qfText
+```
+
 ## License
 
 [MIT License](./LICENSE)
@@ -377,7 +398,8 @@ Then `mql-compile` shows you messages through it.
 > [!Important]
 > Urgent!!!
 
-- [ ] actions not filterd on Quickfix generation
+- [ ] Actions not filterd on Quickfix generation
+- [ ] Add highlight color options ?
 - [ ] Adoopt to Windows
    - [ ] Any problems on Windows ? Tell me please.
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
