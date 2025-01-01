@@ -31,8 +31,11 @@ function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_p
       command = cmd,
       args = args,
       cwd = cwd,
-      on_stdout = function() end, -- Disabled strout
-      on_stderr = function() end, -- Disabled strerr
+      -- Below disabling strout x 4 not work...
+      -- on_stdout = function() end,
+      -- on_stderr = function() end,
+      -- stdout_results = false,
+      -- stderr_results = false,
       on_start = function()
          -- notify: compile.on_start
          if opts.notify.compile.on_start then
@@ -184,6 +187,12 @@ function M.compile(source_path)
    -- Set paths
    -- local metaeditor_path = vim.fn.expand(mql.metaeditor_path)
    local metaeditor_path = fn.get_absolute_path(mql.metaeditor_path)
+   -- Check exe exists
+   if not fn.file_exists(metaeditor_path) then
+      local msg = 'Command does not exist: "' .. metaeditor_path .. '"'
+      fn.notify(msg, vim.log.levels.ERROR)
+      return
+   end
    -- local pattern = fn.pattern_bash_to_lua(mql.pattern) -- Convert pattern from '*.mq5' to '.*%.mq5'
    local basename = fn.get_basename(source_path)
    local log_path = basename .. '.' .. opts.log.extension
