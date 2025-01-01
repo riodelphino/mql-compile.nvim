@@ -31,8 +31,11 @@ function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_p
       command = cmd,
       args = args,
       cwd = cwd,
-      on_stdout = function() end, -- Disabled strout
-      on_stderr = function() end, -- Disabled strerr
+      -- Below disabling strout x 4 not work...
+      -- on_stdout = function() end,
+      -- on_stderr = function() end,
+      -- stdout_results = false,
+      -- stderr_results = false,
       on_start = function()
          -- notify: compile.on_start
          if opts.notify.compile.on_start then
