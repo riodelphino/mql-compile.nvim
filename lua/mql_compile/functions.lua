@@ -61,7 +61,7 @@ function M.log_to_qf(log_path, qf_path, keywords)
    if log_file == nil then
       err_msg = err_msg:gsub('^: ', '')
       msg = string.format('%s: %s', err_msg, log_path)
-      vim.notify(msg, vim.log.levels.ERROR)
+      M.notify(msg, vim.log.levels.ERROR)
       return nil
    end
    for line in log_file:lines() do
@@ -118,7 +118,7 @@ function M.log_to_info(log_path, info_path, actions)
    if log_file == nil then
       err_msg = err_msg:gsub('^: ', '')
       msg = string.format('%s: %s', err_msg, log_path)
-      vim.notify(msg, vim.log.levels.ERROR)
+      M.notify(msg, vim.log.levels.ERROR)
       return nil
    end
 
