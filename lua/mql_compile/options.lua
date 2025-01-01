@@ -11,12 +11,19 @@ M.default = {
       extension = 'log',
       delete_after_load = true,
       -- Parsing function from log
-      parse = function(line, e)
-         if e.type == 'error' or e.type == 'warning' then
-            e.file, e.line, e.col, e.code, e.msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. e.type .. ' (%d+): (.*)$')
-         elseif e.type == 'information' then
-            e.file, e.msg = line:match('^(.*) : ' .. e.type .. ': (.*)$')
+      parse = function(line, type)
+         local e = {}
+         if type == 'error' or type == 'warning' then
+            e.filename, e.lnum, e.col, e.type, e.nr, e.text = line:match('^(.*)%((%d+),(%d+)%) : (.*) (%d+): (.*)$')
+         elseif type == 'information' then
+            e.filename, e.type, e.text = line:match('^(.*) : (.*): (.*)$')
+            e.lnum = 1
+            e.col = 1
+            e.nr = 0
          end
+         -- print(vim.inspect(e))
+         e.type = e.type:sub(1, 1):upper() -- Convert to E / W / I / H / N
+         -- print(e.type)
          return e
       end,
    },
@@ -29,7 +36,7 @@ M.default = {
          -- open_with = { },
          open_with = { 'error', 'warning' },
       },
-      delete_after_load = true,
+      -- delete_after_load = true, -- FIXME: いらない
       -- Formatting function for generating quickfix
       format = function(e)
          if e.type == 'error' or e.type == 'warning' then
@@ -80,8 +87,8 @@ M.default = {
          actions = { 'including' }, -- 'compiling' | 'including' | 'code generated'
       },
       quickfix = {
-         on_saved = false,
-         on_deleted = false,
+         on_updated = false,
+         -- on_deleted = false, -- FIXME: 不要
       },
       log = {
          on_saved = false,

@@ -128,7 +128,6 @@ function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_p
             end
 
             -- Open quickfix
-            vim.cmd('cfile ' .. qf_path)
             if opts.quickfix.auto_open.enabled then
                local open_flag = false
                for _, key in ipairs(opts.quickfix.auto_open.open_with) do
@@ -147,15 +146,15 @@ function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_p
                end
             end
 
-            -- Delete quickfix
-            if opts.quickfix.delete_after_load then
-               vim.fn.delete(qf_path)
-               -- notify: quickfix.on_deleted
-               if opts.notify.quickfix.on_deleted then
-                  msg = "Deleted quickfix: '" .. qf_path .. "'"
-                  fn.notify(msg, vim.log.levels.INFO)
-               end
-            end
+            -- -- Delete quickfix
+            -- if opts.quickfix.delete_after_load then
+            --    vim.fn.delete(qf_path)
+            --    -- notify: quickfix.on_deleted
+            --    if opts.notify.quickfix.on_deleted then
+            --       msg = "Deleted quickfix: '" .. qf_path .. "'"
+            --       fn.notify(msg, vim.log.levels.INFO)
+            --    end
+            -- end
 
             -- Delete info
             if opts.information.delete_after_load then

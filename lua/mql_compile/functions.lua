@@ -48,7 +48,7 @@ end
 
 function M.log_to_qf(log_path, qf_path, keywords)
    local opts = opt.get_opts()
-   local qf_lines = {}
+   local qf_list = {}
    local count = {
       error = 0,
       warning = 0,
@@ -57,6 +57,21 @@ function M.log_to_qf(log_path, qf_path, keywords)
    local default_keywords = { 'error', 'warning', 'information' }
    keywords = keywords or default_keywords
 
+   --  bufnr     : buffer number; must be the number of a valid buffer
+   --  filename  : name of a file; only used when "bufnr" is not present or it is invalid.
+   --  module    : name of a module; if given it will be used in quickfix error window instead of the filename.
+   --  lnum      : line number in the file
+   --  end_lnum  : end of lines, if the item spans multiple lines
+   --  pattern   : search pattern used to locate the error
+   --  col       : column number
+   --  vcol      : when non-zero: "col" is visual column when zero: "col" is byte index
+   --  end_col   : end column, if the item spans multiple columns
+   --  nr        : error number
+   --  text      : description of the error
+   --  type      : single-character error type, 'E', 'W', etc.
+   --  valid     : recognized error message
+   --  user_data : custom data associated with the item, can be any type.
+
    local log_file, err_msg, err_code = io.open(log_path, 'r')
    if log_file == nil then
       err_msg = err_msg:gsub('^: ', '')
@@ -64,38 +79,23 @@ function M.log_to_qf(log_path, qf_path, keywords)
       M.notify(msg, vim.log.levels.ERROR)
       return nil
    end
+
+   vim.fn.setqflist({}, 'f') -- Clear qflist
    for line in log_file:lines() do
       -- Filter lines
       for _, key in pairs(keywords) do
          if line:match(' : ' .. key) then
             count[key] = count[key] + 1
-            local e = {}
             -- local file, line_num, col_num, code, msg
-
-            e.type = key
-            e = opts.log.parse(line, e) -- Parse log !
-
-            -- e.file = M.convert_path_to_os(e.file, opt._mql.wine_drive_letter, opt._os_type)
-
-            if M.in_table(keywords, key) then -- Check for showing in qfix
-               -- Output as quickfix format
-               local formatted_line = opts.quickfix.format(e) -- Format log to quickfix!
-               table.insert(qf_lines, formatted_line)
-            end
+            local e = opts.log.parse(line, key) -- Parse log
+            vim.fn.setqflist({ e }, 'a') -- Add to quickfix
          end
       end
    end
    log_file:close()
 
-   -- Save to quickfix
-   local qf_file = io.open(qf_path, 'w')
-   for _, line in ipairs(qf_lines) do
-      qf_file:write(line .. '\n')
-   end
-   qf_file:close()
-
-   -- notify 'quickfix.on_saved'
-   if opts.notify.quickfix.on_saved then
+   -- notify 'quickfix.on_updated'
+   if opts.notify.quickfix.on_updated then
       msg = "Saved quickfix: '" .. qf_path .. "'"
       M.notify(msg, vim.log.levels.INFO)
    end
