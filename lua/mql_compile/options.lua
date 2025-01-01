@@ -59,13 +59,11 @@ M.default = {
          metaeditor_path = '',
          include_path = '',
          pattern = '*.mq5',
-         -- wine_drive_letter = 'Z:',
       },
       mql4 = {
          metaeditor_path = '',
          include_path = '',
          pattern = '*.mq4',
-         -- wine_drive_letter = 'Z:',
       },
    },
    notify = {
