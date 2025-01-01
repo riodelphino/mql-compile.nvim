@@ -1,14 +1,19 @@
 # mql-compile.nvim
 
 ## Concepts
-A Neovim plugin for compiling MQL5 scripts.  
+A neovim plugin for compiling MQL5/4 scripts asyncronously.  
 Without heavy MetaEditor GUI (Compiles on command-line).
 
 > [!Caution]
-> Still testing. Be careful to use, not to lose your files.
+> This is a test version.  
+
+Be careful to use, not to lose your files.
 
 > [!Caution]
-> Currently works only in 'macOS + wine(wineskin) + MT5' environment.
+> Not tested in Windows or Linux  
+
+Currently ensured to work only in 'macOS + wine(wineskin)' environment.  
+If anyone encounters any problems while testing on Windows, please create an issue on GitHub.
 
 
 ## Screen shots
@@ -36,16 +41,15 @@ With [nvim-notify](https://github.com/rcarriga/nvim-notify)
 ## Features
 
 **Main features**
-- Compile MQL5
-- Show errors in quickfix (& jump to the position)
-- Auto detect mql5/mql4 by given source path
-- Works on `MacOS + wine(wineskin)`
+- Async compiling MQL5
+- Show quickfix
+- Auto detect mql5/mql4
+- Works on `MacOS + wine(wineskin)` for now
 
 **Not implemented**
-- Compile MQL4 (in future)
-- Async compiling (in future)
-- Works on Windows (in future)
-- Works on Linux (just not tested)
+- Async compiling MQL4 (Under fixing)
+- Works on `Windows` (Need tested)
+- Works on `Linux` (Need tested)
 
 
 ## Requirement
@@ -55,10 +59,10 @@ With [nvim-notify](https://github.com/rcarriga/nvim-notify)
 - MT5
 - wine (for now)
 
-**Required**
+**Required plugins**
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for async
 
-**Optional**
+**Optional plugins**
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages
 
@@ -74,7 +78,10 @@ Using [Lazy.nvim](https://github.com/folke/lazy.nvim):
 -- Minimum config:
 return {
    'riodelphino/mql-compile.nvim',
-   requires = { 'nvim-lua/plenary.nvim' },
+   dependencies = {
+      'nvim-lua/plenary.nvim',
+      { 'rcarriga/nvim-notify', commit = 'fbef5d32be8466dd76544a257d3f3dce20082a07' } -- v3.14.0 (later version cause `{ title = '' }` error for now)
+   },
    lazy = true,
    ft = { 'cpp', 'c' }, -- If your filetype settings read mql5 as cpp / mql4 as c.
    opts = {
@@ -143,7 +150,7 @@ return {
       },
       notify = { -- Timings to notify to user
          compile = {
-            on_start = false,
+            on_start = true,
             on_failed = true,
             on_succeeded = true,
          },
@@ -151,7 +158,7 @@ return {
             on_saved = false,
             on_deleted = false,
             -- on_load = false,
-            counts = false,
+            on_count = false,
             actions = { 'including', }, -- 'compiling' | 'including'
          },
          quickfix = {
@@ -161,7 +168,7 @@ return {
          log = {
             on_saved = false,
             on_deleted = false,
-            counts = true,
+            on_count = true,
          },
       },
    },
@@ -253,6 +260,8 @@ opts = {
 ## Commands
 
 ### Compiling
+This plugin compiles mql5/4 asyncronously.
+
 ```vim
 " Set mql5 path
 :MQLCompileSetSource my_ea.mq5
@@ -378,19 +387,18 @@ For those who want to have nicer messages, follow this.
 Then `mql-compile` shows you messages through it.
 
 
+## License
+
+[MIT License](./LICENSE)
+
+
 ## TO-DO
 
 > [!Important]
 > Urgent!!!
 
 - [ ] Adoopt to Windows
-   - [ ] lfs library ?
-   - [ ] Standard library ?
-      - [ ] separator : package.config:sub(1, 1) -- "/" or "\\"
-      - [ ] homedir: vim.fn.expand("~")
-      - [ ] tmpdir : vim.fn.tempname() or vim.loop.os_tmpdir()
-      - [ ] join   : vim.fs.joinpath("folder", "subfolder", "file.txt") (nvim v0.9 or later)
-- [ ] ❗️Async compile
+   - [ ] Any problems on Windows ? Tell me please.
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] git
    - [x] Detect git root
@@ -402,5 +410,5 @@ Then `mql-compile` shows you messages through it.
 > [!Note]
 > Hope to add in future
 
-- [ ] MQL4 compiling (has problem with log file's encoding)
+- [ ] MQL4 compiling (has some problem with log's encoding)
 

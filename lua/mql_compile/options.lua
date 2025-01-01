@@ -72,7 +72,7 @@ M.default = {
    },
    notify = {
       compile = {
-         on_start = false,
+         on_start = true,
          on_failed = true,
          on_succeeded = true,
       },
@@ -80,7 +80,7 @@ M.default = {
          on_saved = false,
          on_deleted = false,
          -- on_load = false,
-         counts = false,
+         on_count = false,
          actions = { 'including' }, -- 'compiling' | 'including' | 'code generated'
       },
       quickfix = {
@@ -90,7 +90,7 @@ M.default = {
       log = {
          on_saved = false,
          on_deleted = false,
-         counts = true,
+         on_count = true,
       },
    },
 }

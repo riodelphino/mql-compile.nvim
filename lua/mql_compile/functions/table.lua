@@ -22,7 +22,6 @@ function M.table_to_string(table, keys, key_value_separator, item_separator)
    key_value_separator = key_value_separator or ': '
    item_separator = item_separator or ' | '
    local str = ''
-   print(vim.inspect(keys))
    for _, key in ipairs(keys) do
       str = str .. key .. key_value_separator .. tostring(table[key]) .. item_separator
    end
