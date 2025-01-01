@@ -61,7 +61,7 @@ function M.log_to_qf(log_path, qf_path, keywords)
    if log_file == nil then
       err_msg = err_msg:gsub('^: ', '')
       msg = string.format('%s: %s', err_msg, log_path)
-      vim.notify(msg, vim.log.levels.ERROR)
+      M.notify(msg, vim.log.levels.ERROR)
       return nil
    end
    for line in log_file:lines() do
@@ -75,7 +75,7 @@ function M.log_to_qf(log_path, qf_path, keywords)
             e.type = key
             e = opts.log.parse(line, e) -- Parse log !
 
-            e.file = M.convert_path_to_os(e.file, opt._mql.wine_drive_letter, opt._os_type)
+            -- e.file = M.convert_path_to_os(e.file, opt._mql.wine_drive_letter, opt._os_type)
 
             if M.in_table(keywords, key) then -- Check for showing in qfix
                -- Output as quickfix format
@@ -118,7 +118,7 @@ function M.log_to_info(log_path, info_path, actions)
    if log_file == nil then
       err_msg = err_msg:gsub('^: ', '')
       msg = string.format('%s: %s', err_msg, log_path)
-      vim.notify(msg, vim.log.levels.ERROR)
+      M.notify(msg, vim.log.levels.ERROR)
       return nil
    end
 
@@ -130,7 +130,7 @@ function M.log_to_info(log_path, info_path, actions)
             local i = {}
 
             i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
-            i.file = M.convert_path_to_os(i.file, opt._mql.wine_drive_letter, opt._os_type)
+            -- i.file = M.convert_path_to_os(i.file, opt._mql.wine_drive_letter, opt._os_type)
             if M.in_table(actions, i.action) then -- Check for showing in info
                -- Output as infomation format
                -- table.insert(info_lines, string.format('[%s] %s %s', file, action, details))
