@@ -127,7 +127,7 @@ return {
       information = {
          actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
          show = {
-            notify = true,
+            notify = true, -- Show 'information' independently in notify
             with = { 'including' }, -- Actions to show. 'compiling' | 'including'
          },
          parse = nil,
