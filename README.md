@@ -2,39 +2,49 @@
 
 ## Concepts
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
-Without heavy MetaEditor GUI (Compiles on command-line).
+Without heavy MetaEditor GUI. (Compiling on command-line).
 
-> [!Caution]
+> [!Warning]
 > This is a test version.  
 
 Be careful to use, not to lose your files.
 
-> [!Caution]
+> [!Warning]
 > Not tested in Windows or Linux  
 
 Currently ensured to work only in 'macOS + wine(wineskin)' environment.  
-If anyone encounters any problems while testing on Windows, please create an issue on GitHub.
+If anyone encounters any problems while using/testing, please [create an issue](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
 
 
-## Screen shots
+## Screenshots
+
 With [nvim-notify](https://github.com/rcarriga/nvim-notify)
 
-### On error
+> [!Note]
+> Sorry, these pics are from older ver.
 
+### Error
+
+Quickfix
 ![error_quickfix](./img/error_quickfix.png)
 
+Notify
 ![error_notify](./img/error_notify.png)
 
-### On warning
+### Warning
 
+Quickfix
 ![warning_quickfix](./img/warning_quickfix.png)
 
+Notify
 ![warning_notify](./img/warning_notify.png)
 
-### On success
+### Success
 
+Quickfix
 ![success_quickfix](./img/success_quickfix.png)
 
+Notify
 ![success_notify](./img/success_notify.png)
 
 
@@ -62,7 +72,7 @@ With [nvim-notify](https://github.com/rcarriga/nvim-notify)
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages
 
-> [!Caution]
+> [!Warning]
 > nvim-notify: Only v3.14.0 or earlier versions work for now as its error.
 
 
@@ -84,11 +94,9 @@ return {
       ft = {
          mql5 = {
             metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
-            wine_drive_letter = 'Z:',
          },
          mql4 = {
             metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
-            wine_drive_letter = 'Z:',
          },
       },
    },
@@ -107,28 +115,27 @@ return {
       log = {
          extension = 'log',
          delete_after_load = true,
-         parse = nil,
       },
       quickfix = {
-         extension = 'qf',
-         keywords = { 'error', 'warning', }, -- Shows in quickfix. 'error' | 'warning' | 'information'
-         auto_open = {
-            enabled = true, -- Open quickfix after compile
-            open_with = { 'error', 'warning', },
+         types = { 'error', 'warning' }, -- Types to pick up. 'error' | 'warning' | 'information'
+         show = {
+            copen = true, -- Open quickfix automatically
+            with = { 'error', 'warning' }, -- Types to copen. 'error' | 'warning' | 'information'
          },
-         delete_after_load = true,
-         format = nil,
+         parse = nil,
       },
       information = {
-         show_notify = true, -- 'information' can be shown in notify too. (Reommend)
-         extension = 'info',
-         actions = { 'including' }, -- Actions to show. 'compiling' | 'including'
+         actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
+         show = {
+            notify = true,
+            with = { 'including' }, -- Actions to show. 'compiling' | 'including'
+         },
          parse = nil,
          format = nil,
       },
       wine = {
-         enabled = true,
-         command = 'wine', -- Wine command path, if you installed MT4/5 with wine.
+         enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
+         command = 'wine', -- Wine command path
       },
       ft = {
          mql5 = {
@@ -142,28 +149,19 @@ return {
             pattern = '*.mq4',
          },
       },
-      notify = { -- Timings to notify to user
+      notify = { -- Enable/disable notify
          compile = {
-            on_start = true,
-            on_failed = true,
-            on_succeeded = true,
-         },
-         information = {
-            on_saved = false,
-            on_deleted = false,
-            -- on_load = false,
-            on_count = false,
-            actions = { 'including', }, -- 'compiling' | 'including'
-         },
-         quickfix = {
-            on_saved = false,
-            on_deleted = false,
+            on_started = true,
+            on_finished = true,
          },
          log = {
             on_saved = false,
             on_deleted = false,
-            on_count = true,
          },
+         quickfix = {
+            on_finished = true, -- Add quickfix counts to main message on 'notify.compile.on_finished'
+         },
+         information = {},
       },
    },
 ```
@@ -199,43 +197,30 @@ You can modify parsing & formatting functions, if you need.
 Leave 'parse' or 'format' as nil to use these default functions. 
 
 
-### Parsing function to read log
+### Parsing function, from log to quickfix
 
 Default:
 ```lua
 opts = {
-   log = {
-      parse = function(line, e)
-         if e.type == 'error' or e.type == 'warning' then
-            e.file, e.line, e.col, e.code, e.msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. e.type .. ' (%d+): (.*)$')
-         elseif e.type == 'information' then
-            e.file, e.msg = line:match('^(.*) : ' .. e.type .. ': (.*)$')
+   quickfix = {
+      parse = function(line, type)
+         local e = {}
+         if type == 'error' or type == 'warning' then
+            e.filename, e.lnum, e.col, e.type, e.nr, e.text = line:match('^(.*)%((%d+),(%d+)%) : (.*) (%d+): (.*)$')
+         elseif type == 'information' then
+            e.filename, e.type, e.text = line:match('^(.*) : (.*): (.*)$')
+            e.lnum = 1
+            e.col = 1
+            e.nr = 0
          end
+         e.type = e.type:sub(1, 1):upper() -- Convert type to E/W/I/H/N
          return e
       end,
    },
 },
 ```
 
-### Formatting function to generate quickfix
-
-Default:
-```lua
-opts = {
-   quickfix = {
-      format = function(e)
-         if e.type == 'error' or e.type == 'warning' then
-            return string.format('%s:%d:%d: %s:%s: %s', e.file, e.line, e.col, e.type, e.code, e.msg)
-         elseif e.type == 'information' then
-            return string.format('%s:1:1: %s: %s', e.file, e.type, e.msg)
-         end
-      end,
-   },
-},
-
-```
-
-### Parsing and formatting function of information
+### Parsing and formatting function, from log to information
 
 Default:
 ```lua
@@ -252,9 +237,12 @@ opts = {
 },
 
 ```
+
 ## Commands
 
+
 ### Compiling
+
 This plugin compiles mql5/4 asyncronously.
 
 ```vim
@@ -295,6 +283,7 @@ So, `:MQLCompileSetSource` & Auto-detection allow you to compile the file anywhe
 
 
 ### Show options
+
 Show all current options as table. Just for checking.
 ```vim
 :MQLCompileShowOptions
@@ -382,6 +371,24 @@ For those who want to have nicer messages, follow this.
 Then `mql-compile` shows you messages through it.
 
 
+## Highlights
+
+Highlight groups in quickfix list.  
+
+> [!Warning]
+> Not completed yet. ugly...
+
+```txt
+qfFileName
+qfSeparatorLeft
+qfLnum
+qfCol
+qfError / qfWarning / qfInfo
+qfCode
+qfSeparatorRight
+qfText
+```
+
 ## License
 
 [MIT License](./LICENSE)
@@ -389,11 +396,7 @@ Then `mql-compile` shows you messages through it.
 
 ## TO-DO
 
-> [!Important]
-> Urgent!!!
-
-- [ ] Adoopt to Windows
-   - [ ] Any problems on Windows ? Tell me please.
+- [ ] Add highlight color options ?
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] git
    - [x] Detect git root
@@ -401,9 +404,4 @@ Then `mql-compile` shows you messages through it.
    - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] include path NOT WORKS for the space char in `Program Files`
-
-> [!Note]
-> Hope to add in future
-
-- [ ] MQL4 compiling (has some problem with log's encoding)
 

@@ -33,7 +33,7 @@ function M.get_root(path)
    return git_root or cwd or current_buf_dir or path
 end
 
-function M.find_files_recursively(base_dir, pattern) -- FIXME: pattern arg is lua ? bash ?
+function M.find_files_recursively(base_dir, pattern) -- pattern must be lua type
    local files = {}
    local uv = vim.loop
 

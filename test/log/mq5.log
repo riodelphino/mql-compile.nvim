@@ -1,0 +1,8 @@
+
+
+ea_errors.mq5 : information: compiling 'ea_errors.mq5'
+ea_errors.mq5 : information: including class\file_1.mqh
+ea_errors.mq5(2,11) : error 106: file 'class\file_2.mqh' not found
+ea_errors.mq5(12,1) : error 149: 'aaa' - unexpected token, probably type is missing?
+ea_errors.mq5(9,11) : warning 31: variable 'test' not used
+Result: 2 errors, 1 warnings

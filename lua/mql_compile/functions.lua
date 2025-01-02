@@ -46,16 +46,41 @@ function M.convert_encoding(path)
    if not success then M.notify(err, vim.log.levels.ERROR) end
 end
 
-function M.log_to_qf(log_path, qf_path, keywords)
+function M.generate_qf(log_path, types)
    local opts = opt.get_opts()
-   local qf_lines = {}
    local count = {
-      error = 0,
-      warning = 0,
-      information = 0,
+      -- error = 0,
+      -- warning = 0,
+      -- information = 0,
    }
-   local default_keywords = { 'error', 'warning', 'information' }
-   keywords = keywords or default_keywords
+   local default_types = { 'error', 'warning', 'information' }
+   types = types or default_types -- TODO: Is this needed ??
+
+   -- Checking actions of information
+   function is_match_action(line)
+      local format = ' : information: %s'
+      local matched = false
+      for _, action in ipairs(opts.information.actions) do
+         search = string.format(format, action)
+         matched = matched or line:match(search)
+      end
+      return matched
+   end
+
+   --  bufnr     : buffer number; must be the number of a valid buffer
+   --  filename  : name of a file; only used when "bufnr" is not present or it is invalid.
+   --  module    : name of a module; if given it will be used in quickfix error window instead of the filename.
+   --  lnum      : line number in the file
+   --  end_lnum  : end of lines, if the item spans multiple lines
+   --  pattern   : search pattern used to locate the error
+   --  col       : column number
+   --  vcol      : when non-zero: "col" is visual column when zero: "col" is byte index
+   --  end_col   : end column, if the item spans multiple columns
+   --  nr        : error number
+   --  text      : description of the error
+   --  type      : single-character error type, 'E', 'W', etc.
+   --  valid     : recognized error message
+   --  user_data : custom data associated with the item, can be any type.
 
    local log_file, err_msg, err_code = io.open(log_path, 'r')
    if log_file == nil then
@@ -64,55 +89,38 @@ function M.log_to_qf(log_path, qf_path, keywords)
       M.notify(msg, vim.log.levels.ERROR)
       return nil
    end
+
+   vim.fn.setqflist({}, 'f') -- Clear qflist
    for line in log_file:lines() do
       -- Filter lines
-      for _, key in pairs(keywords) do
+      for _, key in pairs(types) do
          if line:match(' : ' .. key) then
-            count[key] = count[key] + 1
-            local e = {}
-            -- local file, line_num, col_num, code, msg
-
-            e.type = key
-            e = opts.log.parse(line, e) -- Parse log !
-
-            -- e.file = M.convert_path_to_os(e.file, opt._mql.wine_drive_letter, opt._os_type)
-
-            if M.in_table(keywords, key) then -- Check for showing in qfix
-               -- Output as quickfix format
-               local formatted_line = opts.quickfix.format(e) -- Format log to quickfix!
-               table.insert(qf_lines, formatted_line)
+            -- Check for matching action in information
+            if key == 'information' then
+               if not is_match_action(line) then break end -- exit if not matched in opts.infomration.actions
             end
+            if count[key] == nil then count[key] = 0 end
+            count[key] = count[key] + 1 -- Count up
+            local e = opts.quickfix.parse(line, key) -- Parse log
+            vim.fn.setqflist({ e }, 'a') -- Add to quickfix
          end
       end
    end
    log_file:close()
 
-   -- Save to quickfix
-   local qf_file = io.open(qf_path, 'w')
-   for _, line in ipairs(qf_lines) do
-      qf_file:write(line .. '\n')
-   end
-   qf_file:close()
-
-   -- notify 'quickfix.on_saved'
-   if opts.notify.quickfix.on_saved then
-      msg = "Saved quickfix: '" .. qf_path .. "'"
-      M.notify(msg, vim.log.levels.INFO)
-   end
-
    return count
 end
 
-function M.log_to_info(log_path, info_path, actions)
+function M.generate_info(log_path, actions)
    local opts = opt.get_opts()
    local info_lines = {}
    local count = {
-      compiling = 0,
-      including = 0,
+      -- compiling = 0,
+      -- including = 0,
    }
-   -- local default_keywords = { 'compiling', 'including' }
+   -- local default_types = { 'compiling', 'including' }
    local default_actions = { 'compiling', 'including' }
-   actions = actions or default_actions
+   actions = actions or default_actions -- TODO: Is this checking & overwriting needed ?
 
    local log_file, err_msg, err_code = io.open(log_path, 'r')
    if log_file == nil then
@@ -126,14 +134,13 @@ function M.log_to_info(log_path, info_path, actions)
       -- Filter lines
       for _, action in pairs(actions) do
          if line:match('information: ' .. action) then
+            if count[action] == nil then count[action] = 0 end
             count[action] = count[action] + 1
             local i = {}
-
-            i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
-            -- i.file = M.convert_path_to_os(i.file, opt._mql.wine_drive_letter, opt._os_type)
-            if M.in_table(actions, i.action) then -- Check for showing in info
-               -- Output as infomation format
-               -- table.insert(info_lines, string.format('[%s] %s %s', file, action, details))
+            -- Parse from log
+            i = opts.information.parse(line, i)
+            if M.in_table(actions, i.action) then -- Check for showing in info or not
+               -- Format to information
                local formatted = opts.information.format(i)
                table.insert(info_lines, formatted)
             end
@@ -142,24 +149,23 @@ function M.log_to_info(log_path, info_path, actions)
    end
    log_file:close()
 
-   -- Show result if 'opts.information.show_notify'
+   -- Generate result string
    local info_content = ''
    for _, line in ipairs(info_lines) do
       info_content = info_content .. line .. '\n'
    end
-   if opts.information.show_notify then M.notify(info_content, vim.log.levels.INFO) end
 
-   -- Save to info
-   local info_file = io.open(info_path, 'w')
-   for _, line in ipairs(info_lines) do
-      info_file:write(line .. '\n')
-   end
-   info_file:close()
-
-   -- notify 'information.on_saved'
-   if opts.notify.information.on_saved then
-      msg = "Saved info: '" .. info_path .. "'"
-      M.notify(msg, vim.log.levels.INFO)
+   -- notify: opts.information.show.notify
+   if opts.information.show.notify then
+      if info_content ~= '' then
+         -- Check action matched in count
+         local show_flag = false
+         local actions_to_show = opts.information.show.with
+         for _, action in ipairs(actions_to_show) do
+            if count[action] ~= nil then show_flag = true end
+         end
+         if show_flag then M.notify(info_content, vim.log.levels.INFO) end
+      end
    end
 
    return count
