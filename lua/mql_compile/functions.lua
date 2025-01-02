@@ -48,7 +48,6 @@ end
 
 function M.log_to_qf(log_path, qf_path, keywords)
    local opts = opt.get_opts()
-   local qf_list = {}
    local count = {
       error = 0,
       warning = 0,
@@ -56,6 +55,17 @@ function M.log_to_qf(log_path, qf_path, keywords)
    }
    local default_keywords = { 'error', 'warning', 'information' }
    keywords = keywords or default_keywords
+
+   -- Checking actions of information
+   function is_match_action(line)
+      local format = ' : information: %s'
+      local matched = false
+      for _, action in ipairs(opts.information.actions) do
+         search = string.format(format, action)
+         matched = matched or line:match(search)
+      end
+      return matched
+   end
 
    --  bufnr     : buffer number; must be the number of a valid buffer
    --  filename  : name of a file; only used when "bufnr" is not present or it is invalid.
@@ -85,8 +95,11 @@ function M.log_to_qf(log_path, qf_path, keywords)
       -- Filter lines
       for _, key in pairs(keywords) do
          if line:match(' : ' .. key) then
-            count[key] = count[key] + 1
-            -- local file, line_num, col_num, code, msg
+            -- Check for matching action in information
+            if key == 'information' then
+               if not is_match_action(line) then break end -- exit if not matched in opts.infomration.actions
+            end
+            count[key] = count[key] + 1 -- Count up
             local e = opts.log.parse(line, key) -- Parse log
             vim.fn.setqflist({ e }, 'a') -- Add to quickfix
          end
