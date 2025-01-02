@@ -18,16 +18,37 @@ function M.is_array(table)
    return is_array_flg
 end
 
-function M.table_to_string(table, keys, key_value_separator, item_separator)
+function M.is_empty_table(t)
+   return next(t) == nil -- next() returns nil if table = {}
+end
+
+function M.get_table_len(t)
+   -- For arrays (integer indexes are sequential numbers)
+   if #t > 0 then
+      return #t
+   else
+      -- For associative arrays (keys other than integer)
+      local count = 0
+      for _ in pairs(t) do
+         count = count + 1
+      end
+      return count
+   end
+end
+
+-- Format table to string (ordered)
+function M.format_table_to_string(table, keys, key_value_separator, item_separator)
    key_value_separator = key_value_separator or ': '
    item_separator = item_separator or ' | '
    local str = ''
    for _, key in ipairs(keys) do
-      str = str .. key .. key_value_separator .. tostring(table[key]) .. item_separator
+      if table[key] ~= nil then -- If the key exists
+         local cur_str
+         cur_str = key .. key_value_separator .. tostring(table[key]) .. item_separator
+         str = str .. cur_str
+      end
    end
-   if str:match(item_separator .. '$') then -- remove last item_separator
-      str = str:sub(1, -(#item_separator + 1))
-   end
+   if str:match(item_separator .. '$') then str = str:gsub(item_separator .. '$', '') end -- Remove last item_separator
    return str
 end
 

@@ -10,40 +10,33 @@ M.default = {
    log = {
       extension = 'log',
       delete_after_load = true,
-      -- Parsing function from log
-      parse = function(line, e)
-         if e.type == 'error' or e.type == 'warning' then
-            e.file, e.line, e.col, e.code, e.msg = line:match('^(.*)%((%d+),(%d+)%) : ' .. e.type .. ' (%d+): (.*)$')
-         elseif e.type == 'information' then
-            e.file, e.msg = line:match('^(.*) : ' .. e.type .. ': (.*)$')
+   },
+   quickfix = {
+      types = { 'error', 'warning' }, -- Types to pick up. 'error' | 'warning' | 'information'
+      show = {
+         copen = true, -- Open quickfix automatically
+         with = { 'error', 'warning' }, -- Types to copen. 'error' | 'warning' | 'information'
+      },
+      parse = function(line, type) -- Parsing function from log
+         local e = {}
+         if type == 'error' or type == 'warning' then
+            e.filename, e.lnum, e.col, e.type, e.nr, e.text = line:match('^(.*)%((%d+),(%d+)%) : (.*) (%d+): (.*)$')
+         elseif type == 'information' then
+            e.filename, e.type, e.text = line:match('^(.*) : (.*): (.*)$')
+            e.lnum = 1
+            e.col = 1
+            e.nr = 0
          end
+         e.type = e.type:sub(1, 1):upper() -- Convert type to E/W/I/H/N
          return e
       end,
    },
-   quickfix = {
-      extension = 'qf',
-      -- keywords = { 'error' }, --  'error' | 'warning'
-      keywords = { 'error', 'warning' }, --  'error' | 'warning' | 'information'
-      auto_open = {
-         enabled = true, -- Open qfix after compile
-         -- open_with = { },
-         open_with = { 'error', 'warning' },
-      },
-      delete_after_load = true,
-      -- Formatting function for generating quickfix
-      format = function(e)
-         if e.type == 'error' or e.type == 'warning' then
-            return string.format('%s:%d:%d: %s:%s: %s', e.file, e.line, e.col, e.type, e.code, e.msg)
-         elseif e.type == 'information' then
-            return string.format('%s:1:1: %s: %s', e.file, e.type, e.msg)
-         end
-      end,
-   },
    information = {
-      show_notify = true,
-      extension = 'info',
-      actions = { 'including' }, -- 'compiling' | 'including'
-      delete_after_load = true,
+      actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
+      show = {
+         notify = true,
+         with = { 'including' }, -- Actions to show. 'compiling' | 'including'
+      },
       parse = function(line, i)
          i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
          return i
@@ -68,25 +61,18 @@ M.default = {
    },
    notify = {
       compile = {
-         on_start = true,
-         on_failed = true,
-         on_succeeded = true,
-      },
-      information = {
-         on_saved = false,
-         on_deleted = false,
-         -- on_load = false,
-         on_count = false,
-         actions = { 'including' }, -- 'compiling' | 'including' | 'code generated'
-      },
-      quickfix = {
-         on_saved = false,
-         on_deleted = false,
+         on_started = true,
+         on_finished = true,
       },
       log = {
          on_saved = false,
          on_deleted = false,
-         on_count = true,
+      },
+      quickfix = {
+         on_finished = true, -- Add quickfix counts to main message
+      },
+      information = {
+         on_generated = true, -- Show informations on notify
       },
    },
 }
@@ -122,18 +108,6 @@ function M.merge(user_opts)
 
    -- opts = vim.tbl_deep_extend("force", M.default, user_opts or {})
    opts = M.deep_merge(M.default, user_opts or {})
-
-   -- expand path for % ~
-   opts.ft.mql5.metaeditor_path = vim.fn.expand(opts.ft.mql5.metaeditor_path)
-   opts.ft.mql5.include_path = vim.fn.expand(opts.ft.mql5.include_path)
-   opts.ft.mql5.source_path = vim.fn.expand(opts.ft.mql5.source_path)
-   opts.ft.mql4.metaeditor_path = vim.fn.expand(opts.ft.mql4.metaeditor_path)
-   opts.ft.mql4.include_path = vim.fn.expand(opts.ft.mql4.include_path)
-   opts.ft.mql4.source_path = vim.fn.expand(opts.ft.mql4.source_path)
-
-   -- Set default
-   opts.ft.mql5.extension = opts.ft.mql5 and opts.ft.mql5.extension or 'mq5'
-   opts.ft.mql4.extension = opts.ft.mql4 and opts.ft.mql4.extension or 'mq4'
 
    M._opts = opts
 
