@@ -114,19 +114,19 @@ return {
          delete_after_load = true,
       },
       quickfix = {
-         extension = 'qf',
-         keywords = { 'error', 'warning', }, -- Shows in quickfix. 'error' | 'warning' | 'information'
-         auto_open = {
-            enabled = true, -- Open quickfix after compile
-            open_with = { 'error', 'warning', },
+         keywords = { 'error', 'warning' }, -- Keywords to collect. 'error' | 'warning' | 'information'
+         show = {
+            copen = true, -- Open quickfix automatically
+            with = { 'error', 'warning' }, -- Keywords to copen. 'error' | 'warning' | 'information'
          },
          parse = nil,
       },
       information = {
-         show_notify = true, -- 'information' can be shown in notify too. (Reommend)
-         extension = 'info',
-         actions = { 'including' }, -- Actions to show. 'compiling' | 'including'
-         delete_after_load = true,
+         actions = { 'including' }, -- Actions to collect. 'compiling' | 'including'
+         show = {
+            notify = true,
+            with = { 'including' }, -- Actions to show. 'compiling' | 'including'
+         },
          parse = nil,
          format = nil,
       },
@@ -159,7 +159,7 @@ return {
             on_finished = true, -- Add quickfix counts to main message
          },
          information = {
-            on_generated = true, -- Show informations on notify
+            -- on_generated = true, -- Show informations on notify
          },
       },
    },
@@ -392,10 +392,7 @@ qfText
 > [!Important]
 > Urgent!!!
 
-- [ ] Actions not filterd on Quickfix generation
 - [ ] Add highlight color options ?
-- [ ] Adoopt to Windows
-   - [ ] Any problems on Windows ? Tell me please.
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] git
    - [x] Detect git root
@@ -403,9 +400,4 @@ qfText
    - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] include path NOT WORKS for the space char in `Program Files`
-
-> [!Note]
-> Hope to add in future
-
-- [ ] MQL4 compiling (has some problem with log's encoding)
 
