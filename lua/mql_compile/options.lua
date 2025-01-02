@@ -12,10 +12,10 @@ M.default = {
       delete_after_load = true,
    },
    quickfix = {
-      keywords = { 'error', 'warning' }, -- Keywords to pick up. 'error' | 'warning' | 'information'
+      types = { 'error', 'warning' }, -- Types to pick up. 'error' | 'warning' | 'information'
       show = {
          copen = true, -- Open quickfix automatically
-         with = { 'error', 'warning' }, -- Keywords to copen. 'error' | 'warning' | 'information'
+         with = { 'error', 'warning' }, -- Types to copen. 'error' | 'warning' | 'information'
       },
       parse = function(line, type) -- Parsing function from log
          local e = {}

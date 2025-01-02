@@ -46,15 +46,15 @@ function M.convert_encoding(path)
    if not success then M.notify(err, vim.log.levels.ERROR) end
 end
 
-function M.generate_qf(log_path, keywords)
+function M.generate_qf(log_path, types)
    local opts = opt.get_opts()
    local count = {
       -- error = 0,
       -- warning = 0,
       -- information = 0,
    }
-   local default_keywords = { 'error', 'warning', 'information' }
-   keywords = keywords or default_keywords
+   local default_types = { 'error', 'warning', 'information' }
+   types = types or default_types -- TODO: Is this needed ??
 
    -- Checking actions of information
    function is_match_action(line)
@@ -93,7 +93,7 @@ function M.generate_qf(log_path, keywords)
    vim.fn.setqflist({}, 'f') -- Clear qflist
    for line in log_file:lines() do
       -- Filter lines
-      for _, key in pairs(keywords) do
+      for _, key in pairs(types) do
          if line:match(' : ' .. key) then
             -- Check for matching action in information
             if key == 'information' then
@@ -118,7 +118,7 @@ function M.generate_info(log_path, actions)
       -- compiling = 0,
       -- including = 0,
    }
-   -- local default_keywords = { 'compiling', 'including' }
+   -- local default_types = { 'compiling', 'including' }
    local default_actions = { 'compiling', 'including' }
    actions = actions or default_actions -- TODO: Is this checking & overwriting needed ?
 

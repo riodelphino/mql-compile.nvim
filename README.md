@@ -2,22 +2,26 @@
 
 ## Concepts
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
-Without heavy MetaEditor GUI (Compiles on command-line).
+Without heavy MetaEditor GUI. (Compiling on command-line).
 
-> [!Caution]
+> [!Warning]
 > This is a test version.  
 
 Be careful to use, not to lose your files.
 
-> [!Caution]
+> [!Warning]
 > Not tested in Windows or Linux  
 
 Currently ensured to work only in 'macOS + wine(wineskin)' environment.  
-If anyone encounters any problems while testing on Windows, please create an issue on GitHub.
+If anyone encounters any problems while using/testing, please [create an issue](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
 
 
-## Screen shots
+## Screenshots
+
 With [nvim-notify](https://github.com/rcarriga/nvim-notify)
+
+> [!Note]
+> Sorry, these pics are from older ver.
 
 ### Error
 
@@ -28,6 +32,7 @@ Notify
 ![error_notify](./img/error_notify.png)
 
 ### Warning
+
 Quickfix
 ![warning_quickfix](./img/warning_quickfix.png)
 
@@ -67,7 +72,7 @@ Notify
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages
 
-> [!Caution]
+> [!Warning]
 > nvim-notify: Only v3.14.0 or earlier versions work for now as its error.
 
 
@@ -89,11 +94,9 @@ return {
       ft = {
          mql5 = {
             metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
-            wine_drive_letter = 'Z:',
          },
          mql4 = {
             metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
-            wine_drive_letter = 'Z:',
          },
       },
    },
@@ -114,10 +117,10 @@ return {
          delete_after_load = true,
       },
       quickfix = {
-         keywords = { 'error', 'warning' }, -- Keywords to pick up. 'error' | 'warning' | 'information'
+         types = { 'error', 'warning' }, -- Types to pick up. 'error' | 'warning' | 'information'
          show = {
             copen = true, -- Open quickfix automatically
-            with = { 'error', 'warning' }, -- Keywords to copen. 'error' | 'warning' | 'information'
+            with = { 'error', 'warning' }, -- Types to copen. 'error' | 'warning' | 'information'
          },
          parse = nil,
       },
@@ -131,8 +134,8 @@ return {
          format = nil,
       },
       wine = {
-         enabled = true,
-         command = 'wine', -- Wine command path, if you installed MT4/5 with wine.
+         enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
+         command = 'wine', -- Wine command path
       },
       ft = {
          mql5 = {
@@ -156,11 +159,9 @@ return {
             on_deleted = false,
          },
          quickfix = {
-            on_finished = true, -- Add quickfix counts to main message
+            on_finished = true, -- Add quickfix counts to main message on 'notify.compile.on_finished'
          },
-         information = {
-            -- on_generated = true, -- Show informations on notify
-         },
+         information = {},
       },
    },
 ```
@@ -236,9 +237,12 @@ opts = {
 },
 
 ```
+
 ## Commands
 
+
 ### Compiling
+
 This plugin compiles mql5/4 asyncronously.
 
 ```vim
@@ -279,6 +283,7 @@ So, `:MQLCompileSetSource` & Auto-detection allow you to compile the file anywhe
 
 
 ### Show options
+
 Show all current options as table. Just for checking.
 ```vim
 :MQLCompileShowOptions
@@ -368,8 +373,10 @@ Then `mql-compile` shows you messages through it.
 
 ## Highlights
 
-Using these highlight groups in quickfix list.  
-(Not complete)
+Highlight groups in quickfix list.  
+
+> [!Warning]
+> Not completed yet. ugly...
 
 ```txt
 qfFileName
@@ -388,9 +395,6 @@ qfText
 
 
 ## TO-DO
-
-> [!Important]
-> Urgent!!!
 
 - [ ] Add highlight color options ?
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?

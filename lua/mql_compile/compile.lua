@@ -70,7 +70,7 @@ function M.async_compile(metaeditor_path, source_path, log_path)
             local info_cnt = fn.generate_info(log_path, opts.information.actions)
 
             -- Convert log to quickfix format
-            local qf_cnt = fn.generate_qf(log_path, opts.quickfix.keywords)
+            local qf_cnt = fn.generate_qf(log_path, opts.quickfix.types)
 
             -- NOT WORKS: How to get shell error ?
             -- if compile_shell_error == 1 then
@@ -97,7 +97,7 @@ function M.async_compile(metaeditor_path, source_path, log_path)
                local msg_main
                local msg_qf
                if opts.notify.quickfix.on_finished then
-                  msg_qf = fn.format_table_to_string(qf_cnt, opts.quickfix.keywords)
+                  msg_qf = fn.format_table_to_string(qf_cnt, opts.quickfix.types)
                else
                   msg_qf = ''
                end
@@ -114,11 +114,11 @@ function M.async_compile(metaeditor_path, source_path, log_path)
 
             -- Open quickfix
             if opts.quickfix.show.copen then
-               -- Check keyword matched in count
+               -- Check Type matched in count
                local show_flag = false
-               local keywords_to_show = opts.quickfix.show.with
-               for _, keyword in ipairs(keywords_to_show) do
-                  if qf_cnt[keyword] ~= nil then show_flag = true end
+               local types_to_show = opts.quickfix.show.with
+               for _, type in ipairs(types_to_show) do
+                  if qf_cnt[type] ~= nil then show_flag = true end
                end
                if show_flag then vim.cmd('copen') end
             end
