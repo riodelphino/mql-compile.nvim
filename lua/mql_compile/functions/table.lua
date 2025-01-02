@@ -22,22 +22,33 @@ function M.is_empty_table(t)
    return next(t) == nil -- next() returns nil if table = {}
 end
 
+function M.get_table_len(t)
+   -- For arrays (integer indexes are sequential numbers)
+   if #t > 0 then
+      return #t
+   else
+      -- For associative arrays (keys other than integer)
+      local count = 0
+      for _ in pairs(t) do
+         count = count + 1
+      end
+      return count
+   end
+end
+
 -- Format table to string (ordered)
 function M.format_table_to_string(table, keys, key_value_separator, item_separator)
    key_value_separator = key_value_separator or ': '
    item_separator = item_separator or ' | '
    local str = ''
-   for i, key in ipairs(keys) do
+   for _, key in ipairs(keys) do
       if table[key] ~= nil then -- If the key exists
          local cur_str
-         if i == #keys then -- If last item
-            cur_str = key .. key_value_separator .. tostring(table[key])
-         else
-            cur_str = key .. key_value_separator .. tostring(table[key]) .. item_separator
-         end
+         cur_str = key .. key_value_separator .. tostring(table[key]) .. item_separator
          str = str .. cur_str
       end
    end
+   if str:match(item_separator .. '$') then str = str:gsub(item_separator .. '$', '') end -- Remove last item_separator
    return str
 end
 
