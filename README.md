@@ -114,7 +114,7 @@ return {
          delete_after_load = true,
       },
       quickfix = {
-         keywords = { 'error', 'warning' }, -- Keywords to collect. 'error' | 'warning' | 'information'
+         keywords = { 'error', 'warning' }, -- Keywords to pick up. 'error' | 'warning' | 'information'
          show = {
             copen = true, -- Open quickfix automatically
             with = { 'error', 'warning' }, -- Keywords to copen. 'error' | 'warning' | 'information'
@@ -122,7 +122,7 @@ return {
          parse = nil,
       },
       information = {
-         actions = { 'including' }, -- Actions to collect. 'compiling' | 'including'
+         actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
          show = {
             notify = true,
             with = { 'including' }, -- Actions to show. 'compiling' | 'including'

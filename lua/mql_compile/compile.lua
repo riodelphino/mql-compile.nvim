@@ -113,12 +113,14 @@ function M.async_compile(metaeditor_path, source_path, log_path)
             end
 
             -- Open quickfix
-            if opts.quickfix.auto_open.enabled then
-               local open_flag = false
-               for _, key in ipairs(opts.quickfix.auto_open.open_with) do
-                  if qf_cnt[key] ~= nil then open_flag = true end
+            if opts.quickfix.show.copen then
+               -- Check keyword matched in count
+               local show_flag = false
+               local keywords_to_show = opts.quickfix.show.with
+               for _, keyword in ipairs(keywords_to_show) do
+                  if qf_cnt[keyword] ~= nil then show_flag = true end
                end
-               if open_flag then vim.cmd('copen') end
+               if show_flag then vim.cmd('copen') end
             end
 
             -- Delete log

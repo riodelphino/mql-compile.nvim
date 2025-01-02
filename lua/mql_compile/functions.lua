@@ -120,7 +120,7 @@ function M.generate_info(log_path, actions)
    }
    -- local default_keywords = { 'compiling', 'including' }
    local default_actions = { 'compiling', 'including' }
-   actions = actions or default_actions
+   actions = actions or default_actions -- TODO: Is this checking & overwriting needed ?
 
    local log_file, err_msg, err_code = io.open(log_path, 'r')
    if log_file == nil then
@@ -155,9 +155,17 @@ function M.generate_info(log_path, actions)
       info_content = info_content .. line .. '\n'
    end
 
-   -- notify: opts.notify.information.on_generated
-   if opts.notify.information.on_generated then
-      if info_content ~= '' then M.notify(info_content, vim.log.levels.INFO) end
+   -- notify: opts.information.show.notify
+   if opts.information.show.notify then
+      if info_content ~= '' then
+         -- Check action matched in count
+         local show_flag = false
+         local actions_to_show = opts.information.show.with
+         for _, action in ipairs(actions_to_show) do
+            if count[action] ~= nil then show_flag = true end
+         end
+         if show_flag then M.notify(info_content, vim.log.levels.INFO) end
+      end
    end
 
    return count

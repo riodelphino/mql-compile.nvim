@@ -12,10 +12,10 @@ M.default = {
       delete_after_load = true,
    },
    quickfix = {
-      keywords = { 'error', 'warning' }, --  'error' | 'warning' | 'information'
-      auto_open = {
-         enabled = true, -- Open qfix after compile
-         open_with = { 'error', 'warning' },
+      keywords = { 'error', 'warning' }, -- Keywords to pick up. 'error' | 'warning' | 'information'
+      show = {
+         copen = true, -- Open quickfix automatically
+         with = { 'error', 'warning' }, -- Keywords to copen. 'error' | 'warning' | 'information'
       },
       parse = function(line, type) -- Parsing function from log
          local e = {}
@@ -32,7 +32,11 @@ M.default = {
       end,
    },
    information = {
-      actions = { 'including' }, -- 'compiling' | 'including' -- Filtering actions shown in information notify, and also in quickfix.
+      actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
+      show = {
+         notify = true,
+         with = { 'including' }, -- Actions to show. 'compiling' | 'including'
+      },
       parse = function(line, i)
          i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
          return i
