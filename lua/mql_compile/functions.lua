@@ -108,13 +108,6 @@ function M.generate_qf(log_path, keywords)
    end
    log_file:close()
 
-   -- いらんやろ
-   -- -- notify 'quickfix.on_generated'
-   -- if opts.notify.quickfix.on_generated then
-   --    msg = 'Generated quickfix'
-   --    M.notify(msg, vim.log.levels.INFO)
-   -- end
-
    return count
 end
 
@@ -144,13 +137,10 @@ function M.generate_info(log_path, actions)
             if count[action] == nil then count[action] = 0 end
             count[action] = count[action] + 1
             local i = {}
-
-            -- i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
+            -- Parse from log
             i = opts.information.parse(line, i)
-            -- i.file = M.convert_path_to_os(i.file, opt._mql.wine_drive_letter, opt._os_type)
-            if M.in_table(actions, i.action) then -- Check for showing in info
-               -- Output as infomation format
-               -- table.insert(info_lines, string.format('[%s] %s %s', file, action, details))
+            if M.in_table(actions, i.action) then -- Check for showing in info or not
+               -- Format to information
                local formatted = opts.information.format(i)
                table.insert(info_lines, formatted)
             end

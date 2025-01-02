@@ -12,7 +12,6 @@ M.default = {
       delete_after_load = true,
    },
    quickfix = {
-      extension = 'qf',
       keywords = { 'error', 'warning' }, --  'error' | 'warning' | 'information'
       auto_open = {
          enabled = true, -- Open qfix after compile
@@ -33,9 +32,7 @@ M.default = {
       end,
    },
    information = {
-      extension = 'info',
       actions = { 'including' }, -- 'compiling' | 'including' -- Filtering actions shown in information notify, and also in quickfix.
-      delete_after_load = true,
       parse = function(line, i)
          i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
          return i

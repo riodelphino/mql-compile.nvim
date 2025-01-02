@@ -21,7 +21,7 @@ function M.async_compile(metaeditor_path, source_path, log_path)
       cmd = opts.wine.command
       args = { metaeditor_path, '/compile:' .. source_path, '/log:' .. log_path, '&>/dev/null' } -- '&>/dev/null' cannot avoid useless echo
    else
-      cmd = metaeditor_path -- FIXME: "" is not needed ?
+      cmd = metaeditor_path -- "" is not needed somewhy
       args = { '/compile:' .. source_path, '/log:' .. log_path, '&>/dev/null' }
    end
 
