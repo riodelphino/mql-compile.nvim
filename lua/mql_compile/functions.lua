@@ -46,12 +46,12 @@ function M.convert_encoding(path)
    if not success then M.notify(err, vim.log.levels.ERROR) end
 end
 
-function M.log_to_qf(log_path, qf_path, keywords)
+function M.generate_qf(log_path, keywords)
    local opts = opt.get_opts()
    local count = {
-      error = 0,
-      warning = 0,
-      information = 0,
+      -- error = 0,
+      -- warning = 0,
+      -- information = 0,
    }
    local default_keywords = { 'error', 'warning', 'information' }
    keywords = keywords or default_keywords
@@ -99,29 +99,31 @@ function M.log_to_qf(log_path, qf_path, keywords)
             if key == 'information' then
                if not is_match_action(line) then break end -- exit if not matched in opts.infomration.actions
             end
+            if count[key] == nil then count[key] = 0 end
             count[key] = count[key] + 1 -- Count up
-            local e = opts.log.parse(line, key) -- Parse log
+            local e = opts.quickfix.parse(line, key) -- Parse log
             vim.fn.setqflist({ e }, 'a') -- Add to quickfix
          end
       end
    end
    log_file:close()
 
-   -- notify 'quickfix.on_updated'
-   if opts.notify.quickfix.on_updated then
-      msg = "Saved quickfix: '" .. qf_path .. "'"
-      M.notify(msg, vim.log.levels.INFO)
-   end
+   -- いらんやろ
+   -- -- notify 'quickfix.on_generated'
+   -- if opts.notify.quickfix.on_generated then
+   --    msg = 'Generated quickfix'
+   --    M.notify(msg, vim.log.levels.INFO)
+   -- end
 
    return count
 end
 
-function M.log_to_info(log_path, info_path, actions)
+function M.generate_info(log_path, actions)
    local opts = opt.get_opts()
    local info_lines = {}
    local count = {
-      compiling = 0,
-      including = 0,
+      -- compiling = 0,
+      -- including = 0,
    }
    -- local default_keywords = { 'compiling', 'including' }
    local default_actions = { 'compiling', 'including' }
@@ -139,10 +141,12 @@ function M.log_to_info(log_path, info_path, actions)
       -- Filter lines
       for _, action in pairs(actions) do
          if line:match('information: ' .. action) then
+            if count[action] == nil then count[action] = 0 end
             count[action] = count[action] + 1
             local i = {}
 
-            i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
+            -- i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
+            i = opts.information.parse(line, i)
             -- i.file = M.convert_path_to_os(i.file, opt._mql.wine_drive_letter, opt._os_type)
             if M.in_table(actions, i.action) then -- Check for showing in info
                -- Output as infomation format
@@ -155,24 +159,15 @@ function M.log_to_info(log_path, info_path, actions)
    end
    log_file:close()
 
-   -- Show result if 'opts.information.show_notify'
+   -- Generate result string
    local info_content = ''
    for _, line in ipairs(info_lines) do
       info_content = info_content .. line .. '\n'
    end
-   if opts.information.show_notify then M.notify(info_content, vim.log.levels.INFO) end
 
-   -- Save to info
-   local info_file = io.open(info_path, 'w')
-   for _, line in ipairs(info_lines) do
-      info_file:write(line .. '\n')
-   end
-   info_file:close()
-
-   -- notify 'information.on_saved'
-   if opts.notify.information.on_saved then
-      msg = "Saved info: '" .. info_path .. "'"
-      M.notify(msg, vim.log.levels.INFO)
+   -- notify: opts.notify.information.on_generated
+   if opts.notify.information.on_generated then
+      if info_content ~= '' then M.notify(info_content, vim.log.levels.INFO) end
    end
 
    return count

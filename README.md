@@ -112,7 +112,6 @@ return {
       log = {
          extension = 'log',
          delete_after_load = true,
-         parse = nil,
       },
       quickfix = {
          extension = 'qf',
@@ -121,7 +120,7 @@ return {
             enabled = true, -- Open quickfix after compile
             open_with = { 'error', 'warning', },
          },
-         format = nil,
+         parse = nil,
       },
       information = {
          show_notify = true, -- 'information' can be shown in notify too. (Reommend)
@@ -149,23 +148,18 @@ return {
       },
       notify = { -- Enable/disable notify
          compile = {
-            on_start = true,
-            on_failed = true,
-            on_succeeded = true,
+            on_started = true,
+            on_finished = true,
          },
          log = {
             on_saved = false,
             on_deleted = false,
-            on_count = true,
          },
          quickfix = {
-            on_updated = false,
+            on_finished = true, -- Add quickfix counts to main message
          },
          information = {
-            on_saved = false,
-            on_deleted = false,
-            on_count = false,
-            actions = { 'including' }, -- 'compiling' | 'including'
+            on_generated = true, -- Show informations on notify
          },
       },
    },
@@ -202,12 +196,12 @@ You can modify parsing & formatting functions, if you need.
 Leave 'parse' or 'format' as nil to use these default functions. 
 
 
-### Parsing function to read log
+### Parsing function, from log to quickfix
 
 Default:
 ```lua
 opts = {
-   log = {
+   quickfix = {
       parse = function(line, type)
          local e = {}
          if type == 'error' or type == 'warning' then
@@ -225,7 +219,7 @@ opts = {
 },
 ```
 
-### Parsing and formatting function of information
+### Parsing and formatting function, from log to information
 
 Default:
 ```lua

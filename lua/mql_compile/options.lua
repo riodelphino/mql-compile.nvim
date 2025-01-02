@@ -10,8 +10,15 @@ M.default = {
    log = {
       extension = 'log',
       delete_after_load = true,
-      -- Parsing function from log
-      parse = function(line, type)
+   },
+   quickfix = {
+      extension = 'qf',
+      keywords = { 'error', 'warning' }, --  'error' | 'warning' | 'information'
+      auto_open = {
+         enabled = true, -- Open qfix after compile
+         open_with = { 'error', 'warning' },
+      },
+      parse = function(line, type) -- Parsing function from log
          local e = {}
          if type == 'error' or type == 'warning' then
             e.filename, e.lnum, e.col, e.type, e.nr, e.text = line:match('^(.*)%((%d+),(%d+)%) : (.*) (%d+): (.*)$')
@@ -25,16 +32,7 @@ M.default = {
          return e
       end,
    },
-   quickfix = {
-      extension = 'qf',
-      keywords = { 'error', 'warning' }, --  'error' | 'warning' | 'information'
-      auto_open = {
-         enabled = true, -- Open qfix after compile
-         open_with = { 'error', 'warning' },
-      },
-   },
    information = {
-      show_notify = true,
       extension = 'info',
       actions = { 'including' }, -- 'compiling' | 'including' -- Filtering actions shown in information notify, and also in quickfix.
       delete_after_load = true,
@@ -62,24 +60,18 @@ M.default = {
    },
    notify = {
       compile = {
-         on_start = true,
-         on_failed = true,
-         on_succeeded = true,
-      },
-      information = {
-         on_saved = false,
-         on_deleted = false,
-         -- on_load = false,
-         on_count = false,
-         actions = { 'including' }, -- 'compiling' | 'including' | 'code generated'
-      },
-      quickfix = {
-         on_updated = false,
+         on_started = true,
+         on_finished = true,
       },
       log = {
          on_saved = false,
          on_deleted = false,
-         on_count = true,
+      },
+      quickfix = {
+         on_finished = true, -- Add quickfix counts to main message
+      },
+      information = {
+         on_generated = true, -- Show informations on notify
       },
    },
 }

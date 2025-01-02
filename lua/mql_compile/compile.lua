@@ -3,7 +3,7 @@ local M = {}
 local opt = require('mql_compile.options')
 local fn = require('mql_compile.functions')
 
-function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_path)
+function M.async_compile(metaeditor_path, source_path, log_path)
    local opts = opt.get_opts()
    local msg = ''
 
@@ -36,10 +36,11 @@ function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_p
       -- on_stderr = function() end,
       -- stdout_results = false,
       -- stderr_results = false,
+
       on_start = function()
-         -- notify: compile.on_start
-         if opts.notify.compile.on_start then
-            msg = "Compiling '" .. source_path .. "' ..."
+         -- notify: compile.on_started
+         if opts.notify.compile.on_started then
+            msg = "Compiling: '" .. source_path .. "'"
             fn.notify(msg, vim.log.levels.INFO)
          end
       end,
@@ -53,77 +54,61 @@ function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_p
 
          -- Convert log encoding & convert to qf, info
          vim.schedule(function()
-            local log_cnt
-            local info_cnt
-
             -- notify: log.on_saved
             if opts.notify.log.on_saved then
-               msg = "Saved log: '" .. log_path .. "'"
-               fn.notify(msg, vim.log.levels.INFO)
+               if fn.file_exists(log_path) then
+                  msg = "Saved log: '" .. log_path .. "'"
+                  fn.notify(msg, vim.log.levels.INFO)
+               end
             end
 
             -- Convert encoding for mac
             local os_type = opt._os_type
             if os_type == 'macos' then fn.convert_encoding(log_path) end
 
-            -- Convert log to quickfix format
-            log_cnt = fn.log_to_qf(log_path, qf_path, opts.quickfix.keywords)
-
             -- Convert log to information format
-            info_cnt = fn.log_to_info(log_path, info_path, opts.information.actions)
+            local info_cnt = fn.generate_info(log_path, opts.information.actions)
 
-            -- check log count & set base level
-            if log_cnt == nil then
-               msg = 'Error on loading log file: ' .. log_path
-               fn.notify(msg, vim.log.levels.ERROR)
-               return
-            end
-            if info_cnt == nil then
-               msg = 'Error on loading log file: ' .. log_path
-               fn.notify(msg, vim.log.levels.ERROR)
-               return
-            end
+            -- Convert log to quickfix format
+            local qf_cnt = fn.generate_qf(log_path, opts.quickfix.keywords)
+
             -- NOT WORKS: How to get shell error ?
             -- if compile_shell_error == 1 then
             --    msg = 'Error on compiling: ' .. source_path
             --    vim.notify(msg, vim.log.levels.ERROR)
             --    return
             -- end
+
+            -- Set level
             local level
-            if log_cnt.error > 0 then
+            if qf_cnt.error ~= nil then
                level = vim.log.levels.ERROR
-            elseif log_cnt.warning > 0 then
+            elseif qf_cnt.warning ~= nil then
                level = vim.log.levels.WARN
             else
                level = vim.log.levels.INFO
             end
 
-            -- notify: log.on_count
-            if opts.notify.log.on_count then
-               msg = fn.table_to_string(log_cnt, opts.quickfix.keywords)
-               fn.notify(msg, level)
-            end
-
-            -- notify: information.on_count
-            if opts.notify.information.on_count then
-               msg = fn.table_to_string(info_cnt, opts.information.actions)
-               fn.notify(msg, vim.log.levels.INFO)
-            end
-
             -- Check result & notify
             local source_filename = fn.get_relative_path(source_path)
 
-            if log_cnt.error > 0 then
-               -- notify: compile.on_failed
-               if opts.notify.compile.on_failed then
-                  msg = "Failed compiling '" .. source_filename .. "'"
-                  fn.notify(msg, level)
+            -- notify: compile.on_finished
+            if opts.notify.compile.on_finished then
+               local msg_main
+               local msg_qf
+               if opts.notify.quickfix.on_finished then
+                  msg_qf = fn.format_table_to_string(qf_cnt, opts.quickfix.keywords)
+               else
+                  msg_qf = ''
                end
-            else
-               -- notify: compile.on_succeeded
-               if opts.notify.compile.on_succeeded then
-                  msg = "Succeeded compiling '" .. source_filename .. "'"
-                  fn.notify(msg, level)
+               if qf_cnt.error ~= nil then
+                  -- Failed
+                  msg_main = "Failed compiling: '" .. source_filename .. "'"
+                  fn.notify(msg_main .. '\n' .. msg_qf, level)
+               else
+                  -- Succeeded
+                  msg_main = "Succeeded compiling: '" .. source_filename .. "'"
+                  fn.notify(msg_main .. '\n' .. msg_qf, level)
                end
             end
 
@@ -131,7 +116,7 @@ function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_p
             if opts.quickfix.auto_open.enabled then
                local open_flag = false
                for _, key in ipairs(opts.quickfix.auto_open.open_with) do
-                  if log_cnt[key] ~= nil and log_cnt[key] > 0 then open_flag = true end
+                  if qf_cnt[key] ~= nil then open_flag = true end
                end
                if open_flag then vim.cmd('copen') end
             end
@@ -142,26 +127,6 @@ function M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_p
                -- notify: log.on_deleted
                if opts.notify.log.on_deleted then
                   msg = "Deleted log: '" .. log_path .. "'"
-                  fn.notify(msg, vim.log.levels.INFO)
-               end
-            end
-
-            -- -- Delete quickfix
-            -- if opts.quickfix.delete_after_load then
-            --    vim.fn.delete(qf_path)
-            --    -- notify: quickfix.on_deleted
-            --    if opts.notify.quickfix.on_deleted then
-            --       msg = "Deleted quickfix: '" .. qf_path .. "'"
-            --       fn.notify(msg, vim.log.levels.INFO)
-            --    end
-            -- end
-
-            -- Delete info
-            if opts.information.delete_after_load then
-               vim.fn.delete(info_path)
-               -- notify: info.on_deleted
-               if opts.notify.information.on_deleted then
-                  msg = "Deleted info: '" .. info_path .. "'"
                   fn.notify(msg, vim.log.levels.INFO)
                end
             end
@@ -183,24 +148,25 @@ function M.compile(source_path)
 
    opt._mql = mql
 
-   -- Set paths
-   -- local metaeditor_path = vim.fn.expand(mql.metaeditor_path)
+   -- Adjust metaeditor's path
    local metaeditor_path = fn.get_absolute_path(mql.metaeditor_path)
+
    -- Check exe exists
    if not fn.file_exists(metaeditor_path) then
       local msg = 'Command does not exist: "' .. metaeditor_path .. '"'
       fn.notify(msg, vim.log.levels.ERROR)
       return
    end
-   -- local pattern = fn.pattern_bash_to_lua(mql.pattern) -- Convert pattern from '*.mq5' to '.*%.mq5'
+
+   -- Generate log path
    local basename = fn.get_basename(source_path)
    local log_path = basename .. '.' .. opts.log.extension
-   local qf_path = basename .. '.' .. opts.quickfix.extension
-   local info_path = basename .. '.' .. opts.information.extension
+
+   -- Adjust source_path
+   source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
 
    -- Execute async-compiling
-   source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
-   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path, qf_path, info_path)
+   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path)
    return compile_shell_error
 end
 
