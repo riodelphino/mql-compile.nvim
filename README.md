@@ -73,7 +73,7 @@ Notify
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 
 > [!Warning]
-> nvim-notify: Only v3.14.0 or earlier versions work for now as its error.
+> Use v3.14.0 or earlier versions of nvim-notify. v3.14.1 not works somewhy with it's error.
 
 
 ## Installation
@@ -164,12 +164,12 @@ opts = {
       information = {},
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...
-            none = vim.log.levels.INFO, -- *.OFF is also good. (but maybe same color)
+            none = vim.log.levels.INFO,
             info = vim.log.levels.INFO,
             warn = vim.log.levels.WARN, -- *.INFO is also good, if you don't like warn color on success.
          },
          failed = vim.log.levels.ERROR,
-         information = vim.log.levels.INFO, -- for informations. *.OFF is also good. (but maybe same color)
+         information = vim.log.levels.INFO, -- for notifing informations
       },
    },
 },
@@ -370,14 +370,19 @@ And [these lua functions](#lua-functions) follow same rules.
 
 
 ## notify
+> [!Warning]
+> Use v3.14.0 or earlier versions of nvim-notify. v3.14.1 not works somewhy with it's error.
 
-This plugin uses `vim.notify()` to show messages to users.  
+This plugin optionally uses `vim.notify()` to show messages to users.  
 For those who want to have nicer messages, follow this.
 
 1. Install [nvim-notify](https://github.com/rcarriga/nvim-notify)
-2. Put code `vim.notify = require('notify')` in notify's lazy.nvim config, to replace default notify.
-
-Then `mql-compile` shows you messages through it.
+2. Put below code in init.lua, to replace default notify.
+```lua
+-- ex.) for lazy.nvim, `config = {}` in `lua/plugins/notify.lua`
+vim.notify = require('notify')
+```
+Then `mql-compile` shows messages through it.
 
 
 ## Highlights
