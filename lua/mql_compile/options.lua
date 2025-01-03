@@ -50,16 +50,16 @@ M.default = {
    ft = {
       mql5 = {
          metaeditor_path = '',
-         include_path = '',
+         include_path = '', -- Not supported now
          pattern = '*.mq5',
       },
       mql4 = {
          metaeditor_path = '',
-         include_path = '',
+         include_path = '', -- Not supported now
          pattern = '*.mq4',
       },
    },
-   notify = {
+   notify = { -- Enable/disable notify
       compile = {
          on_started = true,
          on_finished = true,
@@ -73,6 +73,15 @@ M.default = {
       },
       information = {
          on_generated = true, -- Show informations on notify
+      },
+      levels = { -- Color to notify if compiling was ...
+         succeeded = { -- with type ...
+            none = vim.log.levels.INFO, -- *.OFF is also good. (but maybe same color)
+            info = vim.log.levels.INFO,
+            warn = vim.log.levels.WARN, -- *.INFO is also good, if you don't like warn color on success.
+         },
+         failed = vim.log.levels.ERROR,
+         information = vim.log.levels.INFO, -- for informations. *.OFF is also good. (but maybe same color)
       },
    },
 }
