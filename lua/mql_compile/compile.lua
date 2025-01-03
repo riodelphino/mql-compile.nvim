@@ -143,14 +143,12 @@ function M.compile(source_path)
    local opts = opt.get_opts()
    local mql
 
-   source_path, mql = fn.get_source(source_path)
+   source_path, mql = fn.get_source(source_path, true)
    if source_path == nil or mql == nil then
       local msg = 'Cannot find any target files.'
       vim.notify(msg, vim.log.levels.ERROR)
       return
    end
-
-   opt._mql = mql
 
    -- Adjust metaeditor's path
    local metaeditor_path = fn.get_absolute_path(mql.metaeditor_path)

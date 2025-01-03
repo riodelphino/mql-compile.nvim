@@ -187,68 +187,77 @@ function M.get_ft_list()
 end
 
 -- Automatically change mql5/4 by source_path's extension
-function M.get_source(source_path)
+function M.get_source(path, on_compile)
+   if on_compile == nil then on_compile = false end
    local opts = opt.get_opts()
    local mql = {}
    local ft_list = M.get_ft_list()
 
-   -- Adjust arg source_path
-   source_path = vim.fn.expand(source_path)
-   if source_path == 'v:null' or source_path == '' or source_path == nil then source_path = nil end
-   if source_path ~= nil then -- Has some source_path
+   -- Adjust arg path
+   path = vim.fn.expand(path)
+   if path == 'v:null' or path == '' or path == nil then path = nil end
+   if path ~= nil then -- Has some path
       for _, ft_key in ipairs(ft_list) do -- Loop for ft list
          local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
-         if source_path:match(pattern) then -- Check pattern
-            if M.file_exists(source_path) then -- Check file exists
+         if path:match(pattern) then -- Check pattern
+            if M.file_exists(path) then -- Check file exists
                mql = opts.ft[ft_key]
-               return M.get_relative_path(source_path), mql
+               return M.get_relative_path(path), mql
             else
-               local msg = 'File does not exist: ' .. source_path
+               local msg = 'File not exists: ' .. path
                M.notify(msg, vim.log.levels.ERROR)
                return nil, nil
             end
          end
       end
-      local msg = 'Patterns are not matched: ' .. M.get_relative_path(source_path)
+      local msg = 'Patterns not matched: ' .. M.get_relative_path(path)
       M.notify(msg, vim.log.levels.ERROR)
       return nil, nil
-   else -- No specify arg source_path
+   else -- No specify arg path
+      -- Check for current buffer
       local current_filename = vim.api.nvim_buf_get_name(0) -- Check for current filename
       if current_filename ~= '' and current_filename ~= nil then -- Has filename
          for _, ft_key in pairs(ft_list) do -- Loop for ft list
             local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
             if current_filename:match(pattern) then -- Check pattern
                mql = opts.ft[ft_key]
-               source_path = current_filename
-               return source_path, mql
+               path = current_filename
+               return path, mql
             end
          end
       end
 
-      -- No current filename or not matched filetype
-      local git_root_dir = M.get_git_root() -- Check for git root
+      -- Check for stacked _source_path & _mql
+      if on_compile then -- Allowed only in compiling. Not to rewrite stacked path & mql in set_source.
+         stacked_path = opt._source_path
+         stacked_mql = opt._mql
+         if stacked_path ~= nil and stacked_mql ~= nil then return stacked_path, stacked_mql end
+      end
+
+      -- Check for git root recursively
+      local git_root_dir = M.get_git_root()
       if git_root_dir ~= '' and git_root_dir ~= nil then -- Has git root
          for _, ft_key in ipairs(ft_list) do -- Loop for ft list
             local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
             local find_list = M.find_files_recursively(git_root_dir, pattern)
             if #find_list > 0 then
-               source_path = find_list[1]
+               path = find_list[1]
                mql = opts.ft[ft_key]
-               return source_path, mql
+               return path, mql
             end
          end
       end
 
-      -- No git root, or No files in git root
-      local cwd_dir = vim.fn.getcwd() -- Check for cwd
+      -- Check for cwd recursively
+      local cwd_dir = vim.fn.getcwd()
       if cwd_dir ~= '' and cwd_dir ~= nil then
          for _, ft_key in ipairs(ft_list) do -- Loop for ft list
             local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
             local find_list = M.find_files_recursively(cwd_dir, pattern)
             if #find_list > 0 then
-               source_path = find_list[1]
+               path = find_list[1]
                mql = opts.ft[ft_key]
-               return source_path, mql
+               return path, mql
             end
          end
       end
@@ -275,7 +284,6 @@ end
 
 function M.set_source_path(path)
    local opts = opt.get_opts()
-   local sep = M.get_path_separator()
    local mql = {}
    local msg = ''
 
@@ -284,8 +292,8 @@ function M.set_source_path(path)
    end
 
    path = vim.fn.expand(path) -- for % ~
-   path, mql = M.get_source(path)
-   if path == nil then return end
+   path, mql = M.get_source(path, false)
+   if path == nil and mql == nil then return end -- Already notified in get_souce()
 
    -- Determin mql by extension
    for ft_key, ft in pairs(opts.ft) do
@@ -293,7 +301,8 @@ function M.set_source_path(path)
       if path:match(pattern) then
          path = M.get_relative_path(path)
          opt._source_path = path
-         msg = 'Source path is set to: ' .. path .. ' (' .. ft_key .. ')'
+         opt._mql = opts.ft[ft_key]
+         msg = "Source path: '" .. path .. "' (" .. ft_key .. ')'
          M.notify(msg, vim.log.levels.INFO)
          return
       end
