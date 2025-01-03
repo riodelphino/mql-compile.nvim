@@ -37,11 +37,15 @@ M.default = {
          notify = true,
          with = { 'including' }, -- Actions to show. 'compiling' | 'including'
       },
-      parse = function(line, i)
+      parse = function(line)
+         local i = {}
          i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
          return i
       end,
-      format = function(i) return string.format('%s %s', i.action, i.details) end,
+      format = function(i)
+         local formated = string.format('%s %s', i.action, i.details)
+         return formated
+      end,
    },
    wine = {
       enabled = true,

@@ -235,12 +235,14 @@ Default:
 ```lua
 opts = {
    information = {
-      parse = function(line, i)
+      parse = function(line)
+         local i = {}
          i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
          return i
       end,
       format = function(i)
-         return string.format('%s %s', i.action, i.details)
+         local formated = string.format('%s %s', i.action, i.details)
+         return formated
       end,
    },
 },
@@ -410,10 +412,12 @@ qfText
 
 ## TO-DO
 
-- [ ] Add highlight color options ?
+- [ ] Add metaeditor's `/s` option (:MQLCompileCheck)
 - [ ] Add version management
    - [ ] by '#property version "x.xx"'
    - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
+- [ ] Auto compiling on saved ?
+- [ ] Add highlight color options ?
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] git
    - [x] Detect git root

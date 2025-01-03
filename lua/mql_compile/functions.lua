@@ -138,7 +138,7 @@ function M.generate_info(log_path, actions)
             count[action] = count[action] + 1
             local i = {}
             -- Parse from log
-            i = opts.information.parse(line, i)
+            i = opts.information.parse(line)
             if M.in_table(actions, i.action) then -- Check for showing in info or not
                -- Format to information
                local formatted = opts.information.format(i)
