@@ -361,8 +361,8 @@ If no files are detected, the command returns `error`.
 
 The compiling command without arg, like `:MQLCompile`, also detects the files in almost same way.
 
-1. The path set by `:MQLCompileSetSource` command previousely
-2. Current buffer (if mql5/4)
+1. Current buffer (if mql5/4)
+2. The path set by `:MQLCompileSetSource` command previousely
 3. First detected mql5/4 file in git root dir (recursively)
 4. First detected mql5/4 file in cwd dir (recursively)
 
