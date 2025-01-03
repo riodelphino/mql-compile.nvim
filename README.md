@@ -4,10 +4,10 @@
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
 
-> [!Warning]
+> [!Caution]
 > This is a test version.  
 
-Be careful to use, not to lose your files.
+Be careful to use at your own risk.
 
 > [!Warning]
 > Not tested in Windows or Linux  
@@ -69,11 +69,11 @@ Notify
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) Plugin for async
 
 **Optional plugins**
-- [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages
+- [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 
 > [!Warning]
-> nvim-notify: Only v3.14.0 or earlier versions work for now as its error.
+> Use v3.14.0 or earlier versions of nvim-notify. v3.14.1 not works somewhy with it's error.
 
 
 ## Installation
@@ -110,60 +110,69 @@ return {
 ## Default options
 
 ```lua
-   opts = {
-      priority = { 'mql5', 'mql4' }, -- priority for auto file detection
-      log = {
-         extension = 'log',
-         delete_after_load = true,
+opts = {
+   priority = { 'mql5', 'mql4' }, -- priority for auto file detection
+   log = {
+      extension = 'log',
+      delete_after_load = true,
+   },
+   quickfix = {
+      types = { 'error', 'warning' }, -- Types to pick up. 'error' | 'warning' | 'information'
+      show = {
+         copen = true, -- Open quickfix automatically
+         with = { 'error', 'warning' }, -- Types to copen. 'error' | 'warning' | 'information'
       },
-      quickfix = {
-         types = { 'error', 'warning' }, -- Types to pick up. 'error' | 'warning' | 'information'
-         show = {
-            copen = true, -- Open quickfix automatically
-            with = { 'error', 'warning' }, -- Types to copen. 'error' | 'warning' | 'information'
-         },
-         parse = nil,
+      parse = nil,
+   },
+   information = {
+      actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
+      show = {
+         notify = true, -- Show 'information' independently in notify
+         with = { 'including' }, -- Actions to show. 'compiling' | 'including'
       },
-      information = {
-         actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
-         show = {
-            notify = true,
-            with = { 'including' }, -- Actions to show. 'compiling' | 'including'
-         },
-         parse = nil,
-         format = nil,
+      parse = nil,
+      format = nil,
+   },
+   wine = {
+      enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
+      command = 'wine', -- Wine command path
+   },
+   ft = {
+      mql5 = {
+         metaeditor_path = '', -- '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
+         include_path = '', -- Not supported now
+         pattern = '*.mq5',
       },
-      wine = {
-         enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
-         command = 'wine', -- Wine command path
-      },
-      ft = {
-         mql5 = {
-            metaeditor_path = '', -- '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
-            include_path = '',
-            pattern = '*.mq5',
-         },
-         mql4 = {
-            metaeditor_path = '', -- '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe', -- your MT4 exe's path
-            include_path = '',
-            pattern = '*.mq4',
-         },
-      },
-      notify = { -- Enable/disable notify
-         compile = {
-            on_started = true,
-            on_finished = true,
-         },
-         log = {
-            on_saved = false,
-            on_deleted = false,
-         },
-         quickfix = {
-            on_finished = true, -- Add quickfix counts to main message on 'notify.compile.on_finished'
-         },
-         information = {},
+      mql4 = {
+         metaeditor_path = '', -- '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe', -- your MT4 exe's path
+         include_path = '', -- Not supported now
+         pattern = '*.mq4',
       },
    },
+   notify = { -- Enable/disable notify
+      compile = {
+         on_started = true,
+         on_finished = true,
+      },
+      log = {
+         on_saved = false,
+         on_deleted = false,
+      },
+      quickfix = {
+         on_finished = true, -- Add quickfix counts to main message on 'notify.compile.on_finished'
+      },
+      information = {},
+      levels = { -- Color to notify if compiling was ...
+         succeeded = { -- with type ...
+            none = vim.log.levels.INFO,
+            info = vim.log.levels.INFO,
+            warn = vim.log.levels.WARN, -- *.INFO is also good, if you don't like warn color on success.
+         },
+         failed = vim.log.levels.ERROR,
+         information = vim.log.levels.INFO, -- for notifing informations
+      },
+   },
+},
 ```
 
 
@@ -226,12 +235,14 @@ Default:
 ```lua
 opts = {
    information = {
-      parse = function(line, i)
+      parse = function(line)
+         local i = {}
          i.file, i.type, i.action, i.details = line:match('^(.-) : (%w+): (%w+) (.+)')
          return i
       end,
       format = function(i)
-         return string.format('%s %s', i.action, i.details)
+         local formated = string.format('%s %s', i.action, i.details)
+         return formated
       end,
    },
 },
@@ -361,14 +372,19 @@ And [these lua functions](#lua-functions) follow same rules.
 
 
 ## notify
+> [!Warning]
+> Use v3.14.0 or earlier versions of nvim-notify. v3.14.1 not works somewhy with it's error.
 
-This plugin uses `vim.notify()` to show messages to users.  
+This plugin optionally uses `vim.notify()` to show messages to users.  
 For those who want to have nicer messages, follow this.
 
 1. Install [nvim-notify](https://github.com/rcarriga/nvim-notify)
-2. Put code `vim.notify = require('notify')` in notify's lazy.nvim config, to replace default notify.
-
-Then `mql-compile` shows you messages through it.
+2. Put below code in init.lua, to replace default notify.
+```lua
+-- ex.) for lazy.nvim, `config = {}` in `lua/plugins/notify.lua`
+vim.notify = require('notify')
+```
+Then `mql-compile` shows messages through it.
 
 
 ## Highlights
@@ -396,6 +412,11 @@ qfText
 
 ## TO-DO
 
+- [ ] Add metaeditor's `/s` option (:MQLCompileCheck)
+- [ ] Add version management
+   - [ ] by '#property version "x.xx"'
+   - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
+- [ ] Auto compiling on saved ?
 - [ ] Add highlight color options ?
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] git

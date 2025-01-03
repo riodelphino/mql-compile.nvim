@@ -82,11 +82,13 @@ function M.async_compile(metaeditor_path, source_path, log_path)
             -- Set level
             local level
             if qf_cnt.error ~= nil then
-               level = vim.log.levels.ERROR
+               level = opts.notify.levels.failed
             elseif qf_cnt.warning ~= nil then
-               level = vim.log.levels.WARN
+               level = opts.notify.levels.succeeded.warn
+            elseif qf_cnt.information ~= nil then
+               level = opts.notify.levels.succeeded.info
             else
-               level = vim.log.levels.INFO
+               level = opts.notify.levels.succeeded.none
             end
 
             -- Check result & notify
