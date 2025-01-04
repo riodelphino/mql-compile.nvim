@@ -1,6 +1,6 @@
 # mql-compile.nvim
 
-## Concepts
+## Concept
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
 
@@ -412,10 +412,10 @@ qfText
 
 ## TO-DO
 
-- [ ] Add metaeditor's `/s` option (:MQLCompileCheck)
-- [ ] Add version management
-   - [ ] by '#property version "x.xx"'
+- [-] Add version management
+   - [ ] grep '#property version "x.xx"'
    - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
+   - [x] Add `ft.mql[5/4].compiled_extension`
 - [ ] Auto compiling on saved ?
 - [ ] Add highlight color options ?
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
@@ -425,4 +425,10 @@ qfText
    - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] include path NOT WORKS for the space char in `Program Files`
+
+> [!Tip]
+
+- [ ] Use `vim.o.errorformat` ?
+   - [ ] To parse log to quickfix, like [naoina/syntastic-MQL](https://github.com/naoina/syntastic-MQL/blob/master/syntax_checkers/mql5/metaeditor.vim)
+   - [ ] Counting functions should be suitable for it.
 

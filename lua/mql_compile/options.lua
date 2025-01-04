@@ -57,11 +57,13 @@ M.default = {
          metaeditor_path = '',
          include_path = '', -- Not supported now
          pattern = '*.mq5',
+         compiled_extension = 'ex5',
       },
       mql4 = {
          metaeditor_path = '',
          include_path = '', -- Not supported now
          pattern = '*.mq4',
+         compiled_extension = 'ex4',
       },
    },
    notify = { -- Enable/disable notify
