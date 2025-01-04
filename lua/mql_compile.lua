@@ -3,6 +3,7 @@ local M = {}
 local opt = require('mql_compile.options')
 local fn = require('mql_compile.functions')
 local cmd = require('mql_compile.commands')
+local hl = require('mql_compile.highlights')
 
 local _loaded = false
 
@@ -16,6 +17,7 @@ function M.setup(user_opts)
    opt._root = fn.get_root()
    opt._opts = opt.merge(user_opts)
    cmd.create_commands()
+   hl.set_highlights()
 end
 
 return M
