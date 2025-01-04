@@ -122,7 +122,7 @@ opts = {
          copen = true, -- Open quickfix automatically
          with = { 'error', 'warning' }, -- Types to copen. 'error' | 'warning' | 'information'
       },
-      parse = nil,
+      parse = nil, -- See '# Parsing quickfix' section
    },
    information = {
       actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
@@ -130,8 +130,8 @@ opts = {
          notify = true, -- Show 'information' independently in notify
          with = { 'including' }, -- Actions to show. 'compiling' | 'including'
       },
-      parse = nil,
-      format = nil,
+      parse = nil, -- See '# Parsing and formatting information' section
+      format = nil, -- See '# Parsing and formatting information' section
    },
    wine = {
       enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
@@ -172,6 +172,10 @@ opts = {
          information = vim.log.levels.INFO, -- for notifing informations
       },
    },
+   highlights = { -- Highlights & syntax on quickfix window
+      enabled = true,
+      hlgroups = nil, -- See '# Highlights' section
+   },
 },
 ```
 
@@ -206,8 +210,8 @@ You can modify parsing & formatting functions, if you need.
 Leave 'parse' or 'format' as nil to use these default functions. 
 
 
-### Parsing function, from log to quickfix
-
+### Parsing quickfix
+This is the parsing function, from log to quickfix
 Default:
 ```lua
 opts = {
@@ -229,7 +233,9 @@ opts = {
 },
 ```
 
-### Parsing and formatting function, from log to information
+### Parsing and formatting information
+
+This is the parsing and formatting function, from log to information
 
 Default:
 ```lua
@@ -341,6 +347,39 @@ keys = {
 },
 ```
 
+## Highlights
+
+> [!Warning]
+> Highlighting(and syntaxing) has not finished yet.
+
+> [!Tip]
+> Highlighting should not be set by this plugin ?
+
+Set-up highlight groups in quickfix list.  
+
+To use default, leave `hlgroups = nil`.
+```lua
+opts = {
+   highlights = { -- Highlights on quickfix window
+      enabled = true,
+      hlgroups = {
+         filename = { 'qfFileName', { link = 'Directory' } },
+         separator_left = { 'qfSeparatorLeft', { fg = '#cccccc' } },
+         separator_right = { 'qfSeparatorRight', { fg = '#cccccc' } },
+         line_nr = { 'qfLineNr', { fg = '#888888' } },
+         col = { 'qfCol', { link = 'DiagnosticError' } },
+         error = { 'qfError', { fg = '#0033FF' } },
+         warning = { 'qfWarning', { link = 'DiagnosticWarn' } },
+         info = { 'qfInfo', { link = 'DiagnosticInfo' } },
+         hint = { 'qfHint', { link = 'DiagnosticHint' } },
+         note = { 'qfNote', { link = 'DiagnosticHint' } },
+         code = { 'qfCode', { fg = '#888888' } },
+         text = { 'qfText', { link = 'Normal' } },
+      },
+   },
+},
+```
+
 ## Auto detection rules
 
 
@@ -387,24 +426,6 @@ vim.notify = require('notify')
 Then `mql-compile` shows messages through it.
 
 
-## Highlights
-
-Highlight groups in quickfix list.  
-
-> [!Warning]
-> Not completed yet. ugly...
-
-```txt
-qfFileName
-qfSeparatorLeft
-qfLnum
-qfCol
-qfError / qfWarning / qfInfo
-qfCode
-qfSeparatorRight
-qfText
-```
-
 ## License
 
 [MIT License](./LICENSE)
@@ -412,7 +433,6 @@ qfText
 
 ## TO-DO
 
-- [ ] Add highlight color options ?
 - [-] Add version management
    - [ ] grep '#property version "x.xx"'
    - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
@@ -435,6 +455,7 @@ qfText
 > [!Tip]
 
 - [ ] Use `vim.o.errorformat` ?
+   - [ ] Easy to use, but not so customizable.
    - [ ] To parse log to quickfix, like [naoina/syntastic-MQL](https://github.com/naoina/syntastic-MQL/blob/master/syntax_checkers/mql5/metaeditor.vim)
    - [ ] Counting functions should be suitable for it.
 
