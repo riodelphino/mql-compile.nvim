@@ -412,12 +412,18 @@ qfText
 
 ## TO-DO
 
+- [ ] Add highlight color options ?
 - [-] Add version management
    - [ ] grep '#property version "x.xx"'
    - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
    - [x] Add `ft.mql[5/4].compiled_extension`
-- [ ] Auto compiling on saved ?
-- [ ] Add highlight color options ?
+- [ ] `opts.information.actions` has other actions ?
+   - [ ] Now only 'compiling' & 'including' are confirmed
+- [ ] Auto compiling on save ? (Complicated...)
+   - [ ] Should set source_path before.
+   - [ ] Should search & dig including paths
+   - [ ] If current buffer is matched to the included path ?
+   - [ ] Compile source_path
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] git
    - [x] Detect git root
