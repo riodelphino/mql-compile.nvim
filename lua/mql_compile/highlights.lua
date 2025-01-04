@@ -7,8 +7,9 @@ function M.set_highlights()
    if not opts.highlights.enabled then return end
 
    local hlgroups = opts.highlights.hlgroups
-   for _, hl in pairs(hlgroups) do
-      vim.api.nvim_set_hl(0, hl.name, hl.opts)
+   for _, hlgroup in pairs(hlgroups) do
+      hl_name, hl_opts = unpack(hlgroup)
+      vim.api.nvim_set_hl(0, hl_name, hl_opts)
    end
 end
 
