@@ -3,13 +3,13 @@ local M = {}
 
 -- Set qf's syntax
 function M.set_qf_syntax()
+   local highlights = require('mql_compile.options').get_opts().highlights
    -- Clear syntax
    vim.cmd('syntax clear')
 
    -- Get highlight name by syntax_group
    local function get_hl_name(syntax_group)
-      local hlgroups = require('mql_compile.options').get_opts().highlights.hlgroups
-      local hlgroup = hlgroups[syntax_group]
+      local hlgroup = highlights.hlgroups[syntax_group]
       local hl_name, _ = unpack(hlgroup)
       return hl_name
    end

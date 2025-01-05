@@ -353,7 +353,7 @@ keys = {
 > Highlighting(and syntaxing) has not finished yet.
 
 > [!Tip]
-> Qf highlighting should not be modified by this plugin ?
+> Quickfix highlighting should not be modified by this plugin ?
 
 Set-up highlight groups in quickfix list.  
 
@@ -368,7 +368,7 @@ opts = {
          separator_right = { 'qfSeparatorRight', { fg = '#cccccc' } },
          line_nr = { 'qfLineNr', { fg = '#888888' } },
          col = { 'qfCol', { link = 'DiagnosticError' } },
-         error = { 'qfError', { fg = '#0033FF' } },
+         error = { 'qfError', { link = 'DiagnosticError' } },
          warning = { 'qfWarning', { link = 'DiagnosticWarn' } },
          info = { 'qfInfo', { link = 'DiagnosticInfo' } },
          hint = { 'qfHint', { link = 'DiagnosticHint' } },
@@ -433,7 +433,7 @@ Then `mql-compile` shows messages through it.
 
 ## TO-DO
 
-- [-] Add version management
+- [ ] Add version management
    - [ ] grep '#property version "x.xx"'
    - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
    - [x] Add `ft.mql[5/4].compiled_extension`
@@ -452,10 +452,10 @@ Then `mql-compile` shows messages through it.
 - [ ] Show fugitive message on progress & success or error
 - [ ] include path NOT WORKS for the space char in `Program Files`
 
-> [!Tip]
 
-- [ ] Use `vim.o.errorformat` ?
-   - [ ] Easy to use, but not so customizable.
-   - [ ] To parse log to quickfix, like [naoina/syntastic-MQL](https://github.com/naoina/syntastic-MQL/blob/master/syntax_checkers/mql5/metaeditor.vim)
-   - [ ] Counting functions should be suitable for it.
+> [!Tip]
+> Use `vim.o.format` ?
+> - [ ] Easy to use, but not so customizable.
+> - [ ] See [naoina/syntastic-MQL](https://github.com/naoina/syntastic-MQL/blob/master/syntax_checkers/mql5/metaeditor.vim)
+> - [ ] Counting functions should be suitable for it.
 
