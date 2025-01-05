@@ -1,6 +1,6 @@
 # mql-compile.nvim
 
-## Concepts
+## Concept
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
 
@@ -122,7 +122,7 @@ opts = {
          copen = true, -- Open quickfix automatically
          with = { 'error', 'warning' }, -- Types to copen. 'error' | 'warning' | 'information'
       },
-      parse = nil,
+      parse = nil, -- See '# Parsing quickfix' section
    },
    information = {
       actions = { 'including' }, -- Actions to pick up. 'compiling' | 'including'
@@ -130,8 +130,8 @@ opts = {
          notify = true, -- Show 'information' independently in notify
          with = { 'including' }, -- Actions to show. 'compiling' | 'including'
       },
-      parse = nil,
-      format = nil,
+      parse = nil, -- See '# Parsing and formatting information' section
+      format = nil, -- See '# Parsing and formatting information' section
    },
    wine = {
       enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
@@ -172,6 +172,10 @@ opts = {
          information = vim.log.levels.INFO, -- for notifing informations
       },
    },
+   highlights = { -- Highlights & syntax on quickfix window
+      enabled = true,
+      hlgroups = nil, -- See '# Highlights' section
+   },
 },
 ```
 
@@ -206,8 +210,8 @@ You can modify parsing & formatting functions, if you need.
 Leave 'parse' or 'format' as nil to use these default functions. 
 
 
-### Parsing function, from log to quickfix
-
+### Parsing quickfix
+This is the parsing function, from log to quickfix
 Default:
 ```lua
 opts = {
@@ -229,7 +233,9 @@ opts = {
 },
 ```
 
-### Parsing and formatting function, from log to information
+### Parsing and formatting information
+
+This is the parsing and formatting function, from log to information
 
 Default:
 ```lua
@@ -341,6 +347,39 @@ keys = {
 },
 ```
 
+## Highlights
+
+> [!Warning]
+> Highlighting(and syntaxing) has not finished yet.
+
+> [!Tip]
+> Quickfix highlighting should not be modified by this plugin ?
+
+Set-up highlight groups in quickfix list.  
+
+To use default, leave `hlgroups = nil`.
+```lua
+opts = {
+   highlights = { -- Highlights on quickfix window
+      enabled = true,
+      hlgroups = {
+         filename = { 'qfFileName', { link = 'Directory' } },  -- { '<Highlight name>' , { <highlight options> } }
+         separator_left = { 'qfSeparatorLeft', { fg = '#cccccc' } },
+         separator_right = { 'qfSeparatorRight', { fg = '#cccccc' } },
+         line_nr = { 'qfLineNr', { fg = '#888888' } },
+         col = { 'qfCol', { link = 'DiagnosticError' } },
+         error = { 'qfError', { link = 'DiagnosticError' } },
+         warning = { 'qfWarning', { link = 'DiagnosticWarn' } },
+         info = { 'qfInfo', { link = 'DiagnosticInfo' } },
+         hint = { 'qfHint', { link = 'DiagnosticHint' } },
+         note = { 'qfNote', { link = 'DiagnosticHint' } },
+         code = { 'qfCode', { fg = '#888888' } },
+         text = { 'qfText', { link = 'Normal' } },
+      },
+   },
+},
+```
+
 ## Auto detection rules
 
 
@@ -361,8 +400,8 @@ If no files are detected, the command returns `error`.
 
 The compiling command without arg, like `:MQLCompile`, also detects the files in almost same way.
 
-1. The path set by `:MQLCompileSetSource` command previousely
-2. Current buffer (if mql5/4)
+1. Current buffer (if mql5/4)
+2. The path set by `:MQLCompileSetSource` command previousely
 3. First detected mql5/4 file in git root dir (recursively)
 4. First detected mql5/4 file in cwd dir (recursively)
 
@@ -387,24 +426,6 @@ vim.notify = require('notify')
 Then `mql-compile` shows messages through it.
 
 
-## Highlights
-
-Highlight groups in quickfix list.  
-
-> [!Warning]
-> Not completed yet. ugly...
-
-```txt
-qfFileName
-qfSeparatorLeft
-qfLnum
-qfCol
-qfError / qfWarning / qfInfo
-qfCode
-qfSeparatorRight
-qfText
-```
-
 ## License
 
 [MIT License](./LICENSE)
@@ -412,12 +433,17 @@ qfText
 
 ## TO-DO
 
-- [ ] Add metaeditor's `/s` option (:MQLCompileCheck)
 - [ ] Add version management
-   - [ ] by '#property version "x.xx"'
+   - [ ] grep '#property version "x.xx"'
    - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
-- [ ] Auto compiling on saved ?
-- [ ] Add highlight color options ?
+   - [x] Add `ft.mql[5/4].compiled_extension`
+- [ ] `opts.information.actions` has other actions ?
+   - [ ] Now only 'compiling' & 'including' are confirmed
+- [ ] Auto compiling on save ? (Complicated...)
+   - [ ] Should set source_path before.
+   - [ ] Should search & dig including paths
+   - [ ] If current buffer is matched to the included path ?
+   - [ ] Compile source_path
 - [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] git
    - [x] Detect git root
@@ -425,4 +451,11 @@ qfText
    - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] include path NOT WORKS for the space char in `Program Files`
+
+
+> [!Tip]
+> Use `vim.o.format` ?
+> - [ ] Easy to use, but not so customizable.
+> - [ ] See [naoina/syntastic-MQL](https://github.com/naoina/syntastic-MQL/blob/master/syntax_checkers/mql5/metaeditor.vim)
+> - [ ] Counting functions should be suitable for it.
 

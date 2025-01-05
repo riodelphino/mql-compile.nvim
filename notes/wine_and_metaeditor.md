@@ -64,11 +64,13 @@ So need to consider about conversion in paths.
 
 **Conclusion:**
 - `cwd` on project root
-- Absolute path in specifying `metatrader's exe`.  
-- Relative path in specifying `/compile:` and `/log:`.  
-- All paths can be written in Linux/MacOS path.
+- Absolute path in specifying `metatrader's exe`
+- Relative path in specifying `/compile:` and `/log:`
+- All paths can be written in Linux/MacOS path
 
 This is easier & safer & ensured.  
+
+[README.md](../README.md) shows `~/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe` as the default metaeditor's path with `~`, but it is internally converted to absolute path.
 
 Examples:
 | Type              | Recommend               | Example                                                                                  |

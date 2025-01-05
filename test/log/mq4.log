@@ -1,7 +1,0 @@
-
-ea.mq4 : information: compiling 'ea.mq4'
-mq4.mqh : information: including 'mq4.mqh'
-ea.mq4(18,1) : error 161: 'aaa' - unexpected end of program
-ea.mq4(18,1) : error 149: 'aaa' - unexpected token, probably type is missing?
-ea.mq4(11,11) : warning 31: variable 'test' not used
-Result: 2 errors, 1 warnings
