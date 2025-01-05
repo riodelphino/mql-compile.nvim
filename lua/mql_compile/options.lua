@@ -57,11 +57,13 @@ M.default = {
          metaeditor_path = '',
          include_path = '', -- Not supported now
          pattern = '*.mq5',
+         compiled_extension = 'ex5',
       },
       mql4 = {
          metaeditor_path = '',
          include_path = '', -- Not supported now
          pattern = '*.mq4',
+         compiled_extension = 'ex4',
       },
    },
    notify = { -- Enable/disable notify
@@ -89,8 +91,24 @@ M.default = {
          information = vim.log.levels.INFO, -- for informations. *.OFF is also good. (but maybe same color)
       },
    },
+   highlights = { -- Highlights on quickfix window
+      enabled = true,
+      hlgroups = {
+         filename = { 'qfFileName', { link = 'Directory' } }, -- '<Highlight name>' , { <highlight options> }
+         separator_left = { 'qfSeparatorLeft', { fg = '#cccccc' } },
+         separator_right = { 'qfSeparatorRight', { fg = '#cccccc' } },
+         line_nr = { 'qfLineNr', { fg = '#888888' } },
+         col = { 'qfCol', { fg = '#888888' } },
+         error = { 'qfError', { link = 'DiagnosticError' } },
+         warning = { 'qfWarning', { link = 'DiagnosticWarn' } },
+         info = { 'qfInfo', { link = 'DiagnosticInfo' } },
+         hint = { 'qfHint', { link = 'DiagnosticHint' } },
+         note = { 'qfNote', { link = 'DiagnosticHint' } },
+         code = { 'qfCode', { fg = '#888888' } },
+         text = { 'qfText', { link = 'Normal' } },
+      },
+   },
 }
-
 function M.get_opts() return M._opts end
 
 function M.get_os_type() return M._os_type end
