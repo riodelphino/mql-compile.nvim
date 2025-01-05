@@ -94,12 +94,12 @@ M.default = {
    highlights = { -- Highlights on quickfix window
       enabled = true,
       hlgroups = {
-         filename = { 'qfFileName', { link = 'Directory' } },
+         filename = { 'qfFileName', { link = 'Directory' } }, -- '<Highlight name>' , { <highlight options> }
          separator_left = { 'qfSeparatorLeft', { fg = '#cccccc' } },
          separator_right = { 'qfSeparatorRight', { fg = '#cccccc' } },
          line_nr = { 'qfLineNr', { fg = '#888888' } },
          col = { 'qfCol', { fg = '#888888' } },
-         error = { 'qfError', { fg = '#0033FF' } },
+         error = { 'qfError', { link = 'DiagnosticError' } },
          warning = { 'qfWarning', { link = 'DiagnosticWarn' } },
          info = { 'qfInfo', { link = 'DiagnosticInfo' } },
          hint = { 'qfHint', { link = 'DiagnosticHint' } },

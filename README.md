@@ -353,7 +353,7 @@ keys = {
 > Highlighting(and syntaxing) has not finished yet.
 
 > [!Tip]
-> Highlighting should not be set by this plugin ?
+> Qf highlighting should not be modified by this plugin ?
 
 Set-up highlight groups in quickfix list.  
 
@@ -363,7 +363,7 @@ opts = {
    highlights = { -- Highlights on quickfix window
       enabled = true,
       hlgroups = {
-         filename = { 'qfFileName', { link = 'Directory' } },
+         filename = { 'qfFileName', { link = 'Directory' } },  -- { '<Highlight name>' , { <highlight options> } }
          separator_left = { 'qfSeparatorLeft', { fg = '#cccccc' } },
          separator_right = { 'qfSeparatorRight', { fg = '#cccccc' } },
          line_nr = { 'qfLineNr', { fg = '#888888' } },

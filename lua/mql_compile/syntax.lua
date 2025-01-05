@@ -17,7 +17,7 @@ function M.set_qf_syntax()
    -- Syntax rules
    local syntax = {
       -- Error code (num over 3digits)
-      { 'match', 'code', [[/\d\+/]], {} },
+      { 'match', 'code', [[/\d\+/]], {} }, -- <type>, <group>, <pattern>, <options>
       -- Filename
       { 'match', 'filename', [[/^[^|]*/]], { nextgroup = 'separator_left' } },
       -- Separator left
