@@ -433,6 +433,17 @@ vim.notify = require('notify')
 Then `mql-compile` shows messages through it.
 
 
+## Test codes to compile
+
+There are some test codes in: `test/*.mq5`
+- nothing.mq5
+- informations.mq5
+- warnings.mq5
+- errors.mq5
+
+Try to compile them for test.
+
+
 ## License
 
 [MIT License](./LICENSE)
@@ -440,6 +451,7 @@ Then `mql-compile` shows messages through it.
 
 ## TO-DO
 
+- [ ] Convert information's included file paths, fits to macos or linux
 - [ ] Add version management
    - [ ] grep '#property version "x.xx"'
    - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
@@ -451,7 +463,6 @@ Then `mql-compile` shows messages through it.
    - [ ] Should search & dig including paths
    - [ ] If current buffer is matched to the included path ?
    - [ ] Compile source_path
-- [ ] Fit for `https://github.com/kevinhwang91/nvim-bqf` ?
 - [ ] git
    - [x] Detect git root
    - [ ] List up & select from git root's mql5 files 
@@ -461,7 +472,7 @@ Then `mql-compile` shows messages through it.
 
 
 > [!Tip]
-> Use `vim.o.format` ?
+> Use `vim.o.errorformat` ?
 > - [ ] Easy to use, but not so customizable.
 > - [ ] See [naoina/syntastic-MQL](https://github.com/naoina/syntastic-MQL/blob/master/syntax_checkers/mql5/metaeditor.vim)
 > - [ ] Counting functions should be suitable for it.
