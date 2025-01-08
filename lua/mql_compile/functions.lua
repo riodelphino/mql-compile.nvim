@@ -102,6 +102,9 @@ function M.generate_qf(log_path, types)
             if count[key] == nil then count[key] = 0 end
             count[key] = count[key] + 1 -- Count up
             local e = opts.quickfix.parse(line, key) -- Parse log
+            if opt._os_type == 'macos' or opt._os_type == 'linux' then -- Convert path delimiters fit to cur OS
+               e.filename = e.filename:gsub('\\', '/')
+            end
             vim.fn.setqflist({ e }, 'a') -- Add to quickfix
          end
       end

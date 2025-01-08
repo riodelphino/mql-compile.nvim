@@ -179,6 +179,25 @@ o ... WORKS
 o! / △! ... Finally chosen  
 
 
+
+## Solved issues
+
+> [!Info]
+> If use '..' in '#include', quickfix path failed to jump.
+
+At first, shown like below:
+```quickfix
+ E  MT5/test/test.mq5        11:1  'aaa' - unexpected token, probably type is missing?
+ E  MT5\class\myclass.mqh    35:4   '}' - semicolon expected
+```
+So, on macos or linux, convert e.filename by :gsub('\\', '/')
+Fixed to below:
+```quickfix
+ E  MT5/test/test.mq5        11:1  'aaa' - unexpected token, probably type is missing?
+ E  MT5/class/myclass.mqh    35:4   '}' - semicolon expected
+```
+
+
 ## Unresolved issues
 
  > [!Warning]
@@ -186,7 +205,6 @@ o! / △! ... Finally chosen
 
 `/include:` does not accept the paths with spaces like `.../Profram Files/...`, maybe internally.  
 Why?
-
 
 
 
