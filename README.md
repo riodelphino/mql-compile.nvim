@@ -444,6 +444,14 @@ There are some test codes in: `test/*.mq5`
 Try to compile them for test.
 
 
+## Additional notes
+
+Researched and verified detailed data of wine and `metaeditor.exe` / `MetaEditor64.exe` commands.
+[notes/wine_and_metaeditor.md](notes/wine_and_metaeditor.md)
+
+Path specifications and path conversions are investigated.
+
+
 ## License
 
 [MIT License](./LICENSE)
@@ -451,7 +459,6 @@ Try to compile them for test.
 
 ## TO-DO
 
-- [ ] Convert information's included file paths, fits to macos or linux
 - [ ] Add version management
    - [ ] grep '#property version "x.xx"'
    - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
@@ -465,7 +472,7 @@ Try to compile them for test.
    - [ ] Compile source_path
 - [ ] git
    - [x] Detect git root
-   - [ ] List up & select from git root's mql5 files 
+   - [ ] Prompt for listing up files by `vim.ui.select`.
    - [ ] If only one mql5 on git root, compile without prompt
 - [ ] Show fugitive message on progress & success or error
 - [ ] include path NOT WORKS for the space char in `Program Files`
@@ -473,7 +480,7 @@ Try to compile them for test.
 
 > [!Tip]
 > Use `vim.o.errorformat` ?
-> - [ ] Easy to use, but not so customizable.
-> - [ ] See [naoina/syntastic-MQL](https://github.com/naoina/syntastic-MQL/blob/master/syntax_checkers/mql5/metaeditor.vim)
-> - [ ] Counting functions should be suitable for it.
+> - Easy to use, but not so customizable.
+> - See [naoina/syntastic-MQL](https://github.com/naoina/syntastic-MQL/blob/master/syntax_checkers/mql5/metaeditor.vim)
+> - If use it, counting functions should be changed.
 

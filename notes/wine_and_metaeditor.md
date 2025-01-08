@@ -182,7 +182,7 @@ o! / △! ... Finally chosen
 
 ## Solved issues
 
-> [!Info]
+> [!Note]
 > If use '..' in '#include', quickfix path failed to jump.
 
 At first, shown like below:
