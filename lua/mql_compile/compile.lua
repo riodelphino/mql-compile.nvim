@@ -13,7 +13,9 @@ function M.async_compile(metaeditor_path, source_path, log_path)
    -- source_path = 'myea/ea_warnings.mq5'
    -- log_path = 'myea/ea_warnings.log'
    -- local cwd = '/Users/rio/Projects/git/FX/EA'
-   local cwd = fn.get_dir(source_path)
+
+   -- local cwd = fn.get_dir(source_path) -- error: cannot compile, for cwd insist source_path's dir, not project root
+   local cwd = fn.get_root(source_path)
 
    local cmd
    local args = {}
@@ -23,6 +25,15 @@ function M.async_compile(metaeditor_path, source_path, log_path)
    else
       cmd = metaeditor_path -- "" is not needed somewhy
       args = { '/compile:' .. source_path, '/log:' .. log_path, '&>/dev/null' }
+   end
+
+   if opts.debug.compile.show_cmd then
+      msg = 'DEBUG: compile.show_cmd\n' .. cmd .. ' ' .. table.concat(args, ' ')
+      fn.notify(msg, vim.log.levels.INFO)
+   end
+   if opts.debug.compile.show_cwd then
+      msg = 'DEBUG: compile.show_cwd\n' .. cwd
+      fn.notify(msg, vim.log.levels.INFO)
    end
 
    -- plenary.job for realtime operation

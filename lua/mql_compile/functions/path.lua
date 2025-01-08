@@ -29,7 +29,8 @@ end
 function M.get_root(path)
    local cwd = vim.fn.getcwd()
    local git_root = M.get_git_root(path)
-   local current_buf_dir = vim.fn.expand('%:p:h')
+   -- local current_buf_dir = vim.fn.expand('%:p:h')
+   local current_buf_dir = M.get_dir(path)
    return git_root or cwd or current_buf_dir or path
 end
 

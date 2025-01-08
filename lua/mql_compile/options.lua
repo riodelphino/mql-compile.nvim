@@ -7,6 +7,9 @@ M._root = ''
 M._source_path = nil
 
 M.default = {
+   debug = {
+      show_compile_cmd = true,
+   },
    priority = { 'mql5', 'mql4' },
    log = {
       extension = 'log',
