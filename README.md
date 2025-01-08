@@ -1,5 +1,6 @@
 # mql-compile.nvim
 
+
 ## Concept
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
@@ -111,6 +112,12 @@ return {
 
 ```lua
 opts = {
+   debug = { -- For debug
+      compile = {
+         show_cmd = false,
+         show_cwd = false,
+      },
+   },
    priority = { 'mql5', 'mql4' }, -- priority for auto file detection
    log = {
       extension = 'log',
