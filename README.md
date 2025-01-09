@@ -444,6 +444,28 @@ There are some test codes in: `test/*.mq5`
 Try to compile them for test.
 
 
+## Errors that do not make sense
+
+> [!Warning]
+> The metaeditor returns errors that do not make sense, so often.
+
+ex.) If you forget to add ';' at the end of class/struct/enum:
+```cpp
+enum ENUM_SAMPLE {
+   SAMPLE_1 = 1,
+   SAMPLE_2 = 2,
+} // Line 4: forgot to add ';'
+
+class CMyClass { // Line 6: `class 'name' expected` error occurs
+};
+```
+The error is actually occurring on line 4. But the MetaEditor says that line 6 has a completely different error.  
+This confuses and annoys us.  
+Especially, if you split files & use `#include`, it becomes quite difficult to find the cause.
+
+Unfortunately, these are the weak point of metaeditor's linting, I guess.
+
+
 ## Additional notes
 
 Researched and verified detailed data of wine and `metaeditor.exe` / `MetaEditor64.exe` commands.
