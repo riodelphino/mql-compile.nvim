@@ -1,7 +1,10 @@
 # mql-compile.nvim
 
+![img/mql-compile.jpg](img/mql-compile.jpg)
+
 
 ## Concept
+
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
 
@@ -31,19 +34,6 @@ Quickfix
 
 Notify
 ![error_notify](./img/error_notify.png)
-
-### Warning
-
-Quickfix
-![warning_quickfix](./img/warning_quickfix.png)
-
-Notify
-![warning_notify](./img/warning_notify.png)
-
-### Success
-
-Quickfix
-![success_quickfix](./img/success_quickfix.png)
 
 Notify
 ![success_notify](./img/success_notify.png)
@@ -97,7 +87,7 @@ return {
             metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
          },
          mql4 = {
-            metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/XMTrading MT4/metaeditor.exe', -- your MT4 exe's path
+            metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe', -- your MT4 exe's path
          },
       },
    },
@@ -468,8 +458,8 @@ Unfortunately, these are the weak point of metaeditor's linting, I guess.
 
 ## Additional notes
 
-Researched and verified detailed data of wine and `metaeditor.exe` / `MetaEditor64.exe` commands.
-[notes/wine_and_metaeditor.md](notes/wine_and_metaeditor.md)
+Researched and verified detailed data of wine and `metaeditor.exe` / `MetaEditor64.exe` commands.  
+See [notes/wine_and_metaeditor.md](notes/wine_and_metaeditor.md).
 
 Path specifications and path conversions are investigated.
 
