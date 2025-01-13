@@ -1,6 +1,6 @@
 // Success with informations
 
-#include "class/file_1.mqh" // [INFO] Include existing file
+#include "dir_1/file_1.mqh" // [info] Include existing file
 
 int OnInit() {
    return INIT_SUCCEEDED;
