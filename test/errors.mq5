@@ -1,14 +1,15 @@
 // Failed with errors
 
-#include "class/file_1.mqh" // [INFO] Include existing file
-#include "class/file_2.mqh" // [ERROR] Include no existing file
+#include "dir_1/file_1.mqh" // [info] Include existing file
+#include "dir_1/file_2.mqh" // [error] Include no existing file
 
 int OnInit() {
    return INIT_SUCCEEDED;
 }
 
 void OnTick() {
-   string test; // [WARN] Unused variable
+   string test; // [warn] Unused variable
 }
 
-aaa // [ERROR] Syntax error
+aaa // [error] Syntax error
+
