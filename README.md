@@ -9,15 +9,16 @@ A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.
 Without heavy MetaEditor GUI. (Compiling on command-line).
 
 > [!Caution]
-> This is a test version.  
+> It's a test version.  
 
-Be careful to use at your own risk.
+Be careful to use at your own risk. Backup your files before testing.
 
 > [!Warning]
 > Not tested in Windows or Linux  
 
 Currently ensured to work only in 'macOS + wine(wineskin)' environment.  
 If anyone encounters any problems while using/testing, please [create an issue](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
+Any reports are welcome, like mql-compile.nvim worked in your environment.
 
 
 ## Screenshots
@@ -27,16 +28,14 @@ With [nvim-notify](https://github.com/rcarriga/nvim-notify)
 > [!Note]
 > Sorry, these pics are from older ver.
 
-### Error
+Quickfix (error)
+![error_quickfix](img/error_quickfix.png)
 
-Quickfix
-![error_quickfix](./img/error_quickfix.png)
+Notify (error)
+![error_notify](img/error_notify.png)
 
-Notify
-![error_notify](./img/error_notify.png)
-
-Notify
-![success_notify](./img/success_notify.png)
+Notify (success)
+![success_notify](img/success_notify.png)
 
 
 ## Features
@@ -56,15 +55,13 @@ Notify
 
 **Mandatory**
 - nvim v0.10.2 (My environment. It seems to work in a little older versions.)
-- MT5 or MT4 installed through wine/wineskin (for now)
-- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) Plugin for async
+- MT5 or MT4 installed (through wine/wineskin, for now)
+- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for async
 
 **Optional plugins**
-- [nvim-notify](https://github.com/rcarriga/nvim-notify) Nice style notify messages
+- [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
-
-> [!Warning]
-> Use v3.14.0 or earlier versions of nvim-notify. v3.14.1 not works somewhy with it's error.
+- [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify quickfix
 
 
 ## Installation
@@ -179,9 +176,12 @@ opts = {
 
 ## Default 'metaeditor_path'
 
-Below are the default path for MetaEditor exe in `opts.ft.[mql5|mql4]`.  
+Below are the default path for MetaEditor exe in `opts.ft.mql5` and `opts.ft.mql4`.  
 (It depends on your settings on installing.)
+
+
 ### MT5
+
 ```lua
  -- MacOS (via wine)
  metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe'
@@ -208,6 +208,7 @@ Leave 'parse' or 'format' as nil to use these default functions.
 
 
 ### Parsing quickfix
+
 This is the parsing function, from log to quickfix
 Default:
 ```lua
@@ -280,7 +281,7 @@ or
 :MQLCompile %
 ```
 
-This plugin auto-detects mql5/mql4 by patterns given in `opts.ft.[mql5|mql4].pattern`.
+This plugin auto-detects mql5/mql4 by patterns given in `opts.ft.mql5.pattern` and `opts.ft.mql4.pattern`.
 See [Auto detection rules](#auto-detection-rules).
 
 ```vim
@@ -408,17 +409,21 @@ And [these lua functions](#lua-functions) follow same rules.
 
 
 ## notify
-> [!Warning]
-> Use v3.14.0 or earlier versions of nvim-notify. v3.14.1 not works somewhy with it's error.
 
 This plugin optionally uses `vim.notify()` to show messages to users.  
 For those who want to have nicer messages, follow this.
 
 1. Install [nvim-notify](https://github.com/rcarriga/nvim-notify)
-2. Put below code in init.lua, to replace default notify.
+2. Put below code to replace default notify.
+
 ```lua
--- ex.) for lazy.nvim, `config = {}` in `lua/plugins/notify.lua`
-vim.notify = require('notify')
+-- ex.) with lazy.nvim
+return {
+   'rcarriga/nvim-notify',
+   config = function()
+      vim.notify = require('notify')
+   end,
+}
 ```
 Then `mql-compile` shows messages through it.
 
@@ -434,22 +439,24 @@ There are some test codes in: `test/*.mq5`
 Try to compile them for test.
 
 
-## Errors that do not make sense
+## Inaccurate error displaying
 
 > [!Warning]
 > The metaeditor returns errors that do not make sense, so often.
 
-ex.) If you forget to add ';' at the end of class/struct/enum:
-```cpp
-enum ENUM_SAMPLE {
-   SAMPLE_1 = 1,
-   SAMPLE_2 = 2,
-} // Line 4: forgot to add ';'
+For example,
 
-class CMyClass { // Line 6: `class 'name' expected` error occurs
+If you forget to add ';' at the end of class:
+```cpp
+class ClassA {
+} // line A: forgot to add ';'
+
+class ClassB { // line B: `class 'name' expected` error occurs
 };
 ```
-The error is actually occurring on line 4. But the MetaEditor says that line 6 has a completely different error.  
+
+The error is actually occurring on line A.  
+But the MetaEditor says that line B has a different error (completely different).  
 This confuses and annoys us.  
 Especially, if you split files & use `#include`, it becomes quite difficult to find the cause.
 
@@ -472,11 +479,11 @@ Path specifications and path conversions are investigated.
 ## TO-DO
 
 - [ ] Add version management
-   - [ ] grep '#property version "x.xx"'
-   - [ ] Auto mv ex5/ex4 to 'archive' dir, after compiling
+   - [ ] grep `#property version "x.x"`
+   - [ ] Auto mv ex5/ex4 to `archive` dir, after compiling
    - [x] Add `ft.mql[5/4].compiled_extension`
 - [ ] `opts.information.actions` has other actions ?
-   - [ ] Now only 'compiling' & 'including' are confirmed
+   - [ ] Now only `compiling` & `including` are confirmed
 - [ ] Auto compiling on save ? (Complicated...)
    - [ ] Should set source_path before.
    - [ ] Should search & dig including paths
