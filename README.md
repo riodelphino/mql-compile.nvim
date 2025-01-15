@@ -74,7 +74,7 @@ return {
    'riodelphino/mql-compile.nvim',
    dependencies = {
       'nvim-lua/plenary.nvim',
-      { 'rcarriga/nvim-notify', commit = 'fbef5d32be8466dd76544a257d3f3dce20082a07' } -- v3.14.0 (later version cause `{ title = '' }` error for now)
+      'rcarriga/nvim-notify',
    },
    lazy = true,
    ft = { 'cpp', 'c' }, -- If your filetype settings read mql5 as cpp / mql4 as c.
