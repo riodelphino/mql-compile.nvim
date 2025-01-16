@@ -9,7 +9,7 @@ A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.
 Without heavy MetaEditor GUI. (Compiling on command-line).
 
 > [!Caution]
-> It's a test version.  
+> It's still test version.  
 
 Be careful to use at your own risk. Backup your files before testing.
 
@@ -78,7 +78,7 @@ return {
       'rcarriga/nvim-notify',
    },
    lazy = true,
-   ft = { 'cpp', 'c' }, -- If your filetype settings read mql5 as cpp / mql4 as c.
+   ft = { 'c', 'cpp' }, -- Using `mql-compile.nvim` is easier to change MQL4/MQL5 filetypes to c/cpp.
    opts = {
       ft = {
          mql5 = {
@@ -134,12 +134,12 @@ opts = {
    },
    ft = {
       mql5 = {
-         metaeditor_path = '', -- '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
+         metaeditor_path = '', -- Set your MT5 exe's path
          include_path = '', -- Not supported now
          pattern = '*.mq5',
       },
       mql4 = {
-         metaeditor_path = '', -- '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe', -- your MT4 exe's path
+         metaeditor_path = '', -- Set your MT4 exe's path
          include_path = '', -- Not supported now
          pattern = '*.mq4',
       },
@@ -177,7 +177,7 @@ opts = {
 
 ## Default 'metaeditor_path'
 
-Below are the default path for MetaEditor exe in `opts.ft.mql5` and `opts.ft.mql4`.  
+The default paths of MetaEditor's exe, for `opts.ft.mql5` and `opts.ft.mql4`.  
 (It depends on your settings on installing.)
 
 
