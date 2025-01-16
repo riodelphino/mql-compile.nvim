@@ -59,6 +59,7 @@ Notify (success)
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for async
 
 **Optional plugins**
+- [mql-filetype.nvim](https://github.com/riodelphino/mql-compile.nvim) Change filetypes from MQL4/MQL5 to c/cpp automatically
 - [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify quickfix
