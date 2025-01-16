@@ -1,1 +1,11 @@
-/Users/rio/.config/lsp-config/.stylua.toml
+column_width = 200 
+line_endings = "Unix" # Unix (LF) or Windows (CRLF)
+indent_type = "Spaces" # Tabs | Spaces
+indent_width = 3
+quote_style = "AutoPreferSingle" # AutoPreferDouble | AutoPreferSingle | ForceDouble | ForceSingle. AutoPrefer
+call_parentheses = "Always" # Always | NoSingleString | NoSingleTable | None.
+collapse_simple_statement = "ConditionalOnly" # Never | FunctionOnly | ConditionalOnly | Always
+
+# This cause error.
+# [sort_requires]
+# enabled = false # true = Sort require() section automatically.

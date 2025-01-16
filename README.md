@@ -59,6 +59,7 @@ Notify (success)
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for async
 
 **Optional plugins**
+- [mql-filetype.nvim](https://github.com/riodelphino/mql-compile.nvim) Change filetypes from MQL4/MQL5 to c/cpp automatically
 - [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify quickfix
@@ -74,7 +75,7 @@ return {
    'riodelphino/mql-compile.nvim',
    dependencies = {
       'nvim-lua/plenary.nvim',
-      { 'rcarriga/nvim-notify', commit = 'fbef5d32be8466dd76544a257d3f3dce20082a07' } -- v3.14.0 (later version cause `{ title = '' }` error for now)
+      'rcarriga/nvim-notify',
    },
    lazy = true,
    ft = { 'cpp', 'c' }, -- If your filetype settings read mql5 as cpp / mql4 as c.
