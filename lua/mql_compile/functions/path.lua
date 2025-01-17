@@ -1,8 +1,10 @@
 local M = {}
 
+local sep
+
 function M.get_path_separator()
-   local sep = package.config:sub(1, 1) -- "/" or "\\"
-   return sep
+   local separator = package.config:sub(1, 1) -- "/" or "\\"
+   return separator
 end
 
 function M.file_exists(path)
@@ -70,7 +72,7 @@ function M.get_absolute_path(path)
 end
 
 function M.get_filename(path)
-   path = vim.fn.fnamemodify(path, ':~')
+   path = vim.fn.fnamemodify(path, ':t:r')
    return path
 end
 
@@ -80,9 +82,26 @@ function M.get_dir(path)
 end
 
 function M.get_basename(path)
-   path = vim.fn.fnamemodify(path, ':r')
+   path = vim.fn.fnamemodify(path, ':t:r')
    return path
 end
+
+function M.get_extension(path)
+   path = vim.fn.fnamemodify(path, ':e')
+   return path
+end
+
+-- function M.get_extension(path)
+--    return path:match('^.+%.([^/]+)$')
+-- end
+--
+-- function M.get_basename(path)
+--    return path:match('([^/]+)%.?[^/]*$')
+-- end
+--
+-- function M.get_filename(path)
+--    return path:match('([^/]+)%.?[^/]*$')
+-- end
 
 function M.detect_file(path, filename)
    path = path or M.get_root()
@@ -125,10 +144,11 @@ end
 
 function M.get_extension_by_filename(filename, fallback_to_filename) -- もっと簡単に出来ない？
    fallback_to_filename = fallback_to_filename == nil or true
-   local sep = M.get_path_separator()
    local extension = filename:match('%.(.*)$')
    if extension == nil and fallback_to_filename then extension = filename:match('^.+' .. sep .. '(.-)$') end
    return extension
 end
+
+sep = M.get_path_separator()
 
 return M

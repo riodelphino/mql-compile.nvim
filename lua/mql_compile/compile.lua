@@ -3,7 +3,7 @@ local M = {}
 local opt = require('mql_compile.options')
 local fn = require('mql_compile.functions')
 
-function M.async_compile(metaeditor_path, source_path, log_path)
+function M.async_compile(metaeditor_path, source_path, log_path, compiled_extension)
    local opts = opt.get_opts()
    local msg = ''
 
@@ -125,6 +125,16 @@ function M.async_compile(metaeditor_path, source_path, log_path)
                end
             end
 
+            -- Move *.ex4 | *.ex5 to custom path
+            if opts.excutable.custom_path.enabled then
+               local fname = fn.get_filename(source_path)
+               local dir = fn.get_dir(source_path)
+               local source_ext = fn.get_extension(source_path)
+               local ext = compiled_extension
+               local compiled_path = vim.fs.joinpath(dir, fname .. '.' .. ext)
+               print(compiled_path)
+            end
+
             -- Open quickfix
             if opts.quickfix.show.copen then
                -- Check Type matched in count
@@ -173,13 +183,14 @@ function M.compile(source_path)
 
    -- Generate log path
    local basename = fn.get_basename(source_path)
-   local log_path = basename .. '.' .. opts.log.extension
+   local dir = fn.get_dir(source_path)
+   local log_path = vim.fs.joinpath(dir, basename .. '.' .. opts.log.extension)
 
    -- Adjust source_path
    source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
 
    -- Execute async-compiling
-   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path)
+   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path, mql.compiled_extension)
    return compile_shell_error
 end
 

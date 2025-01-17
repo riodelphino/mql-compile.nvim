@@ -51,6 +51,20 @@ M.default = {
          return formated
       end,
    },
+   excutable = {
+      file_exists = 'overwrite', -- 'prompt' | 'overwrite' | 'abort'
+      custom_path = {
+         enabled = true,
+         path = function(root, dir, fname, base, ext, ver, major, minor)
+            if ver == nil then
+               -- return nil -- No modify
+               return string.format('archive/%s', fname) -- archive/myea.ex5
+            else
+               return string.format('archive/%s_ver%n.%s', base, ver, ext) -- archive/myea_ver1.10.ex5
+            end
+         end,
+      },
+   },
    wine = {
       enabled = true,
       command = 'wine',
@@ -112,9 +126,13 @@ M.default = {
       },
    },
 }
-function M.get_opts() return M._opts end
+function M.get_opts()
+   return M._opts
+end
 
-function M.get_os_type() return M._os_type end
+function M.get_os_type()
+   return M._os_type
+end
 
 function M.deep_merge(default, user)
    fn = require('mql_compile.functions')
