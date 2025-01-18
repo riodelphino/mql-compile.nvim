@@ -44,11 +44,13 @@ Notify (success)
 - Async compiling MQL5/MQL4
 - Show quickfix
 - Auto detect MQL5/MQL4
+- Customizable target path (place compiled files wherever you prefer)
+- Version management
 - Works on `MacOS + wine(wineskin)` for now
 
 **Not implemented**
-- Works on `Windows` (Need tested)
-- Works on `Linux` (Need tested)
+- Works on `Windows`? (Need tested)
+- Works on `Linux`? (Need tested)
 
 
 ## Requirement
@@ -128,6 +130,19 @@ opts = {
       parse = nil, -- See '# Parsing and formatting information' section
       format = nil, -- See '# Parsing and formatting information' section
    },
+   compiled = {
+      overwrite = true,
+      custom_path = {
+         enabled = true,
+         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+            if ver == nil or ver == '' then
+               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+            else
+               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+            end
+         end,
+      },
+   },
    wine = {
       enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
       command = 'wine', -- Wine command path
@@ -156,7 +171,12 @@ opts = {
       quickfix = {
          on_finished = true, -- Add quickfix counts to main message on 'notify.compile.on_finished'
       },
-      information = {},
+      information = {
+         on_generated = true, -- Show informations on notify
+      },
+      compiled = {
+         on_saved = true,
+      },
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...
             none = vim.log.levels.INFO,
@@ -252,6 +272,67 @@ opts = {
    },
 },
 
+```
+
+### Custom path
+
+The paths for compiled `*.ex[45]` files are modifiable.  
+You can manage versions here.
+
+Default:
+```lua
+opts = {
+   compiled = {
+      custom_path = {
+         enabled = true, -- set false, for using source file name & dir
+         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+            if ver == nil or ver == '' then
+               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+            else
+               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+            end
+         end,
+      },
+   },
+},
+```
+
+Args:
+
+`get_custom_path` callback function has 8 args:
+   root, dir, base, fname, ext, ver, major, minor
+
+for example)
+   `/Users/username/projects/myea/src/ea.mq5`
+   (root=/Users/username/projects/myea)
+
+```vim
+:cwd /Users/username/projects/myea
+:MQLCompileSetSource src/ea.mq5
+```
+```cpp:ea.mq5
+#property version "1.23"
+```
+
+Then, variables will look like this.
+| Variable | Content                | Example                           |
+| -------- | ---------------------- | --------------------------------- |
+| root     | project root (.git)    | . (/Users/username/projects/myea) |
+| dir      | dir                    | src                               |
+| base     | basename (with ext)    | ea.mq5                            |
+| fname    | filename (without ext) | ea                                |
+| ext      | extension              | mq5                               |
+| ver      | version                | 1.23                              |
+| major    | major version          | 1                                 |
+| minor    | minor version          | 23                                |
+
+
+The paths out of root dir are also available.
+```lua
+-- Relative path
+return string.format(root .. '/../../ea/archive/%s.%s', fname, ext)
+-- Absolute path
+return string.format('/path/to/ea/archive/%s.%s', fname, ext)
 ```
 
 ## Commands
@@ -479,17 +560,8 @@ Path specifications and path conversions are investigated.
 
 ## TO-DO
 
-- [ ] Add version management
-   - [ ] grep `#property version "x.x"`
-   - [ ] Auto mv ex5/ex4 to `archive` dir, after compiling
-   - [x] Add `ft.mql[5/4].compiled_extension`
 - [ ] `opts.information.actions` has other actions ?
    - [ ] Now only `compiling` & `including` are confirmed
-- [ ] Auto compiling on save ? (Complicated...)
-   - [ ] Should set source_path before.
-   - [ ] Should search & dig including paths
-   - [ ] If current buffer is matched to the included path ?
-   - [ ] Compile source_path
 - [ ] git
    - [x] Detect git root
    - [ ] Prompt for listing up files by `vim.ui.select`.

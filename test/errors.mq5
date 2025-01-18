@@ -1,5 +1,7 @@
 // Failed with errors
 
+#property version "1.00"
+
 #include "dir_1/file_1.mqh" // [info] Include existing file
 #include "dir_1/file_2.mqh" // [error] Include no existing file
 

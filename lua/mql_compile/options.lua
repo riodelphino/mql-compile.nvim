@@ -51,6 +51,19 @@ M.default = {
          return formated
       end,
    },
+   compiled = {
+      overwrite = true,
+      custom_path = {
+         enabled = true, -- set false, for using source file name & dir
+         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+            if ver == nil or ver == '' then
+               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+            else
+               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+            end
+         end,
+      },
+   },
    wine = {
       enabled = true,
       command = 'wine',
@@ -59,14 +72,22 @@ M.default = {
       mql5 = {
          metaeditor_path = '',
          include_path = '', -- Not supported now
-         pattern = '*.mq5',
-         compiled_extension = 'ex5',
+         -- pattern = '*.mq5',
+         -- compiled_extension = 'ex5',
+         extension = {
+            source = 'mq5',
+            compiled = 'ex5',
+         },
       },
       mql4 = {
          metaeditor_path = '',
          include_path = '', -- Not supported now
-         pattern = '*.mq4',
-         compiled_extension = 'ex4',
+         -- pattern = '*.mq4',
+         -- compiled_extension = 'ex4',
+         extension = {
+            source = 'mq4',
+            compiled = 'ex4',
+         },
       },
    },
    notify = { -- Enable/disable notify
@@ -83,6 +104,10 @@ M.default = {
       },
       information = {
          on_generated = true, -- Show informations on notify
+      },
+      compiled = {
+         on_mkdir = true,
+         on_saved = true,
       },
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...
@@ -112,9 +137,13 @@ M.default = {
       },
    },
 }
-function M.get_opts() return M._opts end
+function M.get_opts()
+   return M._opts
+end
 
-function M.get_os_type() return M._os_type end
+function M.get_os_type()
+   return M._os_type
+end
 
 function M.deep_merge(default, user)
    fn = require('mql_compile.functions')

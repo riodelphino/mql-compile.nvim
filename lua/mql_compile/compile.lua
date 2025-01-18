@@ -3,7 +3,7 @@ local M = {}
 local opt = require('mql_compile.options')
 local fn = require('mql_compile.functions')
 
-function M.async_compile(metaeditor_path, source_path, log_path)
+function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, target_path)
    local opts = opt.get_opts()
    local msg = ''
 
@@ -125,6 +125,28 @@ function M.async_compile(metaeditor_path, source_path, log_path)
                end
             end
 
+            -- Delete log
+            if opts.log.delete_after_load then
+               vim.fn.delete(log_path)
+               -- notify: log.on_deleted
+               if opts.notify.log.on_deleted then
+                  msg = "Deleted log: '" .. log_path .. "'"
+                  fn.notify(msg, vim.log.levels.INFO)
+               end
+            end
+
+            -- Custom path (mv compiled file to custom path)
+            if qf_cnt.error == nil then
+               local target_dir = fn.get_dir(target_path)
+               -- mkdir
+               if fn.folder_exists(target_dir) == false then
+                  vim.fn.mkdir(target_dir)
+                  if opts.notify.compiled.on_mkdir then fn.notify("Created dir: '" .. target_dir .. "'", vim.log.levels.INFO) end
+               end
+               vim.fn.rename(compiled_path, target_path)
+               if opts.notify.compiled.on_saved then fn.notify("Saved as: '" .. target_path .. "'", vim.log.levels.INFO) end
+            end
+
             -- Open quickfix
             if opts.quickfix.show.copen then
                -- Check Type matched in count
@@ -134,16 +156,6 @@ function M.async_compile(metaeditor_path, source_path, log_path)
                   if qf_cnt[type] ~= nil then show_flag = true end
                end
                if show_flag then vim.cmd('copen') end
-            end
-
-            -- Delete log
-            if opts.log.delete_after_load then
-               vim.fn.delete(log_path)
-               -- notify: log.on_deleted
-               if opts.notify.log.on_deleted then
-                  msg = "Deleted log: '" .. log_path .. "'"
-                  fn.notify(msg, vim.log.levels.INFO)
-               end
             end
          end)
       end,
@@ -173,14 +185,43 @@ function M.compile(source_path)
 
    -- Generate log path
    local basename = fn.get_basename(source_path)
-   local log_path = basename .. '.' .. opts.log.extension
+   local dir = fn.get_dir(source_path)
+   local log_path = vim.fs.joinpath(dir, basename .. '.' .. opts.log.extension)
 
    -- Adjust source_path
    source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
 
+   -- Custom or default compiled path
+   local target_path = M.get_target_path(source_path)
+   if fn.file_exists(target_path) and not opts.compiled.overwrite then
+      fn.notify("Abort\nFile already exists: '" .. target_path .. "'", vim.log.levels.ERROR)
+      return -- Abort
+   end
+
+   -- Compiled path
+   local compiled_path = fn.get_compiled_path(source_path)
+
    -- Execute async-compiling
-   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path)
+   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path, compiled_path, target_path)
    return compile_shell_error
+end
+
+-- Custom or default target path
+function M.get_target_path(source_path)
+   local opts = opt.get_opts()
+   local dir, base, fname, ext = fn.split_path(source_path)
+   local target_ext = fn.get_compiled_extension(source_path)
+   local default_target_path = fn.get_compiled_path(source_path)
+   local target_path
+
+   if opts.compiled.custom_path.enabled then
+      local root = fn.get_root(source_path)
+      local ver, major, minor = fn.get_version(source_path)
+      target_path = opts.compiled.custom_path.get_custom_path(root, dir, base, fname, target_ext, ver, major, minor)
+   else
+      target_path = default_target_path
+   end
+   return target_path
 end
 
 return M
