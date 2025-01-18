@@ -44,11 +44,13 @@ Notify (success)
 - Async compiling MQL5/MQL4
 - Show quickfix
 - Auto detect MQL5/MQL4
+- Customizable target path (place compiled files wherever you prefer)
+- Version management
 - Works on `MacOS + wine(wineskin)` for now
 
 **Not implemented**
-- Works on `Windows` (Need tested)
-- Works on `Linux` (Need tested)
+- Works on `Windows`? (Need tested)
+- Works on `Linux`? (Need tested)
 
 
 ## Requirement
@@ -274,7 +276,8 @@ opts = {
 
 ### Custom path
 
-The paths for compiled `*.ex[45]` files are modifiable.
+The paths for compiled `*.ex[45]` files are modifiable.  
+You can manage versions here.
 
 Default:
 ```lua
@@ -557,17 +560,8 @@ Path specifications and path conversions are investigated.
 
 ## TO-DO
 
-- [ ] Add version management
-   - [ ] grep `#property version "x.x"`
-   - [ ] Auto mv ex5/ex4 to `archive` dir, after compiling
-   - [x] Add `ft.mql[5/4].compiled_extension`
 - [ ] `opts.information.actions` has other actions ?
    - [ ] Now only `compiling` & `including` are confirmed
-- [ ] Auto compiling on save ? (Complicated...)
-   - [ ] Should set source_path before.
-   - [ ] Should search & dig including paths
-   - [ ] If current buffer is matched to the included path ?
-   - [ ] Compile source_path
 - [ ] git
    - [x] Detect git root
    - [ ] Prompt for listing up files by `vim.ui.select`.
