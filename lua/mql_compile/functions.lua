@@ -174,10 +174,11 @@ function M.generate_info(log_path, actions)
    return count
 end
 
-function M.get_extension_by_ft(ft)
-   local opts = opt.get_opts()
-   return opts[ft].extension
-end
+-- FIXME: 不要かな
+-- function M.get_extension_by_ft(ft)
+--    local opts = opt.get_opts()
+--    return opts[ft].extension
+-- end
 
 function M.get_ft_list()
    local opts = opt.get_opts()
@@ -201,7 +202,8 @@ function M.get_source(path, on_compile)
    if path == 'v:null' or path == '' or path == nil then path = nil end
    if path ~= nil then -- Has some path
       for _, ft_key in ipairs(ft_list) do -- Loop for ft list
-         local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+         -- local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+         local pattern = '.*%.' .. opts.ft[ft_key].extension.source
          if path:match(pattern) then -- Check pattern
             if M.file_exists(path) then -- Check file exists
                mql = opts.ft[ft_key]
@@ -221,7 +223,8 @@ function M.get_source(path, on_compile)
       local current_filename = vim.api.nvim_buf_get_name(0) -- Check for current filename
       if current_filename ~= '' and current_filename ~= nil then -- Has filename
          for _, ft_key in pairs(ft_list) do -- Loop for ft list
-            local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+            -- local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+            local pattern = '.*%.' .. opts.ft[ft_key].extension.source
             if current_filename:match(pattern) then -- Check pattern
                mql = opts.ft[ft_key]
                path = current_filename
@@ -241,7 +244,8 @@ function M.get_source(path, on_compile)
       local git_root_dir = M.get_git_root()
       if git_root_dir ~= '' and git_root_dir ~= nil then -- Has git root
          for _, ft_key in ipairs(ft_list) do -- Loop for ft list
-            local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+            -- local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+            local pattern = '.*%.' .. opts.ft[ft_key].extension.source
             local find_list = M.find_files_recursively(git_root_dir, pattern)
             if #find_list > 0 then
                path = find_list[1]
@@ -255,7 +259,8 @@ function M.get_source(path, on_compile)
       local cwd_dir = vim.fn.getcwd()
       if cwd_dir ~= '' and cwd_dir ~= nil then
          for _, ft_key in ipairs(ft_list) do -- Loop for ft list
-            local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+            -- local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+            local pattern = '.*%.' .. opts.ft[ft_key].extension.source
             local find_list = M.find_files_recursively(cwd_dir, pattern)
             if #find_list > 0 then
                path = find_list[1]
@@ -300,7 +305,8 @@ function M.set_source_path(path)
 
    -- Determin mql by extension
    for ft_key, ft in pairs(opts.ft) do
-      local pattern = M.pattern_bash_to_lua(ft.pattern)
+      -- local pattern = M.pattern_bash_to_lua(ft.pattern)
+      local pattern = '.*%.' .. ft.extension.source
       if path:match(pattern) then
          path = M.get_relative_path(path)
          opt._source_path = path
@@ -311,9 +317,42 @@ function M.set_source_path(path)
       end
    end
 
-   local extension = M.get_extension_by_filename(path)
+   -- for ft_key, ft in pairs(opts.ft) do
+   --    -- local pattern = M.pattern_bash_to_lua(ft.pattern)
+   --    local pattern = ft.pattern)
+   --    if path:match(pattern) then
+   --       path = M.get_relative_path(path)
+   --       opt._source_path = path
+   --       opt._mql = opts.ft[ft_key]
+   --       msg = "Source path: '" .. path .. "' (" .. ft_key .. ')'
+   --       M.notify(msg, vim.log.levels.INFO)
+   --       return
+   --    end
+   -- end
+
+   local extension = M.get_extension(path)
    msg = 'Unknown file type: ' .. extension .. "\nType must be in 'opts.ft.*.pattern'."
    M.notify(msg, vim.log.levels.ERROR)
+end
+
+function M.get_version(source_path)
+   local version, major, minor
+   if fn.file_exists(source_path) then
+      local f = io.open(source_path, 'r')
+      for line in f:lines() do
+         local v = line:match('#property *version *"([0-9%.]+)"')
+         if v then
+            print('Matched version: ' .. v)
+            version = v
+            major, minor = v:match('^(%d+)%.(%d+)$')
+            break
+         end
+      end
+   end
+   -- version = '1.12'
+   -- major = '1'
+   -- minor = '12'
+   return version, major, minor
 end
 
 return M

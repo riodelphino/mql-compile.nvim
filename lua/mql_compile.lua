@@ -2,7 +2,6 @@ local M = {}
 
 local opt = require('mql_compile.options')
 local fn = require('mql_compile.functions')
-local fn = require('mql_compile.custom_path')
 local cmd = require('mql_compile.commands')
 local hl = require('mql_compile.highlights')
 local syn = require('mql_compile.syntax')

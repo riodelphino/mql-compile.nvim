@@ -51,16 +51,15 @@ M.default = {
          return formated
       end,
    },
-   excutable = {
-      file_exists = 'overwrite', -- 'prompt' | 'overwrite' | 'abort'
+   compiled = {
+      overwrite = 'confirm', -- 'abort' | 'force'
       custom_path = {
          enabled = true,
-         path = function(root, dir, fname, base, ext, ver, major, minor)
-            if ver == nil then
-               -- return nil -- No modify
-               return string.format('archive/%s', fname) -- archive/myea.ex5
+         get_path = function(root, dir, base, fname, ext, ver, major, minor)
+            if ver == nil or ver == '' then
+               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
             else
-               return string.format('archive/%s_ver%n.%s', base, ver, ext) -- archive/myea_ver1.10.ex5
+               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
             end
          end,
       },
@@ -73,14 +72,22 @@ M.default = {
       mql5 = {
          metaeditor_path = '',
          include_path = '', -- Not supported now
-         pattern = '*.mq5',
-         compiled_extension = 'ex5',
+         -- pattern = '*.mq5',
+         -- compiled_extension = 'ex5',
+         extension = {
+            source = 'mq5',
+            compiled = 'ex5',
+         },
       },
       mql4 = {
          metaeditor_path = '',
          include_path = '', -- Not supported now
-         pattern = '*.mq4',
-         compiled_extension = 'ex4',
+         -- pattern = '*.mq4',
+         -- compiled_extension = 'ex4',
+         extension = {
+            source = 'mq4',
+            compiled = 'ex4',
+         },
       },
    },
    notify = { -- Enable/disable notify
@@ -97,6 +104,9 @@ M.default = {
       },
       information = {
          on_generated = true, -- Show informations on notify
+      },
+      compiled = {
+         on_saved = true,
       },
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...

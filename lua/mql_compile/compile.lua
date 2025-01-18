@@ -126,13 +126,23 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_extens
             end
 
             -- Move *.ex4 | *.ex5 to custom path
-            if opts.excutable.custom_path.enabled then
-               local fname = fn.get_filename(source_path)
-               local dir = fn.get_dir(source_path)
-               local source_ext = fn.get_extension(source_path)
-               local ext = compiled_extension
-               local compiled_path = vim.fs.joinpath(dir, fname .. '.' .. ext)
-               print(compiled_path)
+            if opts.compiled.custom_path.enabled then
+               local dir, base, fname, ext = fn.split_path(source_path)
+               print(dir, ' ', base, ' ', fname, ' ', ext)
+               local ver, major, minor = fn.get_version(source_path)
+               print(ver, major, minor)
+               local compiled_ext = fn.get_compiled_extension(source_path)
+               print('compiled_ext: ' .. compiled_ext)
+               local compiled_path = fn.get_compiled_path(source_path)
+               print('compiled_path: ' .. compiled_path)
+               print('fn.file_exists: ' .. tostring(fn.file_exists(compiled_path)))
+               local root = fn.get_root(compiled_path)
+               local new_compiled_path = opts.compiled.custom_path.get_path(root, dir, base, fname, compiled_ext, ver, major, minor)
+               local new_compiled_dir = fn.get_dir(new_compiled_path)
+               if fn.folder_exists(new_compiled_dir) == false then vim.fn.mkdir(new_compiled_dir) end -- mkdir
+               print('new_path: ' .. new_compiled_path)
+               -- (root, dir, fname, base, ext, ver, major, minor)
+               vim.fn.rename(compiled_path, new_compiled_path)
             end
 
             -- Open quickfix

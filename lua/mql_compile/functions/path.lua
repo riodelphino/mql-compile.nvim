@@ -8,18 +8,22 @@ function M.get_path_separator()
 end
 
 function M.file_exists(path)
-   local file = io.open(path, 'r')
-   if file ~= nil then
-      io.close(file)
-      return true
-   else
-      return false
-   end
+   -- local f = io.open(path, 'r')
+   -- if f then io.close(f) end
+   -- return f ~= nil
+   if vim.fn.filereadable(path) == 0 then return false end
+   return true
 end
 
-function M.convert_path_to_os(path, drive_letter, os_type)
-   if os_type == 'macos' then return path:gsub('^' .. drive_letter, ''):gsub('\\', '/') end
+function M.folder_exists(path)
+   if vim.fn.isdirectory(path) == 0 then return false end
+   return true
 end
+
+-- FIXME: 使わなくてOKになったが、information で変換に使ってもいいかも
+-- function M.convert_path_to_os(path, drive_letter, os_type)
+--    if os_type == 'macos' then return path:gsub('^' .. drive_letter, ''):gsub('\\', '/') end
+-- end
 
 function M.get_git_root()
    local git_root = vim.fn.system('git rev-parse --show-toplevel')
@@ -82,7 +86,7 @@ function M.get_dir(path)
 end
 
 function M.get_basename(path)
-   path = vim.fn.fnamemodify(path, ':t:r')
+   path = vim.fn.fnamemodify(path, ':t')
    return path
 end
 
@@ -91,17 +95,34 @@ function M.get_extension(path)
    return path
 end
 
--- function M.get_extension(path)
---    return path:match('^.+%.([^/]+)$')
--- end
---
--- function M.get_basename(path)
---    return path:match('([^/]+)%.?[^/]*$')
--- end
---
--- function M.get_filename(path)
---    return path:match('([^/]+)%.?[^/]*$')
--- end
+function M.split_path(path)
+   local dir = M.get_dir(path)
+   local base = M.get_basename(path)
+   local fname = M.get_filename(path)
+   local ext = M.get_extension(path)
+   return dir, base, fname, ext
+end
+
+function M.get_compiled_path(source_path)
+   local dir, _, fname, _ = M.split_path(source_path)
+   local compiled_ext = M.get_compiled_extension(source_path)
+   if compiled_ext == nil then return nil end
+   local compiled_path = vim.fs.joinpath(dir, fname .. '.' .. compiled_ext)
+   return compiled_path
+end
+
+function M.get_compiled_extension(source_path)
+   local ext = M.get_extension(source_path)
+   local compiled_ext
+   local ft = require('mql_compile.options').get_opts().ft
+   for _, mql in pairs(ft) do
+      if ext == mql.extension.source then
+         compiled_ext = mql.extension.compiled
+         break
+      end
+   end
+   return compiled_ext
+end
 
 function M.detect_file(path, filename)
    path = path or M.get_root()
@@ -142,12 +163,13 @@ function M.pattern_bash_to_lua(bash_pattern)
    return lua_pattern
 end
 
-function M.get_extension_by_filename(filename, fallback_to_filename) -- もっと簡単に出来ない？
-   fallback_to_filename = fallback_to_filename == nil or true
-   local extension = filename:match('%.(.*)$')
-   if extension == nil and fallback_to_filename then extension = filename:match('^.+' .. sep .. '(.-)$') end
-   return extension
-end
+-- FIXME: 不要になった
+-- function M.get_extension_by_filename(filename, fallback_to_filename) -- もっと簡単に出来ない？
+--    fallback_to_filename = fallback_to_filename == nil or true
+--    local extension = filename:match('%.(.*)$')
+--    if extension == nil and fallback_to_filename then extension = filename:match('^.+' .. sep .. '(.-)$') end
+--    return extension
+-- end
 
 sep = M.get_path_separator()
 

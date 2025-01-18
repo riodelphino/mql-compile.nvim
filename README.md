@@ -128,6 +128,19 @@ opts = {
       parse = nil, -- See '# Parsing and formatting information' section
       format = nil, -- See '# Parsing and formatting information' section
    },
+   compiled = {
+      overwrite = 'confirm', -- 'abort' | 'force'
+      custom_path = {
+         enabled = true, -- enabled for move compiled file
+         get_path = function(root, dir, base, fname, ext, ver, major, minor)
+            if ver == nil or ver == '' then
+               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+            else
+               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+            end
+         end,
+      },
+   },
    wine = {
       enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
       command = 'wine', -- Wine command path
@@ -156,7 +169,12 @@ opts = {
       quickfix = {
          on_finished = true, -- Add quickfix counts to main message on 'notify.compile.on_finished'
       },
-      information = {},
+      information = {
+         on_generated = true, -- Show informations on notify
+      },
+      compiled = {
+         on_saved = true,
+      },
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...
             none = vim.log.levels.INFO,
