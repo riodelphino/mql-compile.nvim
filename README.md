@@ -129,10 +129,10 @@ opts = {
       format = nil, -- See '# Parsing and formatting information' section
    },
    compiled = {
-      overwrite = 'confirm', -- 'abort' | 'force'
+      overwrite = true,
       custom_path = {
-         enabled = true, -- enabled for move compiled file
-         get_path = function(root, dir, base, fname, ext, ver, major, minor)
+         enabled = true,
+         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
             if ver == nil or ver == '' then
                return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
             else
@@ -270,6 +270,66 @@ opts = {
    },
 },
 
+```
+
+### Custom path
+
+The paths for compiled `*.ex[45]` files are modifiable.
+
+Default:
+```lua
+opts = {
+   compiled = {
+      custom_path = {
+         enabled = true, -- set false, for using source file name & dir
+         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+            if ver == nil or ver == '' then
+               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+            else
+               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+            end
+         end,
+      },
+   },
+},
+```
+
+Args:
+
+`get_custom_path` callback function has 8 args:
+   root, dir, base, fname, ext, ver, major, minor
+
+for example)
+   `/Users/username/projects/myea/src/ea.mq5`
+   (root=/Users/username/projects/myea)
+
+```vim
+:cwd /Users/username/projects/myea
+:MQLCompileSetSource src/ea.mq5
+```
+```cpp:ea.mq5
+#property version "1.23"
+```
+
+Then, variables will look like this.
+| Variable | Content                | Example                           |
+| -------- | ---------------------- | --------------------------------- |
+| root     | project root (.git)    | . (/Users/username/projects/myea) |
+| dir      | dir                    | src                               |
+| base     | basename (with ext)    | ea.mq5                            |
+| fname    | filename (without ext) | ea                                |
+| ext      | extension              | mq5                               |
+| ver      | version                | 1.23                              |
+| major    | major version          | 1                                 |
+| minor    | minor version          | 23                                |
+
+
+The paths out of root dir are also available.
+```lua
+-- Relative path
+return string.format(root .. '/../../ea/archive/%s.%s', fname, ext)
+-- Absolute path
+return string.format('/path/to/ea/archive/%s.%s', fname, ext)
 ```
 
 ## Commands

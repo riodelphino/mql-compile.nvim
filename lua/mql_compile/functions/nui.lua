@@ -1,0 +1,51 @@
+local M = {}
+
+-- it's so difficult...
+
+-- local Menu = require('nui.menu')
+-- local event = require('nui.utils.autocmd').event
+-- local selected_item
+--
+-- M.menu = Menu({
+--    position = '50%',
+--    size = {
+--       width = 20,
+--       height = 2,
+--    },
+--    border = {
+--       style = 'single',
+--       text = {
+--          top = 'File exists !',
+--          top_align = 'center',
+--       },
+--    },
+--    win_options = {
+--       winhighlight = 'Normal:Normal,FloatBorder:Normal',
+--    },
+-- }, {
+--    lines = {
+--       Menu.item('Cancel'),
+--       Menu.item('Overwrite'),
+--    },
+--    max_width = 20,
+--    keymap = {
+--       focus_next = { 'j', '<Down>', '<Tab>' },
+--       focus_prev = { 'k', '<Up>', '<S-Tab>' },
+--       close = { '<Esc>', '<C-c>' },
+--       submit = { '<CR>', '<Space>' },
+--    },
+--    on_close = function() end,
+--    on_submit = function(item)
+--       print(item.text)
+--       selected_item = item
+--    end,
+-- })
+--
+-- -- mount the component
+-- M.menu:mount()
+--
+-- function M.get_selected_item()
+--    print('Outside: ' .. selected_item.text)
+-- end
+
+return M

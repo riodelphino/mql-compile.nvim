@@ -3,7 +3,7 @@ local M = {}
 local opt = require('mql_compile.options')
 local fn = require('mql_compile.functions')
 
-function M.async_compile(metaeditor_path, source_path, log_path, compiled_extension)
+function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, target_path)
    local opts = opt.get_opts()
    local msg = ''
 
@@ -125,24 +125,26 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_extens
                end
             end
 
-            -- Move *.ex4 | *.ex5 to custom path
-            if opts.compiled.custom_path.enabled then
-               local dir, base, fname, ext = fn.split_path(source_path)
-               print(dir, ' ', base, ' ', fname, ' ', ext)
-               local ver, major, minor = fn.get_version(source_path)
-               print(ver, major, minor)
-               local compiled_ext = fn.get_compiled_extension(source_path)
-               print('compiled_ext: ' .. compiled_ext)
-               local compiled_path = fn.get_compiled_path(source_path)
-               print('compiled_path: ' .. compiled_path)
-               print('fn.file_exists: ' .. tostring(fn.file_exists(compiled_path)))
-               local root = fn.get_root(compiled_path)
-               local new_compiled_path = opts.compiled.custom_path.get_path(root, dir, base, fname, compiled_ext, ver, major, minor)
-               local new_compiled_dir = fn.get_dir(new_compiled_path)
-               if fn.folder_exists(new_compiled_dir) == false then vim.fn.mkdir(new_compiled_dir) end -- mkdir
-               print('new_path: ' .. new_compiled_path)
-               -- (root, dir, fname, base, ext, ver, major, minor)
-               vim.fn.rename(compiled_path, new_compiled_path)
+            -- Delete log
+            if opts.log.delete_after_load then
+               vim.fn.delete(log_path)
+               -- notify: log.on_deleted
+               if opts.notify.log.on_deleted then
+                  msg = "Deleted log: '" .. log_path .. "'"
+                  fn.notify(msg, vim.log.levels.INFO)
+               end
+            end
+
+            -- Custom path (mv compiled file to custom path)
+            if qf_cnt.error == nil then
+               local target_dir = fn.get_dir(target_path)
+               -- mkdir
+               if fn.folder_exists(target_dir) == false then
+                  vim.fn.mkdir(target_dir)
+                  if opts.notify.compiled.on_mkdir then fn.notify("Created dir: '" .. target_dir .. "'", vim.log.levels.INFO) end
+               end
+               vim.fn.rename(compiled_path, target_path)
+               if opts.notify.compiled.on_saved then fn.notify("Saved as: '" .. target_path .. "'", vim.log.levels.INFO) end
             end
 
             -- Open quickfix
@@ -154,16 +156,6 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_extens
                   if qf_cnt[type] ~= nil then show_flag = true end
                end
                if show_flag then vim.cmd('copen') end
-            end
-
-            -- Delete log
-            if opts.log.delete_after_load then
-               vim.fn.delete(log_path)
-               -- notify: log.on_deleted
-               if opts.notify.log.on_deleted then
-                  msg = "Deleted log: '" .. log_path .. "'"
-                  fn.notify(msg, vim.log.levels.INFO)
-               end
             end
          end)
       end,
@@ -199,9 +191,37 @@ function M.compile(source_path)
    -- Adjust source_path
    source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
 
+   -- Custom or default compiled path
+   local target_path = M.get_target_path(source_path)
+   if fn.file_exists(target_path) and not opts.compiled.overwrite then
+      fn.notify("Abort\nFile already exists: '" .. target_path .. "'", vim.log.levels.ERROR)
+      return -- Abort
+   end
+
+   -- Compiled path
+   local compiled_path = fn.get_compiled_path(source_path)
+
    -- Execute async-compiling
-   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path, mql.compiled_extension)
+   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path, compiled_path, target_path)
    return compile_shell_error
+end
+
+-- Custom or default target path
+function M.get_target_path(source_path)
+   local opts = opt.get_opts()
+   local dir, base, fname, ext = fn.split_path(source_path)
+   local target_ext = fn.get_compiled_extension(source_path)
+   local default_target_path = fn.get_compiled_path(source_path)
+   local target_path
+
+   if opts.compiled.custom_path.enabled then
+      local root = fn.get_root(source_path)
+      local ver, major, minor = fn.get_version(source_path)
+      target_path = opts.compiled.custom_path.get_custom_path(root, dir, base, fname, target_ext, ver, major, minor)
+   else
+      target_path = default_target_path
+   end
+   return target_path
 end
 
 return M

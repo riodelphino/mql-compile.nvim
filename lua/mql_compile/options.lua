@@ -52,10 +52,10 @@ M.default = {
       end,
    },
    compiled = {
-      overwrite = 'confirm', -- 'abort' | 'force'
+      overwrite = true,
       custom_path = {
-         enabled = true,
-         get_path = function(root, dir, base, fname, ext, ver, major, minor)
+         enabled = true, -- set false, for using source file name & dir
+         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
             if ver == nil or ver == '' then
                return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
             else
@@ -106,6 +106,7 @@ M.default = {
          on_generated = true, -- Show informations on notify
       },
       compiled = {
+         on_mkdir = true,
          on_saved = true,
       },
       levels = { -- Color to notify if compiling was ...
