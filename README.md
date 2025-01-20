@@ -517,9 +517,9 @@ Then `mql-compile` shows messages through it.
 
 There are some test codes in: `test/*.mq5`
 - nothing.mq5
-- informations.mq5
-- warnings.mq5
-- errors.mq5
+- information.mq5
+- warning.mq5
+- error.mq5
 
 Try to compile them for test.
 
