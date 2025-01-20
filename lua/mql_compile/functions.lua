@@ -17,7 +17,7 @@ function M.get_os_type()
 end
 
 function M.notify(msg, level, opts)
-   local default_opts = { title = 'mql-compile' }
+   local default_opts = { title = 'mql-compile', border = 'single' }
    opts = vim.tbl_deep_extend('force', default_opts, opts or {})
    vim.notify(msg, level, opts)
 end
@@ -336,23 +336,29 @@ function M.set_source_path(path)
 end
 
 function M.get_version(source_path)
-   local version, major, minor
+   local ver, major, minor
    if fn.file_exists(source_path) then
       local f = io.open(source_path, 'r')
       for line in f:lines() do
-         local v = line:match('#property *version *"([0-9%.]+)"')
-         if v then
-            print('Matched version: ' .. v)
-            version = v
-            major, minor = v:match('^(%d+)%.(%d+)$')
+         ver = line:match('#property *version *"([0-9%.]+)"')
+         if ver then
+            major, minor = ver:match('^(%d+)%.(%d+)$')
             break
          end
+      end
+   end
+   local opts = opt.get_opts()
+   if opts.notify.rename.on_version then
+      if ver then
+         M.notify('Version: ' .. ver, vim.log.levels.INFO)
+      else
+         M.notify('Version not found.', vim.log.levels.INFO)
       end
    end
    -- version = '1.12'
    -- major = '1'
    -- minor = '12'
-   return version, major, minor
+   return ver, major, minor
 end
 
 return M

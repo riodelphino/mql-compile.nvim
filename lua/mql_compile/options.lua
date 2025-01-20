@@ -7,9 +7,6 @@ M._root = ''
 M._source_path = nil
 
 M.default = {
-   debug = {
-      show_compile_cmd = true,
-   },
    priority = { 'mql5', 'mql4' },
    log = {
       extension = 'log',
@@ -91,23 +88,35 @@ M.default = {
       },
    },
    notify = { -- Enable/disable notify
+      debug = {
+         compile = {
+            show_cmd = false,
+            show_cwd = false,
+         },
+      },
       compile = {
          on_started = true,
          on_finished = true,
       },
       log = {
-         on_saved = false,
+         on_generated = false,
          on_deleted = false,
       },
       quickfix = {
-         on_finished = true, -- Add quickfix counts to main message
+         on_finished = true, -- Append each type counts of quickfix, on `notify.compile.on_finished`
       },
       information = {
          on_generated = true, -- Show informations on notify
       },
-      compiled = {
-         on_mkdir = true,
-         on_saved = true,
+      -- compiled = {
+      --    on_mkdir = true,
+      --    on_saved = true,
+      --    on_version = true,
+      -- },
+      rename = {
+         on_mkdir = false,
+         on_version = false,
+         on_renamed = true,
       },
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...
@@ -118,6 +127,7 @@ M.default = {
          failed = vim.log.levels.ERROR,
          information = vim.log.levels.INFO, -- for informations. *.OFF is also good. (but maybe same color)
       },
+      show_title = false,
    },
    highlights = { -- Highlights on quickfix window
       enabled = true,

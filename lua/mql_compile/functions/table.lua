@@ -37,6 +37,7 @@ function M.get_table_len(t)
 end
 
 -- Format table to string (ordered)
+-- ex.) table to 'info: 1 | warning: 3 | error: 1'
 function M.format_table_to_string(table, keys, key_value_separator, item_separator)
    key_value_separator = key_value_separator or ': '
    item_separator = item_separator or ' | '

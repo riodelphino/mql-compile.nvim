@@ -62,7 +62,7 @@ Notify (success)
 
 **Optional plugins**
 - [mql-filetype.nvim](https://github.com/riodelphino/mql-filetype.nvim) Change filetypes from MQL4/MQL5 to c/cpp automatically
-- [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
+- [noice.nvim](https://github.com/folke/noice.nvim) or [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify quickfix
 
@@ -102,12 +102,6 @@ return {
 
 ```lua
 opts = {
-   debug = { -- For debug
-      compile = {
-         show_cmd = false,
-         show_cwd = false,
-      },
-   },
    priority = { 'mql5', 'mql4' }, -- priority for auto file detection
    log = {
       extension = 'log',
@@ -160,6 +154,12 @@ opts = {
       },
    },
    notify = { -- Enable/disable notify
+      debug = { -- For debug
+         compile = {
+            show_cmd = false,
+            show_cwd = false,
+         },
+      },
       compile = {
          on_started = true,
          on_finished = true,
@@ -186,6 +186,7 @@ opts = {
          failed = vim.log.levels.ERROR,
          information = vim.log.levels.INFO, -- for notifing informations
       },
+      show_title = false,
    },
    highlights = { -- Highlights & syntax on quickfix window
       enabled = true,

@@ -6,33 +6,25 @@ local fn = require('mql_compile.functions')
 function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, target_path)
    local opts = opt.get_opts()
    local msg = ''
-
    local Job = require('plenary.job')
-
-   -- metaeditor_path = '/Users/rio/Applications/Wineskin/MT5.app/drive_c/Program Files/MT5/MetaEditor64.exe'
-   -- source_path = 'myea/ea_warnings.mq5'
-   -- log_path = 'myea/ea_warnings.log'
-   -- local cwd = '/Users/rio/Projects/git/FX/EA'
-
-   -- local cwd = fn.get_dir(source_path) -- error: cannot compile, for cwd insist source_path's dir, not project root
    local cwd = fn.get_root(source_path)
-
    local cmd
    local args = {}
+   local dev_null = '&>/dev/null' -- Don't need this now
    if opts.wine.enabled then
       cmd = opts.wine.command
-      args = { metaeditor_path, '/compile:' .. source_path, '/log:' .. log_path, '&>/dev/null' } -- '&>/dev/null' cannot avoid useless echo
+      args = { metaeditor_path, '/compile:' .. source_path, '/log:' .. log_path, dev_null }
    else
       cmd = metaeditor_path -- "" is not needed somewhy
-      args = { '/compile:' .. source_path, '/log:' .. log_path, '&>/dev/null' }
+      args = { '/compile:' .. source_path, '/log:' .. log_path, dev_null }
    end
 
-   if opts.debug.compile.show_cmd then
-      msg = 'DEBUG: compile.show_cmd\n' .. cmd .. ' ' .. table.concat(args, ' ')
+   if opts.notify.debug.compile.show_cmd then
+      msg = 'DEBUG: compiling command:\n' .. cmd .. ' ' .. table.concat(args, ' ')
       fn.notify(msg, vim.log.levels.INFO)
    end
-   if opts.debug.compile.show_cwd then
-      msg = 'DEBUG: compile.show_cwd\n' .. cwd
+   if opts.notify.debug.compile.show_cwd then
+      msg = 'DEBUG: cwd:\n' .. cwd
       fn.notify(msg, vim.log.levels.INFO)
    end
 
@@ -51,7 +43,7 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
       on_start = function()
          -- notify: compile.on_started
          if opts.notify.compile.on_started then
-            msg = "Compiling: '" .. source_path .. "'"
+            msg = "Start compiling: '" .. source_path .. "'"
             fn.notify(msg, vim.log.levels.INFO)
          end
       end,
@@ -65,10 +57,10 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
 
          -- Convert log encoding & convert to qf, info
          vim.schedule(function()
-            -- notify: log.on_saved
-            if opts.notify.log.on_saved then
+            -- notify: log.on_generated
+            if opts.notify.log.on_generated then
                if fn.file_exists(log_path) then
-                  msg = "Saved log: '" .. log_path .. "'"
+                  msg = "Generated log: '" .. log_path .. "'"
                   fn.notify(msg, vim.log.levels.INFO)
                end
             end
@@ -108,20 +100,20 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
             -- notify: compile.on_finished
             if opts.notify.compile.on_finished then
                local msg_main
-               local msg_qf
+               local msg_qf_cnt
                if opts.notify.quickfix.on_finished then
-                  msg_qf = fn.format_table_to_string(qf_cnt, opts.quickfix.types)
+                  msg_qf_cnt = fn.format_table_to_string(qf_cnt, opts.quickfix.types)
                else
-                  msg_qf = ''
+                  msg_qf_cnt = ''
                end
                if qf_cnt.error ~= nil then
                   -- Failed
                   msg_main = "Failed compiling: '" .. source_filename .. "'"
-                  fn.notify(msg_main .. '\n' .. msg_qf, level)
+                  fn.notify(msg_main .. '\n' .. msg_qf_cnt, level)
                else
                   -- Succeeded
                   msg_main = "Succeeded compiling: '" .. source_filename .. "'"
-                  fn.notify(msg_main .. '\n' .. msg_qf, level)
+                  fn.notify(msg_main .. '\n' .. msg_qf_cnt, level)
                end
             end
 
@@ -141,10 +133,10 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
                -- mkdir
                if fn.folder_exists(target_dir) == false then
                   vim.fn.mkdir(target_dir)
-                  if opts.notify.compiled.on_mkdir then fn.notify("Created dir: '" .. target_dir .. "'", vim.log.levels.INFO) end
+                  if opts.notify.rename.on_mkdir then fn.notify("Created dir: '" .. target_dir .. "'", vim.log.levels.INFO) end
                end
                vim.fn.rename(compiled_path, target_path)
-               if opts.notify.compiled.on_saved then fn.notify("Saved as: '" .. target_path .. "'", vim.log.levels.INFO) end
+               if opts.notify.rename.on_renamed then fn.notify("Renamed as: '" .. target_path .. "'", vim.log.levels.INFO) end
             end
 
             -- Open quickfix
@@ -184,9 +176,10 @@ function M.compile(source_path)
    end
 
    -- Generate log path
-   local basename = fn.get_basename(source_path)
+   local fname = fn.get_filename(source_path)
    local dir = fn.get_dir(source_path)
-   local log_path = vim.fs.joinpath(dir, basename .. '.' .. opts.log.extension)
+   local log_path = vim.fs.joinpath(dir, fname .. '.' .. opts.log.extension)
+   log_path = fn.get_relative_path(log_path)
 
    -- Adjust source_path
    source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
