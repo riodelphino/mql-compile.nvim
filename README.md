@@ -70,10 +70,13 @@ return {
    'riodelphino/mql-compile.nvim',
    dependencies = {
       'nvim-lua/plenary.nvim',
-      'rcarriga/nvim-notify',
+      'riodelphino/mql-filetype.nvim', -- optional
+      'rcarriga/nvim-notify', -- optional
+      'kevinhwang91/nvim-bqf', -- optional
+      'yorickpeterse/nvim-pqf', -- optional
    },
    lazy = true,
-   ft = { 'c', 'cpp' }, -- Using `mql-compile.nvim` is easier to change MQL4/MQL5 filetypes to c/cpp.
+   ft = { 'c', 'cpp' }, -- NOTE: `mql-filetype.nvim` makes it easier to change MQL4/MQL5 filetypes to c/cpp.
    opts = {
       ft = {
          mql5 = {
@@ -95,7 +98,34 @@ return {
 
 ```lua
 opts = {
-   priority = { 'mql5', 'mql4' }, -- priority for auto file detection
+   detect = {
+      priority = { 'mql5', 'mql4' },
+   },
+   compile = {
+      wine = {
+         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
+         command = 'wine', -- Wine command path
+      },
+      overwrite = true,
+   },
+   ft = {
+      mql5 = {
+         metaeditor_path = '',
+         include_path = '', -- Not supported now
+         extension = {
+            source = 'mq5',
+            compiled = 'ex5',
+         },
+      },
+      mql4 = {
+         metaeditor_path = '',
+         include_path = '', -- Not supported now
+         extension = {
+            source = 'mq4',
+            compiled = 'ex4',
+         },
+      },
+   },
    log = {
       extension = 'log',
       delete_after_load = true,
@@ -117,13 +147,6 @@ opts = {
       parse = nil, -- See '# Parsing and formatting information' section
       format = nil, -- See '# Parsing and formatting information' section
    },
-   compile = {
-      wine = {
-         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
-         command = 'wine', -- Wine command path
-      },
-      overwrite = true,
-   },
    rename = {
       enabled = true,
       get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
@@ -133,18 +156,6 @@ opts = {
             return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
          end
       end,
-   },
-   ft = {
-      mql5 = {
-         metaeditor_path = '', -- Set your MT5 exe's path
-         include_path = '', -- Not supported now
-         pattern = '*.mq5',
-      },
-      mql4 = {
-         metaeditor_path = '', -- Set your MT4 exe's path
-         include_path = '', -- Not supported now
-         pattern = '*.mq4',
-      },
    },
    notify = { -- Enable/disable notify
       debug = { -- For debug
@@ -268,7 +279,7 @@ opts = {
 
 ```
 
-### Custom path
+### Rename (Custom path)
 
 The paths for compiled `*.ex[45]` files are modifiable.  
 You can manage versions here.
@@ -276,17 +287,15 @@ You can manage versions here.
 Default:
 ```lua
 opts = {
-   compiled = {
-      custom_path = {
-         enabled = true, -- set false, for using source file name & dir
-         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
-            if ver == nil or ver == '' then
-               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
-            else
-               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
-            end
-         end,
-      },
+   rename = {
+     enabled = true, -- set false for using default path by metaeditor
+     get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+        if ver == nil or ver == '' then
+           return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+        else
+           return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+        end
+     end,
    },
 },
 ```
@@ -324,9 +333,9 @@ Then, variables will look like this.
 The paths out of root dir are also available.
 ```lua
 -- Relative path
-return string.format(root .. '/../../ea/archive/%s.%s', fname, ext)
+return string.format(root .. '/../../archive/%s.%s', fname, ext)
 -- Absolute path
-return string.format('/path/to/ea/archive/%s.%s', fname, ext)
+return string.format('/path/to/archive/%s.%s', fname, ext)
 ```
 
 ## Commands

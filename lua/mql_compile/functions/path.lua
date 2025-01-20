@@ -20,7 +20,7 @@ function M.folder_exists(path)
    return true
 end
 
--- FIXME: 使わなくてOKになったが、information で変換に使ってもいいかも
+-- FIXME: Don't need anymore, but may use on converting information
 -- function M.convert_path_to_os(path, drive_letter, os_type)
 --    if os_type == 'macos' then return path:gsub('^' .. drive_letter, ''):gsub('\\', '/') end
 -- end
@@ -114,8 +114,8 @@ end
 function M.get_compiled_extension(source_path)
    local ext = M.get_extension(source_path)
    local compiled_ext
-   local ft = require('mql_compile.options').get_opts().ft
-   for _, mql in pairs(ft) do
+   local opts = require('mql_compile.options').get_opts()
+   for _, mql in pairs(opts.ft) do
       if ext == mql.extension.source then
          compiled_ext = mql.extension.compiled
          break
@@ -162,14 +162,6 @@ function M.pattern_bash_to_lua(bash_pattern)
       :gsub('%%%?', '.') -- Bashの `?` を Luaの `.` に
    return lua_pattern
 end
-
--- FIXME: 不要になった
--- function M.get_extension_by_filename(filename, fallback_to_filename) -- もっと簡単に出来ない？
---    fallback_to_filename = fallback_to_filename == nil or true
---    local extension = filename:match('%.(.*)$')
---    if extension == nil and fallback_to_filename then extension = filename:match('^.+' .. sep .. '(.-)$') end
---    return extension
--- end
 
 sep = M.get_path_separator()
 

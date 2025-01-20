@@ -174,22 +174,6 @@ function M.generate_info(log_path, actions)
    return count
 end
 
--- FIXME: 不要かな
--- function M.get_extension_by_ft(ft)
---    local opts = opt.get_opts()
---    return opts[ft].extension
--- end
-
-function M.get_ft_list()
-   local opts = opt.get_opts()
-   -- local ft_list = {}
-   -- for ft_key, ft in pairs(opts.ft) do
-   --    table.insert(ft_list, ft_key)
-   -- end
-   local ft_list = opts.priority
-   return ft_list
-end
-
 -- Automatically change mql5/4 by source_path's extension
 function M.get_source(path, on_compile)
    if on_compile == nil then on_compile = false end
@@ -276,12 +260,12 @@ function M.get_source(path, on_compile)
    return nil, nil
 end
 
-function get_ft_list()
+function M.get_ft_list()
    local opts = opt.get_opts()
-   return opts.priority -- easier alt for getting from opts.fn
+   return opts.detect.priority -- easier alt for getting from opts.fn
 end
 
-function get_extension_list()
+function M.get_extension_list()
    local ft_list = M.get_ft_list()
    local ext_list = {}
    for _, ft in ipairs(ft_list) do

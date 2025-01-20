@@ -1,5 +1,4 @@
 local M = {}
--- FIXME: 途中！！！
 
 -- Set qf's syntax
 function M.set_qf_syntax()

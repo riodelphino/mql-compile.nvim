@@ -7,7 +7,34 @@ M._root = ''
 M._source_path = nil
 
 M.default = {
-   priority = { 'mql5', 'mql4' },
+   detect = {
+      priority = { 'mql5', 'mql4' },
+   },
+   compile = {
+      wine = {
+         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
+         command = 'wine', -- Wine command path
+      },
+      overwrite = true,
+   },
+   ft = {
+      mql5 = {
+         metaeditor_path = '',
+         include_path = '', -- Not supported now
+         extension = {
+            source = 'mq5',
+            compiled = 'ex5',
+         },
+      },
+      mql4 = {
+         metaeditor_path = '',
+         include_path = '', -- Not supported now
+         extension = {
+            source = 'mq4',
+            compiled = 'ex4',
+         },
+      },
+   },
    log = {
       extension = 'log',
       delete_after_load = true,
@@ -48,13 +75,6 @@ M.default = {
          return formated
       end,
    },
-   compile = {
-      wine = {
-         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
-         command = 'wine', -- Wine command path
-      },
-      overwrite = true,
-   },
    rename = {
       enabled = true,
       get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
@@ -64,28 +84,6 @@ M.default = {
             return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
          end
       end,
-   },
-   ft = {
-      mql5 = {
-         metaeditor_path = '',
-         include_path = '', -- Not supported now
-         -- pattern = '*.mq5',
-         -- compiled_extension = 'ex5',
-         extension = {
-            source = 'mq5',
-            compiled = 'ex5',
-         },
-      },
-      mql4 = {
-         metaeditor_path = '',
-         include_path = '', -- Not supported now
-         -- pattern = '*.mq4',
-         -- compiled_extension = 'ex4',
-         extension = {
-            source = 'mq4',
-            compiled = 'ex4',
-         },
-      },
    },
    notify = { -- Enable/disable notify
       debug = {
