@@ -1,9 +1,6 @@
 # mql-compile.nvim
 
-![img/mql-compile.jpg](img/mql-compile.jpg)
-
-
-## Concept
+![img/logo.jpg](img/logo.jpg)
 
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
@@ -11,22 +8,19 @@ Without heavy MetaEditor GUI. (Compiling on command-line).
 > [!Caution]
 > It's still test version.  
 
-Be careful to use at your own risk. Backup your files before testing.
+Use it at your own risk. Backup your files before testing.
 
 > [!Warning]
-> Not tested in Windows or Linux  
+> Need tested in Windows or Linux  
 
-Currently ensured to work only in 'macOS + wine(wineskin)' environment.  
-If anyone encounters any problems while using/testing, please [create an issue](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
-Any reports are welcome, like mql-compile.nvim worked in your environment.
+Now ensured to work only in 'macOS + wine(wineskin)' environment.  
+Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
 
 
 ## Screenshots
 
-With [nvim-notify](https://github.com/rcarriga/nvim-notify)
-
 > [!Note]
-> Sorry, these pics are from older ver.
+> Sorry, pics from older version.
 
 Quickfix (error)
 ![error_quickfix](img/error_quickfix.png)
@@ -34,8 +28,7 @@ Quickfix (error)
 Notify (error)
 ![error_notify](img/error_notify.png)
 
-Notify (success)
-![success_notify](img/success_notify.png)
+(With [nvim-notify](https://github.com/rcarriga/nvim-notify))
 
 
 ## Features
@@ -62,7 +55,7 @@ Notify (success)
 
 **Optional plugins**
 - [mql-filetype.nvim](https://github.com/riodelphino/mql-filetype.nvim) Change filetypes from MQL4/MQL5 to c/cpp automatically
-- [noice.nvim](https://github.com/folke/noice.nvim) or [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
+- [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
 - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
 - [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify quickfix
 
