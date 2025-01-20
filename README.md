@@ -1,9 +1,6 @@
 # mql-compile.nvim
 
-![img/mql-compile.jpg](img/mql-compile.jpg)
-
-
-## Concept
+![img/logo.jpg](img/logo.jpg)
 
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
@@ -11,22 +8,19 @@ Without heavy MetaEditor GUI. (Compiling on command-line).
 > [!Caution]
 > It's still test version.  
 
-Be careful to use at your own risk. Backup your files before testing.
+Use it at your own risk. Backup your files before testing.
 
 > [!Warning]
-> Not tested in Windows or Linux  
+> Need tested in Windows or Linux  
 
-Currently ensured to work only in 'macOS + wine(wineskin)' environment.  
-If anyone encounters any problems while using/testing, please [create an issue](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
-Any reports are welcome, like mql-compile.nvim worked in your environment.
+Now ensured to work only in 'macOS + wine(wineskin)' environment.  
+Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
 
 
 ## Screenshots
 
-With [nvim-notify](https://github.com/rcarriga/nvim-notify)
-
 > [!Note]
-> Sorry, these pics are from older ver.
+> Sorry, pics from older version.
 
 Quickfix (error)
 ![error_quickfix](img/error_quickfix.png)
@@ -34,8 +28,7 @@ Quickfix (error)
 Notify (error)
 ![error_notify](img/error_notify.png)
 
-Notify (success)
-![success_notify](img/success_notify.png)
+(With [nvim-notify](https://github.com/rcarriga/nvim-notify))
 
 
 ## Features
@@ -77,10 +70,13 @@ return {
    'riodelphino/mql-compile.nvim',
    dependencies = {
       'nvim-lua/plenary.nvim',
-      'rcarriga/nvim-notify',
+      'riodelphino/mql-filetype.nvim', -- optional
+      'rcarriga/nvim-notify', -- optional
+      'kevinhwang91/nvim-bqf', -- optional
+      'yorickpeterse/nvim-pqf', -- optional
    },
    lazy = true,
-   ft = { 'c', 'cpp' }, -- Using `mql-compile.nvim` is easier to change MQL4/MQL5 filetypes to c/cpp.
+   ft = { 'c', 'cpp' }, -- NOTE: `mql-filetype.nvim` makes it easier to change MQL4/MQL5 filetypes to c/cpp.
    opts = {
       ft = {
          mql5 = {
@@ -102,13 +98,34 @@ return {
 
 ```lua
 opts = {
-   debug = { -- For debug
-      compile = {
-         show_cmd = false,
-         show_cwd = false,
+   detect = {
+      priority = { 'mql5', 'mql4' },
+   },
+   compile = {
+      wine = {
+         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
+         command = 'wine', -- Wine command path
+      },
+      overwrite = true,
+   },
+   ft = {
+      mql5 = {
+         metaeditor_path = '',
+         include_path = '', -- Not supported now
+         extension = {
+            source = 'mq5',
+            compiled = 'ex5',
+         },
+      },
+      mql4 = {
+         metaeditor_path = '',
+         include_path = '', -- Not supported now
+         extension = {
+            source = 'mq4',
+            compiled = 'ex4',
+         },
       },
    },
-   priority = { 'mql5', 'mql4' }, -- priority for auto file detection
    log = {
       extension = 'log',
       delete_after_load = true,
@@ -130,36 +147,23 @@ opts = {
       parse = nil, -- See '# Parsing and formatting information' section
       format = nil, -- See '# Parsing and formatting information' section
    },
-   compiled = {
-      overwrite = true,
-      custom_path = {
-         enabled = true,
-         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
-            if ver == nil or ver == '' then
-               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
-            else
-               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
-            end
-         end,
-      },
-   },
-   wine = {
-      enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
-      command = 'wine', -- Wine command path
-   },
-   ft = {
-      mql5 = {
-         metaeditor_path = '', -- Set your MT5 exe's path
-         include_path = '', -- Not supported now
-         pattern = '*.mq5',
-      },
-      mql4 = {
-         metaeditor_path = '', -- Set your MT4 exe's path
-         include_path = '', -- Not supported now
-         pattern = '*.mq4',
-      },
+   rename = {
+      enabled = true,
+      get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+         if ver == nil or ver == '' then
+            return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+         else
+            return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+         end
+      end,
    },
    notify = { -- Enable/disable notify
+      debug = { -- For debug
+         compile = {
+            show_cmd = false,
+            show_cwd = false,
+         },
+      },
       compile = {
          on_started = true,
          on_finished = true,
@@ -186,6 +190,7 @@ opts = {
          failed = vim.log.levels.ERROR,
          information = vim.log.levels.INFO, -- for notifing informations
       },
+      show_title = false,
    },
    highlights = { -- Highlights & syntax on quickfix window
       enabled = true,
@@ -274,7 +279,7 @@ opts = {
 
 ```
 
-### Custom path
+### Rename (Custom path)
 
 The paths for compiled `*.ex[45]` files are modifiable.  
 You can manage versions here.
@@ -282,17 +287,15 @@ You can manage versions here.
 Default:
 ```lua
 opts = {
-   compiled = {
-      custom_path = {
-         enabled = true, -- set false, for using source file name & dir
-         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
-            if ver == nil or ver == '' then
-               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
-            else
-               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
-            end
-         end,
-      },
+   rename = {
+     enabled = true, -- set false for using default path by metaeditor
+     get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+        if ver == nil or ver == '' then
+           return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+        else
+           return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+        end
+     end,
    },
 },
 ```
@@ -330,9 +333,9 @@ Then, variables will look like this.
 The paths out of root dir are also available.
 ```lua
 -- Relative path
-return string.format(root .. '/../../ea/archive/%s.%s', fname, ext)
+return string.format(root .. '/../../archive/%s.%s', fname, ext)
 -- Absolute path
-return string.format('/path/to/ea/archive/%s.%s', fname, ext)
+return string.format('/path/to/archive/%s.%s', fname, ext)
 ```
 
 ## Commands
