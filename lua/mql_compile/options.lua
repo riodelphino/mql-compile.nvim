@@ -48,22 +48,22 @@ M.default = {
          return formated
       end,
    },
-   compiled = {
-      overwrite = true,
-      custom_path = {
-         enabled = true, -- set false, for using source file name & dir
-         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
-            if ver == nil or ver == '' then
-               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
-            else
-               return string.format('archive/%s_v%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
-            end
-         end,
+   compile = {
+      wine = {
+         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
+         command = 'wine', -- Wine command path
       },
+      overwrite = true,
    },
-   wine = {
+   rename = {
       enabled = true,
-      command = 'wine',
+      get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+         if ver == nil or ver == '' then
+            return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+         else
+            return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+         end
+      end,
    },
    ft = {
       mql5 = {

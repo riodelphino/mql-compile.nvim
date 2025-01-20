@@ -117,22 +117,22 @@ opts = {
       parse = nil, -- See '# Parsing and formatting information' section
       format = nil, -- See '# Parsing and formatting information' section
    },
-   compiled = {
-      overwrite = true,
-      custom_path = {
-         enabled = true,
-         get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
-            if ver == nil or ver == '' then
-               return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
-            else
-               return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
-            end
-         end,
+   compile = {
+      wine = {
+         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
+         command = 'wine', -- Wine command path
       },
+      overwrite = true,
    },
-   wine = {
-      enabled = true, -- On MacOS/Linux, set true for MT5/MT5 on wine(wineskin). On windows, set false.
-      command = 'wine', -- Wine command path
+   rename = {
+      enabled = true,
+      get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
+         if ver == nil or ver == '' then
+            return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+         else
+            return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+         end
+      end,
    },
    ft = {
       mql5 = {

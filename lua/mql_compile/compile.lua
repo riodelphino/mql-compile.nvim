@@ -11,8 +11,8 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
    local cmd
    local args = {}
    local dev_null = '&>/dev/null' -- Don't need this now
-   if opts.wine.enabled then
-      cmd = opts.wine.command
+   if opts.compile.wine.enabled then
+      cmd = opts.compile.wine.command
       args = { metaeditor_path, '/compile:' .. source_path, '/log:' .. log_path, dev_null }
    else
       cmd = metaeditor_path -- "" is not needed somewhy
@@ -127,7 +127,7 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
                end
             end
 
-            -- Custom path (mv compiled file to custom path)
+            -- Rename (mv compiled file to custom path)
             if qf_cnt.error == nil then
                local target_dir = fn.get_dir(target_path)
                -- mkdir
@@ -135,8 +135,9 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
                   vim.fn.mkdir(target_dir)
                   if opts.notify.rename.on_mkdir then fn.notify("Created dir: '" .. target_dir .. "'", vim.log.levels.INFO) end
                end
+               -- rename
                vim.fn.rename(compiled_path, target_path)
-               if opts.notify.rename.on_renamed then fn.notify("Renamed as: '" .. target_path .. "'", vim.log.levels.INFO) end
+               if opts.notify.rename.on_renamed then fn.notify("Renamed to: '" .. target_path .. "'", vim.log.levels.INFO) end
             end
 
             -- Open quickfix
@@ -186,7 +187,7 @@ function M.compile(source_path)
 
    -- Custom or default compiled path
    local target_path = M.get_target_path(source_path)
-   if fn.file_exists(target_path) and not opts.compiled.overwrite then
+   if fn.file_exists(target_path) and not opts.compile.overwrite then
       fn.notify("Abort\nFile already exists: '" .. target_path .. "'", vim.log.levels.ERROR)
       return -- Abort
    end
@@ -207,10 +208,10 @@ function M.get_target_path(source_path)
    local default_target_path = fn.get_compiled_path(source_path)
    local target_path
 
-   if opts.compiled.custom_path.enabled then
+   if opts.rename.enabled then
       local root = fn.get_root(source_path)
       local ver, major, minor = fn.get_version(source_path)
-      target_path = opts.compiled.custom_path.get_custom_path(root, dir, base, fname, target_ext, ver, major, minor)
+      target_path = opts.rename.get_custom_path(root, dir, base, fname, target_ext, ver, major, minor)
    else
       target_path = default_target_path
    end
