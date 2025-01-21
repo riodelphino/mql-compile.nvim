@@ -196,7 +196,8 @@ opts = {
    },
    highlights = { -- Highlights & syntax on quickfix window
       enabled = true,
-      hlgroups = nil, -- See '# Highlights' section
+      hl_prefix = 'qf', -- prefix for hlgroup
+      hl_groups = nil, -- See '# Highlights' section
    },
 },
 ```
@@ -442,7 +443,7 @@ keys = {
 
 Set-up highlight groups in quickfix list.  
 
-To use default, leave `hlgroups = nil`.
+To use default, leave `hl_groups = nil`.
 ```lua
 opts = {
    highlights = { -- Highlights on quickfix window

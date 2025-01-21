@@ -5,7 +5,7 @@ function M.set_highlights()
    local opts = opt.get_opts()
 
    if not opts.highlights.enabled then return end
-   local hl_prefix = opts.higlights.hl_prefix
+   local hl_prefix = opts.highlights.hl_prefix
 
    local hl_groups = opts.highlights.hl_groups
    for _, hl_group in pairs(hl_groups) do

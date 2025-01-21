@@ -8,7 +8,7 @@ function M.set_qf_syntax()
 
    -- Get highlight name by syntax_group
    local function get_hl_name(syntax_group)
-      local hlgroup = highlights.hlgroups[syntax_group]
+      local hlgroup = highlights.hl_groups[syntax_group]
       local hl_name, _ = unpack(hlgroup)
       return hl_name
    end
