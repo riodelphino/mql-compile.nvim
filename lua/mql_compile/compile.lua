@@ -52,7 +52,7 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
          -- if result == 0 then
          --    fn.notify('Succeeded compiling: ' .. source_path, vim.log.levels.INFO)
          -- else
-         --    fn.notify('Failed compiling: (' .. return_val .. ')\n' .. 'stderr:\n' .. table.concat(j:stderr_result(), '\n'), vim.log.levels.ERROR)
+         --    fn.notify('Failed to compile: (' .. return_val .. ')\n' .. 'stderr:\n' .. table.concat(j:stderr_result(), '\n'), vim.log.levels.ERROR)
          -- end
 
          -- Convert log encoding & convert to qf, info
@@ -108,7 +108,7 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
                end
                if qf_cnt.error ~= nil then
                   -- Failed
-                  msg_main = "Failed compiling: '" .. source_filename .. "'"
+                  msg_main = "Failed to compile: '" .. source_filename .. "'"
                   fn.notify(msg_main .. '\n' .. msg_qf_cnt, level)
                else
                   -- Succeeded

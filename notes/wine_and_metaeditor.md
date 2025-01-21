@@ -121,7 +121,7 @@ If you use absolute path in `/compile:` , like `/compile:"/path/to/ea.mq5"`, met
 `/compile:` arg:
 | Type          | Linux/MacOS path         | --> | Windows path     | Result                            |
 | ------------- | ------------------------ | :-: | ---------------- | --------------------------------- |
-| Absolute path | /compile:"/path/to/ea.mq5" | --> | path\\to\\ea.mq5 | Failed compiling (file not found) |
+| Absolute path | /compile:"/path/to/ea.mq5" | --> | path\\to\\ea.mq5 | Failed to compile (file not found) |
 | Relative path | /compile:"path/to/ea.mq5"  | --> | path\\to\\ea.mq5 | Succeeded compiling               |
 
 ### On relative paths
