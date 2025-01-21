@@ -106,11 +106,6 @@ M.default = {
       information = {
          on_generated = true, -- Show informations on notify
       },
-      -- compiled = {
-      --    on_mkdir = true,
-      --    on_saved = true,
-      --    on_version = true,
-      -- },
       rename = {
          on_mkdir = false,
          on_version = false,
@@ -129,19 +124,20 @@ M.default = {
    },
    highlights = { -- Highlights on quickfix window
       enabled = true,
-      hlgroups = {
-         filename = { 'qfFileName', { link = 'Directory' } }, -- '<Highlight name>' , { <highlight options> }
-         separator_left = { 'qfSeparatorLeft', { fg = '#cccccc' } },
-         separator_right = { 'qfSeparatorRight', { fg = '#cccccc' } },
-         line_nr = { 'qfLineNr', { fg = '#888888' } },
-         col = { 'qfCol', { fg = '#888888' } },
-         error = { 'qfError', { link = 'DiagnosticError' } },
-         warning = { 'qfWarning', { link = 'DiagnosticWarn' } },
-         info = { 'qfInfo', { link = 'DiagnosticInfo' } },
-         hint = { 'qfHint', { link = 'DiagnosticHint' } },
-         note = { 'qfNote', { link = 'DiagnosticHint' } },
-         code = { 'qfCode', { fg = '#888888' } },
-         text = { 'qfText', { link = 'Normal' } },
+      hl_prefix = 'qf',
+      hl_groups = {
+         filename = { 'FileName', { link = 'Directory' } }, -- '<Highlight name>' , { <highlight options> }
+         separator_left = { 'SeparatorLeft', { fg = '#cccccc' } },
+         separator_right = { 'SeparatorRight', { fg = '#cccccc' } },
+         line_nr = { 'LineNr', { fg = '#888888' } },
+         col = { 'Col', { fg = '#888888' } },
+         error = { 'Error', { link = 'DiagnosticError' } },
+         warning = { 'Warning', { link = 'DiagnosticWarn' } },
+         info = { 'Info', { link = 'DiagnosticInfo' } },
+         hint = { 'Hint', { link = 'DiagnosticHint' } },
+         note = { 'Note', { link = 'DiagnosticHint' } },
+         code = { 'Code', { fg = '#888888' } },
+         text = { 'Text', { link = 'Normal' } },
       },
    },
 }

@@ -178,8 +178,10 @@ opts = {
       information = {
          on_generated = true, -- Show informations on notify
       },
-      compiled = {
-         on_saved = true,
+      rename = {
+         on_mkdir = false,
+         on_version = false,
+         on_renamed = true,
       },
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...
@@ -445,19 +447,20 @@ To use default, leave `hlgroups = nil`.
 opts = {
    highlights = { -- Highlights on quickfix window
       enabled = true,
-      hlgroups = {
-         filename = { 'qfFileName', { link = 'Directory' } },  -- { '<Highlight name>' , { <highlight options> } }
-         separator_left = { 'qfSeparatorLeft', { fg = '#cccccc' } },
-         separator_right = { 'qfSeparatorRight', { fg = '#cccccc' } },
-         line_nr = { 'qfLineNr', { fg = '#888888' } },
-         col = { 'qfCol', { link = 'DiagnosticError' } },
-         error = { 'qfError', { link = 'DiagnosticError' } },
-         warning = { 'qfWarning', { link = 'DiagnosticWarn' } },
-         info = { 'qfInfo', { link = 'DiagnosticInfo' } },
-         hint = { 'qfHint', { link = 'DiagnosticHint' } },
-         note = { 'qfNote', { link = 'DiagnosticHint' } },
-         code = { 'qfCode', { fg = '#888888' } },
-         text = { 'qfText', { link = 'Normal' } },
+      hl_prefix = 'qf',
+      hl_groups = {
+         filename = { 'FileName', { link = 'Directory' } },  -- { '<Highlight name>' , { <highlight options> } }
+         separator_left = { 'SeparatorLeft', { fg = '#cccccc' } },
+         separator_right = { 'SeparatorRight', { fg = '#cccccc' } },
+         line_nr = { 'LineNr', { fg = '#888888' } },
+         col = { 'Col', { link = 'DiagnosticError' } },
+         error = { 'Error', { link = 'DiagnosticError' } },
+         warning = { 'Warning', { link = 'DiagnosticWarn' } },
+         info = { 'Info', { link = 'DiagnosticInfo' } },
+         hint = { 'Hint', { link = 'DiagnosticHint' } },
+         note = { 'Note', { link = 'DiagnosticHint' } },
+         code = { 'Code', { fg = '#888888' } },
+         text = { 'Text', { link = 'Normal' } },
       },
    },
 },
