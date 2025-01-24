@@ -5,6 +5,10 @@
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
 
+https://github.com/user-attachments/assets/0029ee53-0812-4c58-ae9e-ce970ca5bb4d
+
+with [nvim-notify](https://github.com/rcarriga/nvim-notify) & [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf)
+
 > [!Caution]
 > It's still test version.  
 
@@ -15,20 +19,6 @@ Use it at your own risk. Backup your files before testing.
 
 Now ensured to work only in 'macOS + wine(wineskin)' environment.  
 Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
-
-
-## Screenshots
-
-> [!Note]
-> Sorry, pics from older version.
-
-Quickfix (error)
-![error_quickfix](img/error_quickfix.png)
-
-Notify (error)
-![error_notify](img/error_notify.png)
-
-(With [nvim-notify](https://github.com/rcarriga/nvim-notify))
 
 
 ## Features
