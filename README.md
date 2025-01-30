@@ -1,6 +1,15 @@
-# mql-compile.nvim
+<h1 align="center">
+mql-compile.nvim
+</h1>
 
-![img/logo.jpg](img/logo.jpg)
+<p align="center">
+   <img
+   alt="mql-compile.nvim logo"
+   src="https://github.com/riodelphino/mql-compile.nvim/blob/05d475d4db63f1ec96b69d76b35b090fa59b3d08/img/logo.jpg"
+   />
+</p>
+
+
 
 A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.  
 Without heavy MetaEditor GUI. (Compiling on command-line).
