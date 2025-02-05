@@ -81,7 +81,7 @@ M.default = {
          if ver == nil or ver == '' then
             return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
          else
-            return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+            return string.format('archive/%s_v%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
          end
       end,
    },
