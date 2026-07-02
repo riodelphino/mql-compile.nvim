@@ -54,6 +54,7 @@ Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/is
 
 Using [Lazy.nvim](https://github.com/folke/lazy.nvim):
 
+with Sikarugir:
 ```lua
 -- Minimum config:
 return {
@@ -68,12 +69,15 @@ return {
    lazy = true,
    ft = { 'c', 'cpp' }, -- NOTE: `mql-filetype.nvim` makes it easier to change MQL4/MQL5 filetypes to c/cpp.
    opts = {
+      wine = {
+         command = '~/Applications/MetaTrader 5.app/Contents/SharedSupport/wine/bin/wine',
+      },
       ft = {
          mql5 = {
-            metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe', -- your MT5 exe's path
+            metaeditor_path = '~/Applications/MetaTrader 5.app/Contents/SharedSupport/prefix/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe'
          },
          mql4 = {
-            metaeditor_path = '~/Applications/Wineskin/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe', -- your MT4 exe's path
+            metaeditor_path = '~/Applications/MetaTrader 4.app/Contents/SharedSupport/prefix/drive_c/Program Files (x86)/MetaTrader 4/MetaEditor.exe'
          },
       },
    },
@@ -195,29 +199,37 @@ opts = {
 
 ## Default 'metaeditor_path'
 
-The default paths of MetaEditor's exe, for `opts.ft.mql5` and `opts.ft.mql4`.  
+Set paths of MetaEditor executables on `opts.ft.mql5` and `opts.ft.mql4`.  
 (It depends on your settings on installing.)
 
 
 ### MT5
 
+macOS: (When the app name is `MetaTrader 5.app`)
 ```lua
- -- MacOS (via wine)
- metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe'
- -- Windows (NOT TESTED. just a note)
- metaeditor_path = 'C:\\Program Files\\MetaTrader 5\\MetaEditor64.exe'
- ```
- 'MT5.app' is the name of app you set on wineskin.
+-- via Sikarugir
+metaeditor_path = '~/Applications/MetaTrader 5.app/Contents/SharedSupport/prefix/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe'
+-- via WineSkin
+metaeditor_path = '~/Applications/Wineskin/MetaTrader 5.app/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe'
+```
+Windows (NOT TESTED):
+```lua
+metaeditor_path = 'C:\\Program Files\\MetaTrader 5\\MetaEditor64.exe'
+```
 
 ### MT4
 
- ```lua
- -- MacOS (via wine)
- metaeditor_path = '~/Applications/Wineskin/MT5.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe'
- -- Windows (NOT TESTED. just a note)
- metaeditor_path = 'C:\\Program Files (x86)\\MetaTrader 4\\metaeditor.exe'
+macOS: (When the app name is `MetaTrader 4.app`)
+```lua
+-- via Sikarugir
+metaeditor_path = '~/Applications/MetaTrader 4.app/Contents/SharedSupport/prefix/drive_c/Program Files (x86)/MetaTrader 4/MetaEditor.exe'
+-- via WineSkin
+metaeditor_path = '~/Applications/Wineskin/MetaTrader 4.app/drive_c/Program Files (x86)/MetaTrader 4/metaeditor.exe'
 ```
- 'MT4.app' is the name of app you set on wineskin.
+Windows (NOT TESTED):
+```lua
+metaeditor_path = 'C:\\Program Files (x86)\\MetaTrader 4\\metaeditor.exe'
+```
 
 
 ## Parsing and formatting
@@ -550,6 +562,11 @@ See [notes/wine_and_metaeditor.md](notes/wine_and_metaeditor.md).
 Path specifications and path conversions are investigated.
 
 
+## Recommendation
+
+[https://github.com/stevearc/overseer.nvim](overseer.nvim) may be the better choice.
+
+
 ## License
 
 [MIT License](./LICENSE)
@@ -557,6 +574,9 @@ Path specifications and path conversions are investigated.
 
 ## TO-DO
 
+- [ ] ❗️ rename.get_custom_path: Relative output path for the `*.mq5` `*.mq4`
+- [ ] ❗️ Customizable for each project by `mqlcompile.yaml`
+- [ ] ❗️ Add `:MQLCompileRedo` command. (this might remove auto-detection?)
 - [ ] `opts.information.actions` has other actions ?
    - [ ] Now only `compiling` & `including` are confirmed
 - [ ] git
