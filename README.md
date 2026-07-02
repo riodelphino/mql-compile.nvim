@@ -17,7 +17,10 @@ Use it at your own risk. Backup your files before testing.
 > [!Warning]
 > Need tested in Windows or Linux  
 
-Now ensured to work only in 'macOS + wine(wineskin)' environment.  
+Now ensured to work only in:
+- macOS + Sikarugir
+- macOS + WineSkin
+
 Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
 
 
@@ -29,18 +32,18 @@ Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/is
 - Auto detect MQL5/MQL4
 - Customizable target path (place compiled files wherever you prefer)
 - Version management
-- Works on `MacOS + wine(wineskin)` for now
+- Works on `macOS + WineSkin` and `macOS + Sikarugir` for now
 
 **Not implemented**
-- Works on `Windows`? (Need tested)
-- Works on `Linux`? (Need tested)
+- Works on Windows ? (Need tested)
+- Works on Linux ? (Need tested)
 
 
 ## Requirement
 
 **Mandatory**
-- nvim v0.10.2 (My environment. It seems to work in a little older versions.)
-- MT5 or MT4 installed (through wine/wineskin, for now)
+- nvim > v0.10.2
+- MT5 or MT4 installed through Sikarugir or WineSkin
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for async
 
 **Optional plugins**
