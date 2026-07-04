@@ -1,15 +1,29 @@
 # LSP
 
 **Recommend**: [clangd](https://github.com/clangd/clangd)
+Additional: [mql-language-server](https://github.com/MichalBPL/mql5-language-server)
 
 
-## Install clangd
+## Common Settings
+
+Enable lsp:
+```lua
+vim.lsp.enable({
+   'clangd',
+   'mql5-lsp',
+})
+```
+
+
+## clangd
+
+### Install clangd
 
 Can install via Mason.
 `:MasonInstall clangd`
 
 
-## Configure clangd
+### Configure clangd
 
 Save below code as `.clangd` in your project root, or as `~/Library/Preferences/clangd/config.yaml`:
 
@@ -71,4 +85,46 @@ Diagnostics:
 > Ensure to:
 > - Replace `<username>` to your actual username in `"-I/..."` config.
 > - Replace the path to the actual MT5 installed path in `"-I/..."` config.
+
+
+
+## mql5-lsp
+
+### Install mql5-lsp
+
+Follow the official instruction in [README](https://github.com/MichalBPL/mql5-language-server)
+
+
+### Configure mql5-lsp
+
+Copied from clang settings.
+
+- Added `MQL5` directory to root_markers.
+- Added `on_init()` to avoid incomplete formatting by `mql5-lsp`.
+
+> [!Warning]
+> Not sure which settings have effects for `mql5-lsp`.
+
+```lua
+---@type vim.lsp.Config
+return {
+   cmd = { 'mql5-lsp' },
+   filetypes = { 'mql5' },
+   root_markers = {
+      ...
+      'MQL5', -- ⚠️ Just added this line
+   },
+   ...
+   on_init = function(client)
+      -- ⚠️ Avoid formatting by mql5-lsp (Still incomplete and disturbs/overwrites clang-format's formatting)
+      client.server_capabilities.documentFormattingProvider = false -- Disable formatting (disturbed)
+      client.server_capabilities.documentRangeFormattingProvider = false -- Disable formatting (disturbed)
+   end,
+   ...
+}
+```
+Refer above clang settings with omitted lines: `...`
+
+> [!Warning]
+> Not sure if `mql5-lsp` loads `.clangd`
 

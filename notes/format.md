@@ -61,3 +61,22 @@ require('conform').setup({
 
 ```
 
+## Issues
+
+### Overwritten by mql5-lsp's formatting
+
+`mql5-lsp` included formatting feature, but it's incomplete.
+
+To avoid formatting by `mql5-lsp`, Add these 4 lines to mql5-lsp.lua:
+```lua
+---@type vim.lsp.Config
+return {
+   ...
+   on_init = function(client)
+      client.server_capabilities.documentFormattingProvider = false -- Disable formatting (disturbed)
+      client.server_capabilities.documentRangeFormattingProvider = false -- Disable formatting (disturbed)
+   end,
+   ...
+}
+```
+
