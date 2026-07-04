@@ -22,11 +22,11 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
    local dev_null = '&>/dev/null' -- Don't need this now
    if opts.compile.wine.enabled then
       cmd = opts.compile.wine.command
-      args = { metaeditor_path, '/compile:' .. source_path, '/log:' .. log_path, dev_null }
+      args = { metaeditor_path, '/compile:' .. source_path, '/log:' .. log_path }
       args_quoted = { quote(metaeditor_path), '/compile:' .. quote(source_path), '/log:' .. quote(log_path), dev_null }
    else
       cmd = metaeditor_path -- "" is not needed somewhy
-      args = { '/compile:' .. source_path, '/log:' .. log_path, dev_null }
+      args = { '/compile:' .. source_path, '/log:' .. log_path }
       args_quoted = { '/compile:' .. quote(source_path), '/log:' .. quote(log_path), dev_null }
    end
 
