@@ -82,7 +82,7 @@ This enables switching wine path between mql5 and mql4.
 
 **Optional plugins**
 - Filetype:
-   - [mql-filetype.nvim](https://github.com/riodelphino/mql-filetype.nvim) Change filetypes from MQL4/MQL5 to c/cpp automatically
+   - [mql-filetype.nvim](https://github.com/riodelphino/mql-filetype.nvim) Set filetypes and Apply parsers for `*.mq5|*.mq4|*.mqh`
 - Notify:
    - [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
 - Quickfix:
@@ -107,18 +107,15 @@ return {
       'yorickpeterse/nvim-pqf', -- optional
    },
    lazy = true,
-   ft = { 'mql5', 'mql4' }, -- NOTE: `mql-filetype.nvim` makes it easier to detect and set *.mq5|*.mq4|*.mqh files to mql5|mql4
+   ft = { 'mql5', 'mql4' }, -- NOTE: Recommend `mql-filetype.nvim` to apply `mql5|mql4` filetypes to `*.mq5|*.mq4|*.mqh` files
    opts = {
-      compile = {
-         wine = {
-            command = '~/Applications/MetaTrader 5.app/Contents/SharedSupport/wine/bin/wine',
-         },
-      },
       ft = {
          mql5 = {
+            wine_path = '~/Applications/MetaTrader 5.app/Contents/SharedSupport/wine/bin/wine',
             metaeditor_path = '~/Applications/MetaTrader 5.app/Contents/SharedSupport/prefix/drive_c/Program Files/MetaTrader 5/MetaEditor64.exe'
          },
          mql4 = {
+            wine_path = '~/Applications/MetaTrader 4.app/Contents/SharedSupport/wine/bin/wine',
             metaeditor_path = '~/Applications/MetaTrader 4.app/Contents/SharedSupport/prefix/drive_c/Program Files (x86)/MetaTrader 4/MetaEditor.exe'
          },
       },
@@ -137,29 +134,24 @@ opts = {
    detect = {
       priority = { 'mql5', 'mql4' },
    },
-   compile = {
-      wine = {
-         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
-         command = 'wine', -- Wine command path
-      },
-      overwrite = true,
-   },
    ft = {
       mql5 = {
-         metaeditor_path = '',
+         metaeditor_path = '', -- wine command path. (leave it '' on windows)
          include_path = '', -- Not supported now
          extension = {
             source = 'mq5',
             compiled = 'ex5',
          },
+         overwrite = true,
       },
       mql4 = {
-         metaeditor_path = '',
+         metaeditor_path = '', -- wine command path. (leave it '' on windows)
          include_path = '', -- Not supported now
          extension = {
             source = 'mq4',
             compiled = 'ex4',
          },
+         overwrite = true,
       },
    },
    log = {

@@ -5,6 +5,7 @@
 
 - [ ] feat: Load per-project option lua file
 - [ ] feat: Choose compile target from list
+- [ ] fix: compiling command error is skipped  -> Show error
 
 ## OLD
 
