@@ -46,6 +46,8 @@ Language: C
 (Same with above MQL5 settings)
 ```
 
+## Configure conform.nvim
+
 Then, add settings to `conform.nvim` config.
 ```lua
 require('conform').setup({
