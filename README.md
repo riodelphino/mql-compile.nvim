@@ -23,6 +23,40 @@ Now ensured to work only in:
 
 Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
 
+## Breaking Changes
+
+Changed the config structure in `v0.4.0`
+
+Before (< `v0.3.6`):
+```lua
+opts = {
+   compile = {
+      wine = {
+         enabled = true,
+         command = '',
+      },
+      overwrite = true,
+   },
+}
+```
+
+After (> `v0.4.0`):
+```lua
+opts = {
+   ft = {
+      mql5 = {
+         wine_path = '', -- wine command path. (leave it '' on windows)
+         overwrite = true,
+      },
+      mql4 = {
+         wine_path = '', -- wine command path. (leave it '' on windows)
+         overwrite = true,
+      },
+   },
+}
+```
+This enables switching wine path between mql5 and mql4.
+
 
 ## Features
 

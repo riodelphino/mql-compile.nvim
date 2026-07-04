@@ -10,29 +10,26 @@ M.default = {
    detect = {
       priority = { 'mql5', 'mql4' },
    },
-   compile = {
-      wine = {
-         enabled = true, -- On MacOS/Linux, set true. On windows, set false.
-         command = 'wine', -- Wine command path
-      },
-      overwrite = true,
-   },
    ft = {
       mql5 = {
-         metaeditor_path = '',
+         wine_path = '', -- wine command path. (leave it '' on windows)
+         metaeditor_path = '', -- 'metaeditor64.exe' path
          include_path = '', -- Not supported now
          extension = {
             source = 'mq5',
             compiled = 'ex5',
          },
+         overwrite = true,
       },
       mql4 = {
-         metaeditor_path = '',
+         wine_path = '', -- wine command path. (leave it '' on windows)
+         metaeditor_path = '', -- 'metaeditor.exe' path
          include_path = '', -- Not supported now
          extension = {
             source = 'mq4',
             compiled = 'ex4',
          },
+         overwrite = true,
       },
    },
    log = {

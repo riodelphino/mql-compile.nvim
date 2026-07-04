@@ -11,7 +11,7 @@ local function dquote(path)
    return '"' .. path .. '"'
 end
 
-function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, target_path)
+function M.async_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path)
    local opts = opt.get_opts()
    local msg = ''
    local Job = require('plenary.job')
@@ -20,8 +20,8 @@ function M.async_compile(metaeditor_path, source_path, log_path, compiled_path, 
    local args = {}
    local args_quoted = {} -- for notify
    local dev_null = '&>/dev/null' -- Don't need this now
-   if opts.compile.wine.enabled then
-      cmd = opts.compile.wine.command
+   if wine_path ~= '' then
+      cmd = wine_path
       args = { metaeditor_path, '/compile:' .. source_path, '/log:' .. log_path }
       args_quoted = { quote(metaeditor_path), '/compile:' .. quote(source_path), '/log:' .. quote(log_path), dev_null }
    else
@@ -177,7 +177,10 @@ function M.compile(source_path)
       return
    end
 
-   -- Adjust metaeditor's path
+   -- Adjust wine path
+   local wine_path = fn.get_absolute_path(mql.wine_path)
+
+   -- Adjust metaeditor path
    local metaeditor_path = fn.get_absolute_path(mql.metaeditor_path)
 
    -- Check exe exists
@@ -198,7 +201,7 @@ function M.compile(source_path)
 
    -- Custom or default compiled path
    local target_path = M.get_target_path(source_path)
-   if fn.file_exists(target_path) and not opts.compile.overwrite then
+   if fn.file_exists(target_path) and not mql.overwrite then
       fn.notify("Abort\nFile already exists: '" .. target_path .. "'", vim.log.levels.ERROR)
       return -- Abort
    end
@@ -207,7 +210,7 @@ function M.compile(source_path)
    local compiled_path = fn.get_compiled_path(source_path)
 
    -- Execute async-compiling
-   local compile_shell_error = M.async_compile(metaeditor_path, source_path, log_path, compiled_path, target_path)
+   local compile_shell_error = M.async_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path)
    return compile_shell_error
 end
 
