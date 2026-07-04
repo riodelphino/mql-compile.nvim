@@ -39,7 +39,7 @@ Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/is
 - Works on Linux ? (Need tested)
 
 
-## Requirement
+## Requirements
 
 **Mandatory**
 - nvim > v0.10.2
@@ -47,10 +47,13 @@ Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/is
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for async
 
 **Optional plugins**
-- [mql-filetype.nvim](https://github.com/riodelphino/mql-filetype.nvim) Change filetypes from MQL4/MQL5 to c/cpp automatically
-- [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
-- [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
-- [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify quickfix
+- Filetype:
+   - [mql-filetype.nvim](https://github.com/riodelphino/mql-filetype.nvim) Change filetypes from MQL4/MQL5 to c/cpp automatically
+- Notify:
+   - [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
+- Quickfix:
+   - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
+   - [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify quickfix
 
 
 ## Installation
@@ -70,10 +73,12 @@ return {
       'yorickpeterse/nvim-pqf', -- optional
    },
    lazy = true,
-   ft = { 'c', 'cpp' }, -- NOTE: `mql-filetype.nvim` makes it easier to change MQL4/MQL5 filetypes to c/cpp.
+   ft = { 'mql5', 'mql4' }, -- NOTE: `mql-filetype.nvim` makes it easier to detect and set *.mq5|*.mq4|*.mqh files to mql5|mql4
    opts = {
-      wine = {
-         command = '~/Applications/MetaTrader 5.app/Contents/SharedSupport/wine/bin/wine',
+      compile = {
+         wine = {
+            command = '~/Applications/MetaTrader 5.app/Contents/SharedSupport/wine/bin/wine',
+         },
       },
       ft = {
          mql5 = {
@@ -524,7 +529,7 @@ Then `mql-compile` shows messages through it.
 
 ## Test codes to compile
 
-There are some test codes in: `test/*.mq5`
+There are some test mql5 codes in: `test/*.mq5`
 - nothing.mq5
 - information.mq5
 - warning.mq5
@@ -532,8 +537,9 @@ There are some test codes in: `test/*.mq5`
 
 Try to compile them for test.
 
+## Issues
 
-## Inaccurate error displaying
+### Inaccurate error displaying
 
 > [!Warning]
 > The metaeditor returns errors that do not make sense, so often.
@@ -557,7 +563,21 @@ Especially, if you split files & use `#include`, it becomes quite difficult to f
 Unfortunately, these are the weak point of metaeditor's linting, I guess.
 
 
-## Additional notes
+## Additional Informations
+
+### Highlight with treesitter
+
+See [notes/highlight_with_treesitter.md]()
+
+### LSP
+
+See [notes/lsp.md](notes/lsp.md)
+
+### Format
+
+See [notes/format.md](notes/format.md)
+
+### Investigation Note
 
 Researched and verified detailed data of wine and `metaeditor.exe` / `MetaEditor64.exe` commands.  
 See [notes/wine_and_metaeditor.md](notes/wine_and_metaeditor.md).

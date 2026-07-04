@@ -8,7 +8,6 @@
 - [ ] chore: Remove unnecessary `dev_null`
 - [ ] feat: Choose compile target from list
 
-
 ## OLD
 
 - [ ] ❗️ rename.get_custom_path: Relative output path for the `*.mq5` `*.mq4`
