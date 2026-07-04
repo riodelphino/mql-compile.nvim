@@ -5,6 +5,8 @@
 
 - [ ] fix: Add option to split `compile.wine.command` for mt4/5 wine executables
 - [ ] feat: Load per-project option lua file
+- [ ] chore: Remove unnecessary `dev_null`
+- [ ] feat: Choose compile target from list
 
 
 ## OLD
