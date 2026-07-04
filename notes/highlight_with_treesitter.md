@@ -14,6 +14,14 @@ Very easy. See and follow the plugin's [README](https://github.com/riodelphino/m
 
 ### 2. Setup manually
 
+~/.config/nvim/ftplugin/mql5.lua:
+```lua
+vim.treesitter.start(bufnr, 'cpp')
+```
+~/.config/nvim/ftplugin/mql4.lua:
+```lua
+vim.treesitter.start(bufnr, 'c')
+```
 ~/.config/nvim/init.lua:
 ```lua
 vim.filetype.add({
