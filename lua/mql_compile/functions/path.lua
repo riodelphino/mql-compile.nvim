@@ -20,24 +20,15 @@ function M.folder_exists(path)
    return true
 end
 
--- FIXME: Don't need anymore, but may use on converting information
+-- NOTE: Don't need anymore, but may use on converting information
 -- function M.convert_path_to_os(path, drive_letter, os_type)
 --    if os_type == 'macos' then return path:gsub('^' .. drive_letter, ''):gsub('\\', '/') end
 -- end
 
-function M.get_git_root()
-   local git_root = vim.fn.system('git rev-parse --show-toplevel')
-   git_root = string.gsub(git_root, '\n$', '')
-   if vim.v.shell_error ~= 0 then return nil end
-   return git_root
-end
-
 function M.get_root(path)
-   local cwd = vim.fn.getcwd()
-   local git_root = M.get_git_root(path)
-   -- local current_buf_dir = vim.fn.expand('%:p:h')
-   local current_buf_dir = M.get_dir(path)
-   return git_root or cwd or current_buf_dir or path
+   path = path or vim.fn.getcwd()
+   local root = vim.fs.root(path, { '.editorconfig', '.gitignore', '.git', '.clangd', '.clang-format', 'cpplint.cfg' })
+   return root
 end
 
 function M.find_files_recursively(base_dir, pattern) -- pattern must be lua type
@@ -54,7 +45,7 @@ function M.find_files_recursively(base_dir, pattern) -- pattern must be lua type
 
          local full_path = dir .. '/' .. name
          if type == 'directory' then
-            scan_dir(full_path) -- 再帰的に探索
+            scan_dir(full_path) -- Recursivelly
          elseif type == 'file' and name:match(pattern) then
             table.insert(files, full_path)
          end
