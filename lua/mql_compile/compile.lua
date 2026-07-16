@@ -20,14 +20,16 @@ function M.async_compile(wine_path, metaeditor_path, source_path, log_path, comp
    local args = {}
    local args_quoted = {} -- for notify
    local dev_null = '&>/dev/null' -- Don't need this now
+   local source_path_win = fn.to_windows_path(source_path)
+   local log_path_win = fn.to_windows_path(log_path)
    if wine_path ~= '' then
       cmd = wine_path
-      args = { metaeditor_path, '/compile:' .. source_path, '/log:' .. log_path }
-      args_quoted = { quote(metaeditor_path), '/compile:' .. quote(source_path), '/log:' .. quote(log_path), dev_null }
+      args = { metaeditor_path, '/compile:' .. source_path_win, '/log:' .. log_path_win }
+      args_quoted = { quote(metaeditor_path), '/compile:' .. quote(source_path_win), '/log:' .. quote(log_path_win), dev_null }
    else
       cmd = metaeditor_path -- "" is not needed somewhy
       args = { '/compile:' .. source_path, '/log:' .. log_path }
-      args_quoted = { '/compile:' .. quote(source_path), '/log:' .. quote(log_path), dev_null }
+      args_quoted = { '/compile:' .. quote(source_path_win), '/log:' .. quote(log_path_win), dev_null }
    end
 
    if opts.notify.debug.compile.show_cmd then

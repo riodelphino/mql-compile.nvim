@@ -349,4 +349,12 @@ function M.get_absolute_path(path)
    return vim.fs.normalize(path)
 end
 
+function M.to_windows_path(path)
+   return path:gsub('/', '\\')
+end
+
+function M.to_unix_path(path)
+   return path:gsub('\\', '/')
+end
+
 return M
