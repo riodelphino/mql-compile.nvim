@@ -1,5 +1,7 @@
 local M = {}
 
+local opt = require('mql_compile.options')
+
 local sep
 
 function M.get_path_separator()
@@ -26,8 +28,9 @@ end
 -- end
 
 function M.get_root(path)
+   local opts = opt.get_opts()
    path = path or vim.fn.getcwd()
-   local root = vim.fs.root(path, { '.editorconfig', '.gitignore', '.git', '.clangd', '.clang-format', 'cpplint.cfg' })
+   local root = vim.fs.root(path, opts.root_marker)
    return root
 end
 

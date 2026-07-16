@@ -10,6 +10,7 @@ M.default = {
    detect = {
       priority = { 'mql5', 'mql4' },
    },
+   root_marker = { '.editorconfig', '.gitignore', '.git', '.clangd', '.clang-format', 'cpplint.cfg' },
    ft = {
       mql5 = {
          wine_path = '', -- wine command path. (leave it '' on windows)

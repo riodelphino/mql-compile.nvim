@@ -3,7 +3,6 @@
 
 ## IMPORTANT
 
-- [ ] fix: Expand `wine_path` and `metaeditor_path` (ex. `~`)
 - [ ] fix: Ensure to check whether the compiling command has errors
 - [ ] feat: Load per-project option lua file
 - [ ] feat: Choose compile target from list

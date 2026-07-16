@@ -15,8 +15,8 @@ function M.setup(user_opts)
 
    -- Initialize plugin
    opt._os_type = fn.get_os_type()
-   opt._root = fn.get_root()
    opt._opts = opt.merge(user_opts)
+   opt._root = fn.get_root()
    cmd.create_commands()
    hl.set_highlights()
    syn.set_qf_syntax()
