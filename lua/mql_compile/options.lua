@@ -171,13 +171,18 @@ end
 
 function M.merge(user_opts)
    local opts = {}
-
    -- opts = vim.tbl_deep_extend("force", M.default, user_opts or {})
    opts = M.deep_merge(M.default, user_opts or {})
-
    M._opts = opts
-
    return opts
+end
+
+function M.merge_project_config()
+   local project_opts = {}
+   local project_config_path = vim.fs.find('.mql-compile.lua', { path = M._root, limit = 1 })[1]
+   if not project_config_path then return M._opts end
+   project_opts = dofile(project_config_path)
+   return M.deep_merge(M._opts, project_opts)
 end
 
 return M

@@ -504,6 +504,21 @@ opts = {
 },
 ```
 
+## Per Project Options
+
+Options defined in `.mql-compile.lua` in your project root overrides the global options.
+Follow the [Default options](#default-options) structure.
+
+ex.) .mql-compile.lua:
+```lua
+return {
+   rename = {
+     enabled = false, -- Disable renaming in this project
+   },
+   -- Add your project specific configs
+}
+```
+
 ## Auto detection rules
 
 
