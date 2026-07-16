@@ -95,6 +95,14 @@ function M.get_extension(path)
    return path
 end
 
+function M.to_windows_path(path)
+   return path:gsub('/', '\\')
+end
+
+function M.to_unix_path(path)
+   return path:gsub('\\', '/')
+end
+
 function M.split_path(path)
    local dir = M.get_dir(path)
    local base = M.get_basename(path)

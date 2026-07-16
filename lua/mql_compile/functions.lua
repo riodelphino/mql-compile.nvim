@@ -345,16 +345,4 @@ function M.get_version(source_path)
    return ver, major, minor
 end
 
-function M.get_absolute_path(path)
-   return vim.fs.normalize(path)
-end
-
-function M.to_windows_path(path)
-   return path:gsub('/', '\\')
-end
-
-function M.to_unix_path(path)
-   return path:gsub('\\', '/')
-end
-
 return M
