@@ -25,6 +25,45 @@ Can install via Mason.
 
 ### Configure clangd
 
+### Global Settings
+```lua
+---@type vim.lsp.Config
+return {
+   cmd = { 'clangd' },
+   filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda', 'proto', 'mql5', 'mql4' }, -- ⚠️ Ensure to add mql5 and mql4
+   root_markers = {
+      '.clangd',
+      '.clang-tidy',
+      '.clang-format',
+      'compile_commands.json',
+      'compile_flags.txt',
+      'configure.ac',
+      '.git',
+   },
+   single_file_support = true,
+   capabilities = require('blink.cmp').get_lsp_capabilities(),
+   handlers = {
+      -- COMMENTED OUT: Null function suppress all the diagnostics...
+      -- ['textDocument/publishDiagnostics'] = function() end,
+   },
+   init_options = {
+      compilationDatabasePath = '.',
+      fallbackFlags = {
+         '-xc++',
+         '-std=c++17',
+      },
+      clangd = {
+         completion = {
+            placeholder = false,
+            detailedLabel = false,
+         },
+      },
+   },
+}
+```
+
+#### per-project Settings
+
 Save below code as `.clangd` in your project root, or as `~/Library/Preferences/clangd/config.yaml`:
 
 for MQL5:
