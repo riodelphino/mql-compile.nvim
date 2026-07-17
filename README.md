@@ -131,9 +131,6 @@ return {
 
 ```lua
 opts = {
-   detect = {
-      priority = { 'mql5', 'mql4' },
-   },
    root_marker = { '.editorconfig', '.gitignore', '.git', '.clangd', '.clang-format', 'cpplint.cfg' },
    ft = {
       mql5 = {
@@ -406,8 +403,8 @@ or
 :MQLCompile %
 ```
 
-This plugin auto-detects mql5/mql4 by patterns given in `opts.ft.mql5.pattern` and `opts.ft.mql4.pattern`.
-See [Auto detection rules](#auto-detection-rules).
+This plugin auto-detects mql5/mql4 by patterns given in `opts.ft.mql5.pattern` and `opts.ft.mql4.pattern` in project root.  
+Symbolic links are excluded.
 
 ```vim
 " Set source in NO mql5/4 buffers (like *.md)
@@ -416,7 +413,7 @@ See [Auto detection rules](#auto-detection-rules).
 
 " Compiling also works same way.
 :MQLCompile
-" Automatically detect file, and compile it
+" Show source files list in project root, then compile the selected one
 ```
 
 So, `:MQLCompileSetSource` & Auto-detection allow you to compile the file anywhere in the project.
@@ -517,36 +514,6 @@ return {
    -- Add your project-specific config here
 }
 ```
-
-## Auto detection rules
-
-
-### :MQLCompileSetSource
-
-If the arg is set like `:MQLCompileSetSource %` or `:MQLCompileSetSource my_ea.mq5`, the command set it as source path preferentially.
-
-But if no args are set, like `:MQLCompileSetSource`, the commannd detect the files automatically.  
-The detection order is below.
-
-1. Current buffer (if mql5/4)
-2. First detected mql5/4 file in git root dir (recursively)
-3. First detected mql5/4 file in cwd dir (recursively)
-
-If no files are detected, the command returns `error`.
-
-### :MQLCompile
-
-The compiling command without arg, like `:MQLCompile`, also detects the files in almost same way.
-
-1. Current buffer (if mql5/4)
-2. The path set by `:MQLCompileSetSource` command previousely
-3. First detected mql5/4 file in git root dir (recursively)
-4. First detected mql5/4 file in cwd dir (recursively)
-
-### Lua functions
-
-And [these lua functions](#lua-functions) follow same rules.
-
 
 ## notify
 

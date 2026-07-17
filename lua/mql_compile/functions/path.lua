@@ -28,36 +28,55 @@ end
 -- end
 
 function M.get_root(path)
-   local opts = opt.get_opts()
    path = path or vim.fn.getcwd()
+   local opts = opt.get_opts()
    local root = vim.fs.root(path, opts.root_marker)
    return root
 end
 
-function M.find_files_recursively(base_dir, pattern) -- pattern must be lua type
-   local files = {}
-   local uv = vim.loop
-
-   local function scan_dir(dir)
-      local handle = uv.fs_scandir(dir)
-      if not handle then return end
-
-      while true do
-         local name, type = uv.fs_scandir_next(handle)
-         if not name then break end
-
-         local full_path = dir .. '/' .. name
-         if type == 'directory' then
-            scan_dir(full_path) -- Recursivelly
-         elseif type == 'file' and name:match(pattern) then
-            table.insert(files, full_path)
-         end
-      end
+function M.find_source_files(path, bash_patterns)
+   local lua_patterns = {}
+   for i, pattern in ipairs(bash_patterns) do
+      lua_patterns[i] = M.pattern_bash_to_lua(pattern)
    end
 
-   scan_dir(base_dir)
-   return files
+   return vim.fs.find(function(name, _)
+      for _, lua_pattern in ipairs(lua_patterns) do
+         if name:match(lua_pattern) then return true end
+      end
+      return false
+   end, {
+      path = path,
+      type = 'file',
+      follow = false, -- Not follow symlink dir
+      limit = math.huge,
+   })
 end
+
+-- function M.find_files_recursively(base_dir, pattern) -- pattern must be lua type
+--    local files = {}
+--    local uv = vim.loop
+--
+--    local function scan_dir(dir)
+--       local handle = uv.fs_scandir(dir)
+--       if not handle then return end
+--
+--       while true do
+--          local name, type = uv.fs_scandir_next(handle)
+--          if not name then break end
+--
+--          local full_path = dir .. '/' .. name
+--          if type == 'directory' then
+--             scan_dir(full_path) -- Recursivelly
+--          elseif type == 'file' and name:match(pattern) then
+--             table.insert(files, full_path)
+--          end
+--       end
+--    end
+--
+--    scan_dir(base_dir)
+--    return files
+-- end
 
 function M.get_relative_path(path)
    path = vim.fn.fnamemodify(path, ':.')
@@ -126,42 +145,22 @@ function M.get_compiled_extension(source_path)
    return compiled_ext
 end
 
-function M.detect_file(path, filename)
-   path = path or M.get_root()
-   local find_cmd = 'find ' .. path .. ' -name ' .. filename
-   local result = vim.fn.system(find_cmd)
-   if result == nil or result == '' then return nil end
-   find_list = M.split(result, '\n')
-   if #find_list == 0 then
-      return result
-   else
-      return find_list[1] -- just return first file
+function M.get_filetype(path)
+   local opts = require('mql_compile.options').get_opts()
+   local ext = M.get_extension(path)
+   for ft_name, ft in pairs(opts.ft) do
+      if ext == ft.extension.source then return ft_name end
    end
+   return nil
 end
 
--- Luaパターン -> Bashパターン
-function M.pattern_lua_to_bash(lua_pattern)
-   -- Luaの正規表現にある特殊文字を変換
-   local bash_pattern = lua_pattern
-      :gsub('%%.', '%%') -- `%` は Bash パターンのエスケープをそのまま維持
-      :gsub('%.', '?') -- `.` は Bash パターンの `?` に対応
-      :gsub('%%%*', '*') -- `%%*` は Bash の `*` に対応
-      :gsub('%%%+', '*') -- Luaの`+` (1文字以上) は Bash の `*` (0文字以上)
-      :gsub('%%%-', '-') -- `%%-` はそのまま `-` に
-      :gsub('%%%(', '(') -- `%(` を `(` に
-      :gsub('%%%)', ')') -- `%)` を `)` に
-      :gsub('%%%[', '[') -- `%[` を `[` に
-      :gsub('%%%]', ']') -- `%]` を `]` に
-   return bash_pattern
-end
-
--- Bashパターン -> Luaパターン
+---@param bash_pattern string
+---@return string lua_pattern
 function M.pattern_bash_to_lua(bash_pattern)
-   -- BashのワイルドカードをLuaパターンに変換
    local lua_pattern = bash_pattern
-      :gsub('([%^%$%(%)%%%.%[%]%*%+%-%?])', '%%%1') -- Lua用に特殊文字をエスケープ
-      :gsub('%%%*', '.*') -- Bashの `*` を Luaの `.*` に
-      :gsub('%%%?', '.') -- Bashの `?` を Luaの `.` に
+      :gsub('([%^%$%(%)%%%.%[%]%+%-])', '%%%1') -- Escape lua special strings (except * ?)
+      :gsub('%*', '.*') -- bash * -> lua .*
+      :gsub('%?', '.') -- bash ? -> lua .
    return lua_pattern
 end
 

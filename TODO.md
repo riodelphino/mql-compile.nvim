@@ -4,7 +4,6 @@
 ## IMPORTANT
 
 - [ ] fix: Ensure to check whether the compiling command has errors
-- [ ] feat: Choose compile target from list
 
 ## OLD
 

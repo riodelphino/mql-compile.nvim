@@ -7,9 +7,6 @@ M._root = ''
 M._source_path = nil
 
 M.default = {
-   detect = {
-      priority = { 'mql5', 'mql4' },
-   },
    root_marker = { '.editorconfig', '.gitignore', '.git', '.clangd', '.clang-format', 'cpplint.cfg' },
    ft = {
       mql5 = {

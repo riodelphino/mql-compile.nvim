@@ -217,42 +217,43 @@ function M.get_source(path, on_compile)
          end
       end
 
-      -- Check for stacked _source_path & _mql
-      if on_compile then -- Allowed only in compiling. Not to rewrite stacked path & mql in set_source.
-         stacked_path = opt._source_path
-         stacked_mql = opt._mql
-         if stacked_path ~= nil and stacked_mql ~= nil then return stacked_path, stacked_mql end
-      end
+      -- TODO: Remove or Keep?
+      -- -- Check for stacked _source_path & _mql
+      -- if on_compile then -- Allowed only in compiling. Not to rewrite stacked path & mql in set_source.
+      --    stacked_path = opt._source_path
+      --    stacked_mql = opt._mql
+      --    if stacked_path ~= nil and stacked_mql ~= nil then return stacked_path, stacked_mql end
+      -- end
 
-      -- Check for git root recursively
-      local git_root_dir = M.get_git_root()
-      if git_root_dir ~= '' and git_root_dir ~= nil then -- Has git root
-         for _, ft_key in ipairs(ft_list) do -- Loop for ft list
-            -- local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
-            local pattern = '.*%.' .. opts.ft[ft_key].extension.source
-            local find_list = M.find_files_recursively(git_root_dir, pattern)
-            if #find_list > 0 then
-               path = find_list[1]
-               mql = opts.ft[ft_key]
-               return path, mql
-            end
-         end
-      end
-
-      -- Check for cwd recursively
-      local cwd_dir = vim.fn.getcwd()
-      if cwd_dir ~= '' and cwd_dir ~= nil then
-         for _, ft_key in ipairs(ft_list) do -- Loop for ft list
-            -- local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
-            local pattern = '.*%.' .. opts.ft[ft_key].extension.source
-            local find_list = M.find_files_recursively(cwd_dir, pattern)
-            if #find_list > 0 then
-               path = find_list[1]
-               mql = opts.ft[ft_key]
-               return path, mql
-            end
-         end
-      end
+      -- TODO: REMOVE
+      -- -- Check for git root recursively
+      -- local git_root_dir = M.get_git_root()
+      -- if git_root_dir ~= '' and git_root_dir ~= nil then -- Has git root
+      --    for _, ft_key in ipairs(ft_list) do -- Loop for ft list
+      --       local pattern = '.*%.' .. opts.ft[ft_key].extension.source
+      --       local find_list = M.find_files(git_root_dir, pattern)
+      --       if #find_list > 0 then
+      --          path = find_list[1]
+      --          mql = opts.ft[ft_key]
+      --          return path, mql
+      --       end
+      --    end
+      -- end
+      --
+      -- -- Check for cwd recursively
+      -- local cwd_dir = vim.fn.getcwd()
+      -- if cwd_dir ~= '' and cwd_dir ~= nil then
+      --    for _, ft_key in ipairs(ft_list) do -- Loop for ft list
+      --       -- local pattern = M.pattern_bash_to_lua(opts.ft[ft_key].pattern) -- Convert pattern to lua
+      --       local pattern = '.*%.' .. opts.ft[ft_key].extension.source
+      --       local find_list = M.find_files_recursively(cwd_dir, pattern)
+      --       if #find_list > 0 then
+      --          path = find_list[1]
+      --          mql = opts.ft[ft_key]
+      --          return path, mql
+      --       end
+      --    end
+      -- end
    end
    -- No files found at all
    msg = 'No files found.'

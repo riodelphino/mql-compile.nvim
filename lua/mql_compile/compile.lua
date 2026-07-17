@@ -11,7 +11,7 @@ local function dquote(path)
    return '"' .. path .. '"'
 end
 
-function M.async_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path)
+local function run_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path)
    local opts = opt.get_opts()
    local msg = ''
    local Job = require('plenary.job')
@@ -170,49 +170,62 @@ end
 
 function M.compile(source_path)
    local opts = opt.get_opts()
-   local mql
 
-   source_path, mql = fn.get_source(source_path, true)
-   if source_path == nil or mql == nil then
-      local msg = 'Cannot find any target files.'
+   if not source_path then
+      local msg = 'Function compile() requires source_path arg.'
       vim.notify(msg, vim.log.levels.ERROR)
       return
    end
 
-   -- Adjust wine path
+   -- Check source_path exists
+   if not fn.file_exists(source_path) then
+      local msg = 'Not found source file: ' .. source_path
+      vim.notify(msg, vim.log.levels.ERROR)
+      return
+   end
+
+   -- Determin filetype
+   local filetype = fn.get_filetype(source_path)
+
+   -- Get filetype's config
+   local mql = opts.ft[filetype]
+
+   -- Get wine_path
    local wine_path = fn.get_absolute_path(mql.wine_path)
 
-   -- Adjust metaeditor path
+   -- Get metaeditor_path
    local metaeditor_path = fn.get_absolute_path(mql.metaeditor_path)
 
-   -- Check exe exists
+   -- Check metaeditor exe exists
    if not fn.file_exists(metaeditor_path) then
-      local msg = 'Command does not exist: "' .. metaeditor_path .. '"'
+      local msg = 'Not found metaeditor executable: "' .. metaeditor_path .. '"'
       fn.notify(msg, vim.log.levels.ERROR)
       return
    end
 
-   -- Generate log path
+   -- Get log_path
    local fname = fn.get_filename(source_path)
    local dir = fn.get_dir(source_path)
    local log_path = vim.fs.joinpath(dir, fname .. '.' .. opts.log.extension)
    log_path = fn.get_relative_path(log_path)
 
-   -- Adjust source_path
+   -- Get source_path
    source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
 
-   -- Custom or default compiled path
+   -- Get compiled_path
+   local compiled_path = fn.get_compiled_path(source_path)
+
+   -- Get target_path (The compiled *.ex5 and *.ex4 executables are finally placed to target_path)
    local target_path = M.get_target_path(source_path)
+
+   -- Check target_path exists
    if fn.file_exists(target_path) and not mql.overwrite then
-      fn.notify("Abort\nFile already exists: '" .. target_path .. "'", vim.log.levels.ERROR)
+      fn.notify("Abort\nTarget file already exists: '" .. target_path .. "'", vim.log.levels.ERROR)
       return -- Abort
    end
 
-   -- Compiled path
-   local compiled_path = fn.get_compiled_path(source_path)
-
    -- Execute async-compiling
-   local compile_shell_error = M.async_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path)
+   local compile_shell_error = run_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path)
    return compile_shell_error
 end
 
