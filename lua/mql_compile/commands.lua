@@ -10,26 +10,33 @@ function M.create_commands()
       local source_path = opts.fargs[1]
       if source_path then
          cmp.compile(source_path)
-      else
-         local root = fn.get_root()
-         -- Get source files
-         local files = fn.find_source_files(root, { '*.mq5', '*.mq4' })
-         if next(files) == nil then
-            local msg = 'Not found any source files in: ' .. root
-            fn.notify(msg, vim.log.levels.ERROR)
-            return
-         end
-         -- Get relative paths
-         local rel_files = {}
-         for i, file in ipairs(files) do
-            rel_files[i] = vim.fs.relpath(root, file)
-         end
-         -- Show ui.select to choose source file
-         vim.ui.select(rel_files, { title = 'Select source file:' }, function(path)
-            local abspath = vim.fs.joinpath(root, path)
-            cmp.compile(abspath)
-         end)
+         return
       end
+
+      local root = fn.get_root()
+      local files = fn.find_source_files(root, { '*.mq5', '*.mq4' }) -- abspath
+
+      if next(files) == nil then
+         local msg = 'Not found any source files in: ' .. root
+         fn.notify(msg, vim.log.levels.ERROR)
+         return
+      end
+
+      -- key: relpath (for displaying in ui.select)
+      -- { 'mt5/myea.mq5' = { abspath = '/path/to/mt5/myea.mq5' } }
+      local sources = {}
+      for _, abspath in ipairs(files) do
+         local relpath = vim.fs.relpath(root, abspath)
+         sources[relpath] = {
+            abspath = abspath,
+         }
+      end
+
+      vim.ui.select(vim.fn.keys(sources), { title = 'Select source file:' }, function(choice)
+         if not choice then return end
+         local source = sources[choice]
+         cmp.compile(source.abspath)
+      end)
    end, { nargs = '?' })
 
    -- :MQLCompilePrintOptions

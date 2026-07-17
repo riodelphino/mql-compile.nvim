@@ -2,7 +2,6 @@ local M = {}
 
 M._opts = {}
 M._os_type = ''
-M._root = ''
 -- M._source_path = ''
 M._source_path = nil
 
