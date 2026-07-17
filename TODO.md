@@ -3,7 +3,8 @@
 
 ## IMPORTANT
 
-- [ ] fix: Ensure to check whether the compiling command has errors
+- [ ] fix: Check whether the compiling command has errors or not (Check source file exists / Pay attention to `cwd`)
+- [ ] docs: Update demo movie
 
 ## OLD
 
