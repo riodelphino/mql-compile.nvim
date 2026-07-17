@@ -1,4 +1,5 @@
 .DS_Store
 *.ex[45]
 *.log
+test/MQL[45]
 *.afphoto~lock~
