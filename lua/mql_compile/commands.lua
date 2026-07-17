@@ -5,12 +5,6 @@ local opt = require('mql_compile.options')
 local cmp = require('mql_compile.compile')
 
 function M.create_commands()
-   -- :MQLCompileSetSourc
-   -- TODO: REMOVE?
-   vim.api.nvim_create_user_command('MQLCompileSetSource', function(opts)
-      fn.set_source_path(opts.fargs ~= '' and opts.fargs or nil)
-   end, { nargs = '?' })
-
    -- :MQLCompile <source_path>
    vim.api.nvim_create_user_command('MQLCompile', function(opts)
       local source_path = opts.fargs[1]
@@ -22,7 +16,7 @@ function M.create_commands()
          local files = fn.find_source_files(root, { '*.mq5', '*.mq4' })
          if next(files) == nil then
             local msg = 'Not found any source files in: ' .. root
-            vim.notify(msg, vim.log.levels.ERROR)
+            fn.notify(msg, vim.log.levels.ERROR)
             return
          end
          -- Get relative paths

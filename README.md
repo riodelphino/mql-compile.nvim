@@ -25,7 +25,13 @@ Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/is
 
 ## Breaking Changes
 
-Changed the config structure in `v0.4.0`
+### v0.5.0 - 0.5.1
+- Show `ui.select` with found source files list, instead of auto-detection.
+- Removed `opts.detect` option.
+- Removed `:MQLSetSource` command and `set_source()` API.
+
+### v0.4.0
+Changed the config structure
 
 Before (< `v0.3.6`):
 ```lua
@@ -63,7 +69,7 @@ This enables switching wine path between mql5 and mql4.
 **Main features**
 - Async compiling MQL5/MQL4
 - Show quickfix
-- Auto detect MQL5/MQL4
+- Select source file to compile
 - Customizable target path (place compiled files wherever you prefer)
 - Version management
 - Works on `macOS + WineSkin` and `macOS + Sikarugir` for now
@@ -318,8 +324,11 @@ opts = {
 
 ### Rename (Custom path)
 
-The paths for compiled `*.ex[45]` files are modifiable.  
-You can manage versions here.
+The paths where the compiled `*.ex[45]` files are placed are modifiable.  
+
+for example:
+- Add version to the file
+- Move the file to `archive` directory
 
 Default:
 ```lua
@@ -336,38 +345,34 @@ opts = {
    },
 },
 ```
-
 Args:
 
 `get_custom_path` callback function has 8 args:
    root, dir, base, fname, ext, ver, major, minor
 
-for example)
-   `/Users/username/projects/myea/src/ea.mq5`
-   (root=/Users/username/projects/myea)
 
-```vim
-:cwd /Users/username/projects/myea
-:MQLCompileSetSource src/ea.mq5
-```
-```cpp:ea.mq5
+#### Rename Example
+
+source file: `/Users/username/projects/ea/myea.mq5`
+
+```cpp
 #property version "1.23"
 ```
 
-Then, variables will look like this.
-| Variable | Content                | Example                           |
-| -------- | ---------------------- | --------------------------------- |
-| root     | project root (.git)    | . (/Users/username/projects/myea) |
-| dir      | dir                    | src                               |
-| base     | basename (with ext)    | ea.mq5                            |
-| fname    | filename (without ext) | ea                                |
-| ext      | extension              | mq5                               |
-| ver      | version                | 1.23                              |
-| major    | major version          | 1                                 |
-| minor    | minor version          | 23                                |
+Then, `get_custom_path` callback recieves following args.
+| Variable | Content                | Example                         |
+| -------- | ---------------------- | ------------------------------- |
+| root     | project root (.git)    | . (/Users/username/projects/ea) |
+| dir      | dir                    | src                             |
+| base     | basename (with ext)    | myea.mq5                        |
+| fname    | filename (without ext) | myea                            |
+| ext      | extension              | mq5                             |
+| ver      | version                | 1.23                            |
+| major    | major version          | 1                               |
+| minor    | minor version          | 23                              |
 
 
-The paths out of root dir are also available.
+The paths out of project-root are also available.
 ```lua
 -- Relative path
 return string.format(root .. '/../../archive/%s.%s', fname, ext)
@@ -375,48 +380,30 @@ return string.format(root .. '/../../archive/%s.%s', fname, ext)
 return string.format('/path/to/archive/%s.%s', fname, ext)
 ```
 
-## Commands
-
+## Usage
 
 ### Compiling
 
-This plugin compiles mql5/4 asyncronously.
-
+User Commands:
 ```vim
-" Set mql5 path
-:MQLCompileSetSource my_ea.mq5
-" Compile it
+" Compile the selected source file with ui.select
 :MQLCompile
-```
-or
-```vim
-" Set current file path
-:MQLCompileSetSource
-" Compile it
-:MQLCompile
-```
-or
-```vim
-" Compile with path
+" Compile the specific source file
 :MQLCompile my_ea.mq5
-" Compile with file name modifier
+" Compile current file
 :MQLCompile %
 ```
-
-This plugin auto-detects mql5/mql4 by patterns given in `opts.ft.mql5.pattern` and `opts.ft.mql4.pattern` in project root.  
-Symbolic links are excluded.
-
-```vim
-" Set source in NO mql5/4 buffers (like *.md)
-:MQLCompileSetSource
-" Automatically detect file, and set it as source
-
-" Compiling also works same way.
-:MQLCompile
-" Show source files list in project root, then compile the selected one
+Lua API functions:
+```lua
+-- Compile the selected source file with ui.select
+require('mql_compile').compile()
+-- Compile the specific source file
+require('mql_compile').compile('my_ea.mq5')
+-- Compile current file
+require('mql_compile').compile('%')
 ```
-
-So, `:MQLCompileSetSource` & Auto-detection allow you to compile the file anywhere in the project.
+- This plugin finds mql5/mql4 source files by patterns given in `opts.ft.*.pattern`, from project root.  
+- Symbolic links are excluded.
 
 
 ### Show options
@@ -426,43 +413,17 @@ Show all current options as table. Just for checking.
 :MQLCompileShowOptions
 ```
 
-## Lua functions
-
-Below lua functions are also available. (with auto-detection by the extension)
-```lua
--- Set mql5 path
-require('mql_compile').set_source('my_ea.mq5')
--- Compile it
-require('mql_compile').compile()
-```
-or
-```lua
--- Set current file path
-require('mql_compile').set_source()
--- Compile it
-require('mql_compile').compile()
-```
-or
-```lua
--- Compile with path
-require('mql_compile').compile('my_ea.mq5')
--- Compile with file name modifier
-require('mql_compile').compile('%')
-```
-
 ## Keymaps
 
 Sample:
 ```lua
 keys = {
-    { '<F4>', '<cmd>MQLCompileSetSource<cr>' },
     { '<F7>', '<cmd>MQLCompile<cr>' },
 },
 ```
 or
 ```lua
 keys = {
-    { '<F4>', function() require('mql_compile').set_source() end },
     { '<F7>', function() require('mql_compile').compile() end },
 },
 ```

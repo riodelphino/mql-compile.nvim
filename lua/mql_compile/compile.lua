@@ -91,7 +91,7 @@ local function run_compile(wine_path, metaeditor_path, source_path, log_path, co
             -- NOT WORKS: How to get shell error ?
             -- if compile_shell_error == 1 then
             --    msg = 'Error on compiling: ' .. source_path
-            --    vim.notify(msg, vim.log.levels.ERROR)
+            --    fn.notify(msg, vim.log.levels.ERROR)
             --    return
             -- end
 
@@ -173,14 +173,14 @@ function M.compile(source_path)
 
    if not source_path then
       local msg = 'Function compile() requires source_path arg.'
-      vim.notify(msg, vim.log.levels.ERROR)
+      fn.notify(msg, vim.log.levels.ERROR)
       return
    end
 
    -- Check source_path exists
    if not fn.file_exists(source_path) then
       local msg = 'Not found source file: ' .. source_path
-      vim.notify(msg, vim.log.levels.ERROR)
+      fn.notify(msg, vim.log.levels.ERROR)
       return
    end
 
