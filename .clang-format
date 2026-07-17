@@ -1,0 +1,20 @@
+Language: Cpp
+SortIncludes: false
+ColumnLimit: 0
+IndentWidth: 3
+UseTab: Never
+ContinuationIndentWidth: 3
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: true
+  AlignCompound: true
+  PadOperators: true
+AllowShortCaseLabelsOnASingleLine: true
+AlignConsecutiveShortCaseStatements:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: true
+  AlignCaseColons: false
+IndentCaseLabels: true
+AlignTrailingComments: true

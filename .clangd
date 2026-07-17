@@ -1,0 +1,28 @@
+# Common settings
+CompileFlags:
+  Add: [-xc++, -std=c++17]
+---
+# MQL-specific settings
+If:
+  PathMatch: [.*\.mq4, .*\.mq5, .*\.mqh]
+CompileFlags:
+  Add:
+    - -DMQL4
+    - -DMQL5
+    - -ferror-limit=0 # Continue parsing even if too many MQL syntax errors
+    # Include MQL5 lib
+    # - "-I/Users/rio/Applications/MT5-01.app/Contents/SharedSupport/prefix/drive_c/Program Files/MetaTrader 5/MQL5" # OK but path too long...
+    # - "-I./MQL5"
+    # - -I/Users/rio/Applications/MT5-01.app/Contents/SharedSupport/prefix/drive_c/Include
+    # - -I/Users/rio/Applications/MT5-01.app/Contents/SharedSupport/prefix/drive_c/Include/Arrays
+Diagnostics:
+  Suppress: # Suppress fake errors/warnings
+    - pp_invalid_directive # preprocessor-related (warnings)
+    - pp_file_not_found
+    - undeclared_var_use
+    - typecheck_member_reference_suggestion
+    - unknown_typename # Unknown type (warnings)
+    - member_function_call_bad_type
+  ClangTidy:
+    Remove: # Remove fake errors/warningns
+      - readability-magic-numbers # Magic numbers (warnigns)
