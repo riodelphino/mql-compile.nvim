@@ -1,2 +1,4 @@
-*.ex*
+.DS_Store
+*.ex[45]
+*.log
 *.afphoto~lock~
