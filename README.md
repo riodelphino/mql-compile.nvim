@@ -6,6 +6,7 @@ A neovim plugin for compiling MQL5/MQL4 scripts asyncronously.
 Without heavy MetaEditor GUI. (Compiling on command-line).
 
 https://github.com/user-attachments/assets/0029ee53-0812-4c58-ae9e-ce970ca5bb4d
+(Sorry, this demo movie was recorded with an older version.)
 
 with [nvim-notify](https://github.com/rcarriga/nvim-notify) & [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf)
 
