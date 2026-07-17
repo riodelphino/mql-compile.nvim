@@ -504,18 +504,17 @@ opts = {
 },
 ```
 
-## Per Project Options
+## Project Specific Options
 
-Options defined in `.mql-compile.lua` in your project root overrides the global options.
-Follow the [Default options](#default-options) structure.
+To override global options for a specific project, add `.mql-compile.lua` to the project root, following the [Default options](#default-options) structure.
 
-ex.) .mql-compile.lua:
+`<project_root>/.mql-compile.lua`:
 ```lua
 return {
    rename = {
-     enabled = false, -- Disable renaming in this project
+     enabled = false, -- ex.) Disable renaming in this project
    },
-   -- Add your project specific configs
+   -- Add your project-specific config here
 }
 ```
 
