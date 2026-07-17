@@ -1,4 +1,4 @@
-// Success with nothing
+// Successfully compiled without any informations, warnings, or errors
 
 #property version "1.03"
 
@@ -7,4 +7,3 @@ int OnInit() {
 }
 
 void OnTick() {}
-

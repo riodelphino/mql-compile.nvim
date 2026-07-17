@@ -1,4 +1,4 @@
-// Success with warnings
+// Successfully compiled with a warning
 
 #property version "1.01"
 
@@ -11,4 +11,3 @@ int OnInit() {
 void OnTick() {
    string test; // [warn] Unused variable
 }
-

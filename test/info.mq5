@@ -1,4 +1,4 @@
-// Success with informations
+// Successfully compiled with a information
 
 #property version "1.02"
 
@@ -9,4 +9,3 @@ int OnInit() {
 }
 
 void OnTick() {}
-
