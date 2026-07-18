@@ -18,8 +18,8 @@ function M.setup(user_opts)
    opt._opts = opt.merge(user_opts)
    opt._opts = opt.merge_project_config()
    cmd.create_commands()
-   hl.set_highlights()
    syn.set_qf_syntax()
+   hl.set_highlights()
 end
 
 return M
