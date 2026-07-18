@@ -84,7 +84,9 @@ This enables switching wine path between mql5 and mql4.
 
 **Mandatory**
 - nvim > v0.10.2
-- MT5 or MT4 installed through Sikarugir or WineSkin
+- MT5 or MT4 installed:
+   - Windows: Install directly
+   - Linux and macOS: Install via Sikarugir or WineSkin
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) for async
 
 **Optional plugins**
@@ -93,8 +95,10 @@ This enables switching wine path between mql5 and mql4.
 - Notify:
    - [nvim-notify](https://github.com/rcarriga/nvim-notify) Cool style notify messages
 - Quickfix:
-   - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Super easy to use quickfix
-   - [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify quickfix
+   - [quicker.nvim](https://github.com/stevearc/quicker.nvim) Beautify qflist
+   - [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify qflist
+   - [qfpreview.nvim](https://github.com/r0nsha/qfpreview.nvim) Show floating preview window
+   - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Show floating preview window and beautify qflist
 
 
 ## Installation
@@ -430,10 +434,9 @@ keys = {
 ## Highlights
 
 > [!Warning]
-> Highlighting(and syntaxing) has not finished yet.
-
-> [!Tip]
-> Quickfix highlighting should not be modified by this plugin ?
+> This is still an experimental feature.
+> The highlights seems not to be modified by this plugin.
+> Highly recommend using other plugins for highlighting or beautifing qflist.
 
 Set-up highlight groups in quickfix list.  
 
