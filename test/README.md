@@ -36,3 +36,10 @@ Then, check followings:
 - `quickfix` is displayed correctly (Exclude `ok.mq5`)
 - `*.ex5` is generated (Execlude `err.mq5` / The saved path depends on the config)
 
+### Show test buffer
+
+A test lua code for generating/displaying a temporary buffer is available.
+```vim
+:lua dofile(vim.fs.joinpath(vim.fn.getcwd(), 'test/test.lua'))
+```
+
