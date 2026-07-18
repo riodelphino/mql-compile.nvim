@@ -501,12 +501,14 @@ Then `mql-compile` shows messages through it.
 ## Test codes to compile
 
 There are some test mql5 codes in: `test/*.mq5`
-- nothing.mq5
-- information.mq5
-- warning.mq5
-- error.mq5
+- ok.mq5
+- info.mq5
+- warn.mq5
+- err.mq5
 
 Try to compile them for test.
+
+Or use `test/test.lua` to generate temporary buffer with diagnostics.
 
 ## Issues
 
