@@ -128,9 +128,7 @@ return {
       },
    },
    keys = {},
-   cmds = {
-      { 'MQLCompile', 'MQLCompileSetSource', 'MQLCompileShowOptions' },
-   },
+   cmd = { 'MQLCompile', 'MQLCompileShowOptions' },
 }
 ```
 
