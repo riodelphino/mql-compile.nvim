@@ -97,8 +97,8 @@ This enables switching wine path between mql5 and mql4.
 - Quickfix:
    - [quicker.nvim](https://github.com/stevearc/quicker.nvim) Beautify qflist
    - [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf) Beautify qflist
-   - [qfpreview.nvim](https://github.com/r0nsha/qfpreview.nvim) Show floating preview window
-   - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Show floating preview window and beautify qflist
+   - [qfpreview.nvim](https://github.com/r0nsha/qfpreview.nvim) Floating preview window
+   - [nvim-bqf](https://github.com/kevinhwang91/nvim-bqf) Floating preview window and beautify qflist
 
 
 ## Installation
