@@ -73,6 +73,7 @@ This enables switching wine path between mql5 and mql4.
 - Select source file to compile
 - Customizable target path (place compiled files wherever you prefer)
 - Version management
+- Project specific options
 - Works on `macOS + WineSkin` and `macOS + Sikarugir` for now
 
 **Not implemented**
@@ -556,7 +557,6 @@ Researched and verified detailed data of wine and `metaeditor.exe` / `MetaEditor
 See [notes/wine_and_metaeditor.md](notes/wine_and_metaeditor.md).
 
 Path specifications and path conversions are investigated.
-
 
 ## Recommendation
 
