@@ -1,5 +1,6 @@
 local M = {}
 
+require('mql_compile.types')
 local opt = require('mql_compile.options')
 local fn = require('mql_compile.functions')
 local cmd = require('mql_compile.commands')

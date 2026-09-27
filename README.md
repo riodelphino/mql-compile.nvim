@@ -10,8 +10,8 @@ https://github.com/user-attachments/assets/0029ee53-0812-4c58-ae9e-ce970ca5bb4d
 
 with [nvim-notify](https://github.com/rcarriga/nvim-notify) & [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf)
 
-> [!Info]
-> Tested for years in MacOS with WineSkin and Sikarugir
+> [!Note]
+> Tested for years in MacOS with WineSkin and Sikarugir.
 > Use it at your own risk. Backup your files before testing.
 
 > [!Warning]
@@ -187,6 +187,7 @@ opts = {
    },
    rename = {
       enabled = true,
+      ---@param ctx mql_compile.RenameCtx
       to = function(ctx) -- ctx: root, dir, base, fname, ext, ext_src, ver, major, minor
          if ctx.ver == nil or ctx.ver == '' then
             return string.format('archive/%s.%s', ctx.fname, ctx.ext) -- archive/myea.ex5
@@ -328,7 +329,7 @@ opts = {
 
 ```
 
-### Rename (Custom path)
+### Rename (Custom destination path)
 
 The paths where the compiled `*.ex[45]` files are placed are modifiable.  
 
@@ -341,7 +342,8 @@ Default:
 opts = {
    rename = {
      enabled = true, -- set false for using default path by metaeditor
-     to = function(ctx) -- ctx: root, dir, base, fname, ext, ext_src, ver, major, minor
+     ---@param ctx mql_compile.RenameCtx
+     to = function(ctx)
        if ctx.ver == nil or ctx.ver == '' then
          return string.format('archive/%s.%s', ctx.fname, ctx.ext) -- archive/myea.ex5
        else
@@ -350,6 +352,19 @@ opts = {
      end,
    },
 },
+```
+`Renamectx` class:
+```lua
+---@class mql_compile.RenameCtx
+---@field root string      Abs path of project root
+---@field dir string       Parent dir of the source file
+---@field base string      Basename with source ext (e.g. 'myea.mq5')
+---@field fname string     Filename without ext (e.g. 'myea')
+---@field ext string       Compiled ext (e.g. 'ex5')
+---@field ext_src string   Source ext (e.g. 'mq5')
+---@field ver string?      '#property version' value (e.g. '1.10' or nil)
+---@field major string?    Major version (e.g. '1')
+---@field minor string?    Minor version (e.g. '10')
 ```
 
 #### Rename Example

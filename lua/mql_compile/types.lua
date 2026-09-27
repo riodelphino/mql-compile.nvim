@@ -1,0 +1,12 @@
+---@meta
+
+---@class mql_compile.RenameCtx
+---@field root string      Abs path of project root
+---@field dir string       Parent dir of the source file
+---@field base string      Basename with source ext (e.g. 'myea.mq5')
+---@field fname string     Filename without ext (e.g. 'myea')
+---@field ext string       Compiled ext (e.g. 'ex5')
+---@field ext_src string   Source ext (e.g. 'mq5')
+---@field ver string?      '#property version' value (e.g. '1.10' or nil)
+---@field major string?    Major version (e.g. '1')
+---@field minor string?    Minor version (e.g. '10')
