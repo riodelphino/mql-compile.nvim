@@ -10,10 +10,9 @@ https://github.com/user-attachments/assets/0029ee53-0812-4c58-ae9e-ce970ca5bb4d
 
 with [nvim-notify](https://github.com/rcarriga/nvim-notify) & [nvim-pqf](https://github.com/yorickpeterse/nvim-pqf)
 
-> [!Caution]
-> It's still test version.  
-
-Use it at your own risk. Backup your files before testing.
+> [!Info]
+> Tested for years in MacOS with WineSkin and Sikarugir
+> Use it at your own risk. Backup your files before testing.
 
 > [!Warning]
 > Need tested in Windows or Linux  
@@ -25,6 +24,9 @@ Now ensured to work only in:
 Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/issues/new) on GitHub.
 
 ## Breaking Changes
+
+### v0.6.0
+- Deprecate `rename.get_custom_path()` option, use `rename.to()` with `ctx` table arg instead.
 
 ### v0.5.0 - 0.5.1
 - Show `ui.select` with found source files list, instead of auto-detection.
@@ -185,11 +187,11 @@ opts = {
    },
    rename = {
       enabled = true,
-      get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
-         if ver == nil or ver == '' then
-            return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+      to = function(ctx) -- ctx: root, dir, base, fname, ext, ext_src, ver, major, minor
+         if ctx.ver == nil or ctx.ver == '' then
+            return string.format('archive/%s.%s', ctx.fname, ctx.ext) -- archive/myea.ex5
          else
-            return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+            return string.format('archive/%s_v%s.%s', ctx.fname, ctx.ver, ctx.ext) -- archive/myea_ver1.10.ex5
          end
       end,
    },
@@ -339,21 +341,16 @@ Default:
 opts = {
    rename = {
      enabled = true, -- set false for using default path by metaeditor
-     get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
-        if ver == nil or ver == '' then
-           return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
-        else
-           return string.format('archive/%s_ver%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
-        end
+     to = function(ctx) -- ctx: root, dir, base, fname, ext, ext_src, ver, major, minor
+       if ctx.ver == nil or ctx.ver == '' then
+         return string.format('archive/%s.%s', ctx.fname, ctx.ext) -- archive/myea.ex5
+       else
+         return string.format('archive/%s_v%s.%s', ctx.fname, ctx.ver, ctx.ext) -- archive/myea_ver1.10.ex5
+       end
      end,
    },
 },
 ```
-Args:
-
-`get_custom_path` callback function has 8 args:
-   root, dir, base, fname, ext, ver, major, minor
-
 
 #### Rename Example
 
@@ -363,17 +360,18 @@ source file: `/Users/username/projects/ea/myea.mq5`
 #property version "1.23"
 ```
 
-Then, `get_custom_path` callback recieves following args.
-| Variable | Content                | Example                         |
-| -------- | ---------------------- | ------------------------------- |
-| root     | project root (.git)    | . (/Users/username/projects/ea) |
-| dir      | dir                    | src                             |
-| base     | basename (with ext)    | myea.mq5                        |
-| fname    | filename (without ext) | myea                            |
-| ext      | extension              | mq5                             |
-| ver      | version                | 1.23                            |
-| major    | major version          | 1                               |
-| minor    | minor version          | 23                              |
+Then, `rename.to` callback recieves following args in ctx table.
+| Name    | Content                | Example                         |
+| ------- | ---------------------- | ------------------------------- |
+| root    | project root (.git)    | . (/Users/username/projects/ea) |
+| dir     | dir                    | src                             |
+| base    | basename (with ext)    | myea.mq5                        |
+| fname   | filename (without ext) | myea                            |
+| ext     | compiled extension     | ex5                             |
+| ext_src | source extension       | mq5                             |
+| ver     | version                | 1.23                            |
+| major   | major version          | 1                               |
+| minor   | minor version          | 23                              |
 
 
 The paths out of project-root are also available.

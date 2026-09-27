@@ -71,11 +71,12 @@ M.default = {
    },
    rename = {
       enabled = true,
-      get_custom_path = function(root, dir, base, fname, ext, ver, major, minor)
-         if ver == nil or ver == '' then
-            return string.format('archive/%s.%s', fname, ext) -- archive/myea.ex5
+      to = function(ctx)
+         -- ctx: root, dir, base, fname, ext, ext_src, ver, major, minor
+         if ctx.ver == nil or ctx.ver == '' then
+            return string.format('archive/%s.%s', ctx.fname, ctx.ext) -- archive/myea.ex5
          else
-            return string.format('archive/%s_v%s.%s', fname, ver, ext) -- archive/myea_ver1.10.ex5
+            return string.format('archive/%s_v%s.%s', ctx.fname, ctx.ver, ctx.ext) -- archive/myea_ver1.10.ex5
          end
       end,
    },
@@ -179,6 +180,13 @@ function M.merge_project_config()
    if not project_config_path then return M._opts end
    project_opts = dofile(project_config_path)
    return M.deep_merge(M._opts, project_opts)
+end
+
+function M.check_opts()
+   -- Check deprecated opts
+   if M._opts.rename.get_custom_path ~= nil then vim.schedule(function()
+      vim.deprecate('`rename.get_custom_path` option', '`rename.to` option', 'v0.6.0', 'mql-compile.nvim', false)
+   end) end
 end
 
 return M

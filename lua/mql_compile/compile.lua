@@ -168,24 +168,24 @@ local function run_compile(wine_path, metaeditor_path, source_path, log_path, co
    }):start()
 end
 
-function M.compile(source_path)
+function M.compile(src_path)
    local opts = opt.get_opts()
 
-   if not source_path then
+   if not src_path then
       local msg = 'Function compile() requires source_path arg.'
       fn.notify(msg, vim.log.levels.ERROR)
       return
    end
 
    -- Check source_path exists
-   if not fn.file_exists(source_path) then
-      local msg = 'Not found source file: ' .. source_path
+   if not fn.file_exists(src_path) then
+      local msg = 'Not found source file: ' .. src_path
       fn.notify(msg, vim.log.levels.ERROR)
       return
    end
 
    -- Determin filetype
-   local filetype = fn.get_filetype(source_path)
+   local filetype = fn.get_filetype(src_path)
 
    -- Get filetype's config
    local mql = opts.ft[filetype]
@@ -204,47 +204,47 @@ function M.compile(source_path)
    end
 
    -- Get log_path
-   local fname = fn.get_filename(source_path)
-   local dir = fn.get_dir(source_path)
+   local fname = fn.get_filename(src_path)
+   local dir = fn.get_dir(src_path)
    local log_path = vim.fs.joinpath(dir, fname .. '.' .. opts.log.extension)
    log_path = fn.get_relative_path(log_path)
 
    -- Get source_path
-   source_path = fn.get_relative_path(source_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
+   src_path = fn.get_relative_path(src_path) -- To avoid wrongly converting from '/Users/yourname' to 'Users/yourname' in mql's include
 
    -- Get compiled_path
-   local compiled_path = fn.get_compiled_path(source_path)
+   local compiled_path = fn.get_compiled_path(src_path)
 
-   -- Get target_path (The compiled *.ex5 and *.ex4 executables are finally placed to target_path)
-   local target_path = M.get_target_path(source_path)
+   -- Get dest_path (The compiled *.ex[4|5] executables are finally placed here)
+   local dest_path = M.get_dest_path(src_path)
 
-   -- Check target_path exists
-   if fn.file_exists(target_path) and not mql.overwrite then
-      fn.notify("Abort\nTarget file already exists: '" .. target_path .. "'", vim.log.levels.ERROR)
+   -- Check dest_path exists
+   if fn.file_exists(dest_path) and not mql.overwrite then
+      fn.notify("Abort\nTarget file already exists: '" .. dest_path .. "'", vim.log.levels.ERROR)
       return -- Abort
    end
 
    -- Execute async-compiling
-   local compile_shell_error = run_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path)
+   local compile_shell_error = run_compile(wine_path, metaeditor_path, src_path, log_path, compiled_path, dest_path)
    return compile_shell_error
 end
 
--- Custom or default target path
-function M.get_target_path(source_path)
+-- Get destination path (= compiled *.ex[4|5] path)
+function M.get_dest_path(src_path)
+   local ctx = {}
    local opts = opt.get_opts()
-   local dir, base, fname, ext = fn.split_path(source_path)
-   local target_ext = fn.get_compiled_extension(source_path)
-   local default_target_path = fn.get_compiled_path(source_path)
-   local target_path
+   ctx.dir, ctx.base, ctx.fname, ctx.ext_src = fn.split_path(src_path)
+   ctx.ext = fn.get_compiled_extension(src_path)
 
    if opts.rename.enabled then
-      local root = fn.get_root(source_path)
-      local ver, major, minor = fn.get_version(source_path)
-      target_path = opts.rename.get_custom_path(root, dir, base, fname, target_ext, ver, major, minor)
+      -- Return custom destination path
+      ctx.root = fn.get_root(src_path)
+      ctx.ver, ctx.major, ctx.minor = fn.get_version(src_path)
+      return opts.rename.to(ctx)
    else
-      target_path = default_target_path
+      -- Return default destination path
+      return fn.get_compiled_path(src_path)
    end
-   return target_path
 end
 
 return M
