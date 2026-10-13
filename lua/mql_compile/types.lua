@@ -13,6 +13,12 @@
 ---@field ver string?      '#property version' value (e.g. '1.10' or nil)
 ---@field major string?    Major version (e.g. '1')
 ---@field minor string?    Minor version (e.g. '10')
+---@field dest_path string? Abs path of the compiled file finally placed (Not set in `rename.to`)
+
+---@class mql_compile.ResultCtx : mql_compile.Ctx
+---@field dest_path string Abs path of the compiled file finally placed
+---@field ok boolean       true if no errors
+---@field counts table     Counts of each quickfix type (e.g. { error = 1, warning = 2 })
 
 ---@deprecated Use `mql_compile.Ctx` instead
 ---@alias mql_compile.RenameCtx mql_compile.Ctx

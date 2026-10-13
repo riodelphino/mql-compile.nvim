@@ -76,6 +76,7 @@ This enables switching wine path between mql5 and mql4.
 - Customizable target path (place compiled files wherever you prefer)
 - Version management
 - Project specific options
+- Hooks (`pre` / `post` compiling)
 - Works on `macOS + WineSkin` and `macOS + Sikarugir` for now
 
 **Not implemented**
@@ -195,6 +196,10 @@ opts = {
             return string.format('archive/%s_v%s.%s', ctx.fname, ctx.ver, ctx.ext) -- archive/myea_ver1.10.ex5
          end
       end,
+   },
+   hooks = { -- See '# Hooks' section
+      pre = nil, -- function(ctx) ... end
+      post = nil, -- function(ctx) ... end
    },
    notify = { -- Enable/disable notify
       debug = { -- For debug
@@ -388,9 +393,38 @@ return string.format(root .. '/../../archive/%s.%s', fname, ext)
 return string.format('/path/to/archive/%s.%s', fname, ext)
 ```
 
+## Hooks
+
+Run your own functions before / after compiling.
+
+| Hook   | Timing                                         | ctx                     | Return           |
+| ------ | ---------------------------------------------- | ----------------------- | ---------------- |
+| `pre`  | Before compiling                               | `mql_compile.Ctx`       | `false` to abort |
+| `post` | After compiling (and renaming), even if failed | `mql_compile.ResultCtx` | (ignored)        |
+
+```lua
+opts = {
+   hooks = {
+      ---@param ctx mql_compile.Ctx
+      pre = function(ctx)
+         if ctx.ver == nil then
+            vim.notify('No version found. Abort.')
+            return false -- Abort compiling
+         end
+      end,
+      ---@param ctx mql_compile.ResultCtx
+      post = function(ctx)
+         if ctx.ok then vim.notify('Compiled: ' .. ctx.dest_path) end
+      end,
+   },
+},
+```
+
+Errors in hooks are caught and notified. (An error in `pre` also aborts compiling.)
+
 ## Ctx
 
-The `ctx` table passed to user functions (`rename.to`, etc.).
+The `ctx` table passed to user functions (`rename.to`, `hooks.*`, etc.).
 
 ```lua
 ---@class mql_compile.Ctx
@@ -406,6 +440,12 @@ The `ctx` table passed to user functions (`rename.to`, etc.).
 ---@field ver string?      '#property version' value (e.g. '1.10' or nil)
 ---@field major string?    Major version (e.g. '1')
 ---@field minor string?    Minor version (e.g. '10')
+---@field dest_path string? Abs path of the compiled file finally placed (Not set in `rename.to`)
+
+---@class mql_compile.ResultCtx : mql_compile.Ctx
+---@field dest_path string Abs path of the compiled file finally placed
+---@field ok boolean       true if no errors
+---@field counts table     Counts of each quickfix type (e.g. { error = 1, warning = 2 })
 ```
 
 > [!Note]

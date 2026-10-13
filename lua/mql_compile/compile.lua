@@ -11,7 +11,20 @@ local function dquote(path)
    return '"' .. path .. '"'
 end
 
-local function run_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path)
+-- Run user hook (`hooks.pre` | `hooks.post`)
+-- Returns false if the hook returned false or raised an error
+local function run_hook(opts, hook_name, ctx)
+   local hook = opts.hooks[hook_name]
+   if type(hook) ~= 'function' then return true end
+   local ok, result = pcall(hook, ctx)
+   if not ok then
+      fn.notify('Error in `hooks.' .. hook_name .. '`:\n' .. tostring(result), vim.log.levels.ERROR)
+      return false
+   end
+   return result ~= false
+end
+
+local function run_compile(wine_path, metaeditor_path, source_path, log_path, compiled_path, target_path, ctx)
    local opts = opt.get_opts()
    local msg = ''
    local Job = require('plenary.job')
@@ -153,6 +166,11 @@ local function run_compile(wine_path, metaeditor_path, source_path, log_path, co
                if opts.notify.rename.on_renamed then fn.notify("Renamed to: '" .. target_path .. "'", vim.log.levels.INFO) end
             end
 
+            -- Run post hook
+            ctx.ok = qf_cnt.error == nil
+            ctx.counts = qf_cnt
+            run_hook(opts, 'post', ctx)
+
             -- Open quickfix
             if opts.quickfix.show.copen then
                -- Check Type matched in count
@@ -227,9 +245,16 @@ function M.compile(src_path)
       fn.notify("Abort\nTarget file already exists: '" .. dest_path .. "'", vim.log.levels.ERROR)
       return -- Abort
    end
+   ctx.dest_path = vim.fs.normalize(fn.get_absolute_path(dest_path))
+
+   -- Run pre hook
+   if not run_hook(opts, 'pre', ctx) then
+      fn.notify('Abort\nCompiling was canceled by `hooks.pre`', vim.log.levels.WARN)
+      return -- Abort
+   end
 
    -- Execute async-compiling
-   local compile_shell_error = run_compile(wine_path, metaeditor_path, src_path, log_path, compiled_path, dest_path)
+   local compile_shell_error = run_compile(wine_path, metaeditor_path, src_path, log_path, compiled_path, dest_path, ctx)
    return compile_shell_error
 end
 

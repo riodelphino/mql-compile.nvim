@@ -81,6 +81,10 @@ M.default = {
          end
       end,
    },
+   hooks = {
+      -- pre = function(ctx) end, -- Called before compiling. Return false to abort. (ctx: mql_compile.Ctx)
+      -- post = function(ctx) end, -- Called after compiling (and renaming). (ctx: mql_compile.ResultCtx)
+   },
    notify = { -- Enable/disable notify
       debug = {
          compile = {
