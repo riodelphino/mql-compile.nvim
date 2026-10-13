@@ -693,6 +693,11 @@ Path specifications and path conversions are investigated.
 [https://github.com/stevearc/overseer.nvim](overseer.nvim) may be the better choice.
 
 
+## AI support
+
+This project was hand-written by the maintainer up to v0.6.x, and has been heavily supported by AI coding assistance (Claude Code) since v0.7.0.
+
+
 ## License
 
 [MIT License](./LICENSE)
