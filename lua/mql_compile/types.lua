@@ -21,6 +21,7 @@
 ---@field dest_path string Abs path of the compiled file finally placed
 ---@field ok boolean       true if no errors
 ---@field counts table     Counts of each quickfix type (e.g. { error = 1, warning = 2 })
+---@field sent_paths string[] Abs paths the compiled file was sent to by `send` (Empty if not sent)
 
 ---@deprecated Use `mql_compile.Ctx` instead
 ---@alias mql_compile.RenameCtx mql_compile.Ctx

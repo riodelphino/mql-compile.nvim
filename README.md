@@ -203,6 +203,7 @@ opts = {
    },
    send = { -- See '# Send' section
       enabled = false,
+      mode = 'copy', -- 'copy' | 'move'
       to = function(ctx) return nil end, -- Return path(s) to send to
    },
    hooks = { -- See '# Hooks' section
@@ -409,10 +410,11 @@ return string.format('/path/to/archive/%s.%s', fname, ext)
 
 ## Send
 
-Send (copy) the compiled `*.ex[45]` file to one or more directories after compiling successfully.  
+Send (copy or move) the compiled `*.ex[45]` file to one or more directories after compiling successfully.  
 (e.g. Copy a compiled EA to `MQL4/Experts` or `MQL5/Experts` dirs of your MT4/MT5 apps)
 
 - `send.enabled`: Enable sending
+- `send.mode`: `'copy'` (default) or `'move'`. `'move'` removes the compiled file after it was sent to all the paths. (Kept if any sending failed)
 - `send.to(ctx)`: Returns the path (string) or paths (table) to send to. (`~` is expanded) Return `nil` to send nothing.
 
 Default:
@@ -420,6 +422,7 @@ Default:
 opts = {
    send = {
       enabled = false,
+      mode = 'copy',
       ---@param ctx mql_compile.ResultCtx
       ---@return string|string[]|nil
       to = function(ctx) return nil end,
@@ -463,14 +466,18 @@ Then, compiling `<project_root>/mt5/myea.mq5` (an EA) sends `myea.ex5` to:
 
 Calling order: Renaming -> Sending -> `hooks.post`
 
+> [!Note]
+> With `mode = 'move'`, the compiled file in the project (`ctx.dest_path`) is removed. (e.g. No file is left in `archive/` by `rename.to`)  
+> Use `ctx.sent_paths` in `hooks.post` to get the paths where the file was sent.
+
 ## Hooks
 
 Run your own functions before / after compiling.
 
-| Hook   | Timing                                         | ctx                     | Return           |
-| ------ | ---------------------------------------------- | ----------------------- | ---------------- |
-| `pre`  | Before compiling                               | `mql_compile.Ctx`       | `false` to abort |
-| `post` | After compiling (and renaming), even if failed | `mql_compile.ResultCtx` | (ignored)        |
+| Hook   | Timing                                                 | ctx                     | Return           |
+| ------ | ------------------------------------------------------ | ----------------------- | ---------------- |
+| `pre`  | Before compiling                                       | `mql_compile.Ctx`       | `false` to abort |
+| `post` | After compiling, renaming and sending (even if failed) | `mql_compile.ResultCtx` | (ignored)        |
 
 ```lua
 opts = {
@@ -518,6 +525,7 @@ The `ctx` table passed to user functions (`rename.to`, `send.to`, `hooks.*`).
 ---@field dest_path string Abs path of the compiled file finally placed
 ---@field ok boolean       true if no errors
 ---@field counts table     Counts of each quickfix type (e.g. { error = 1, warning = 2 })
+---@field sent_paths string[] Abs paths the compiled file was sent to by `send` (Empty if not sent)
 ```
 
 `kind` (MQL program type) is detected from the source file (not from included files):

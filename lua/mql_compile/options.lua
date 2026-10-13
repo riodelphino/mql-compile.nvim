@@ -83,6 +83,7 @@ M.default = {
    },
    send = {
       enabled = false,
+      mode = 'copy', -- 'copy' | 'move' ('move' removes the compiled file after all sending succeeded)
       ---@param ctx mql_compile.ResultCtx
       ---@return string|string[]|nil  Path(s) to send the compiled file to. (nil: send nothing)
       to = function(ctx) return nil end,
