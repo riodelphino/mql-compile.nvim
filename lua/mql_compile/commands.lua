@@ -41,6 +41,8 @@ function M.create_commands()
 
    -- :MQLCompilePrintOptions
    vim.api.nvim_create_user_command('MQLCompileShowOptions', function()
+      local bufname = vim.api.nvim_buf_get_name(0)
+      opt.load_project_config(bufname ~= '' and bufname or vim.fn.getcwd())
       fn.notify(vim.inspect(opt._opts))
    end, { nargs = 0 })
 end

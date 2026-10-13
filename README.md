@@ -481,6 +481,7 @@ opts = {
 ## Project Specific Options
 
 To override global options for a specific project, add `.mql-compile.lua` to the project root, following the [Default options](#default-options) structure.
+It is reloaded from the source file's project root on each compile, so you can switch between projects in a single nvim session.
 
 `<project_root>/.mql-compile.lua`:
 ```lua

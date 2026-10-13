@@ -169,13 +169,14 @@ local function run_compile(wine_path, metaeditor_path, source_path, log_path, co
 end
 
 function M.compile(src_path)
-   local opts = opt.get_opts()
-
    if not src_path then
       local msg = 'Function compile() requires source_path arg.'
       fn.notify(msg, vim.log.levels.ERROR)
       return
    end
+
+   -- Reload project config for the source file's root
+   local opts = opt.load_project_config(src_path)
 
    -- Check source_path exists
    if not fn.file_exists(src_path) then

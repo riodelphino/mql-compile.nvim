@@ -1,6 +1,7 @@
 local M = {}
 
 M._opts = {}
+M._base_opts = {} -- Global opts merged with user opts (without project config)
 M._os_type = ''
 -- M._source_path = ''
 M._source_path = nil
@@ -170,16 +171,31 @@ function M.merge(user_opts)
    local opts = {}
    -- opts = vim.tbl_deep_extend("force", M.default, user_opts or {})
    opts = M.deep_merge(M.default, user_opts or {})
+   M._base_opts = opts
    M._opts = opts
    return opts
 end
 
-function M.merge_project_config()
-   local project_opts = {}
-   local project_config_path = vim.fs.find('.mql-compile.lua', { path = M._root, limit = 1 })[1]
-   if not project_config_path then return M._opts end
-   project_opts = dofile(project_config_path)
-   return M.deep_merge(M._opts, project_opts)
+-- Load `<project_root>/.mql-compile.lua` for the given path, and merge it into the base opts
+function M.load_project_config(path)
+   local opts = M._base_opts
+   path = vim.fn.fnamemodify(path, ':p')
+   local root = vim.fs.root(path, opts.root_marker)
+   if root then
+      local project_config_path = vim.fs.joinpath(root, '.mql-compile.lua')
+      if vim.fn.filereadable(project_config_path) == 1 then
+         local ok, project_opts = pcall(dofile, project_config_path)
+         if ok and type(project_opts) == 'table' then
+            opts = M.deep_merge(M._base_opts, project_opts)
+         else
+            local msg = "Failed to load project config: '" .. project_config_path .. "'\n" .. tostring(project_opts)
+            vim.notify(msg, vim.log.levels.ERROR, { title = 'mql-compile' })
+         end
+      end
+   end
+   M._opts = opts
+   M.check_opts()
+   return opts
 end
 
 function M.check_opts()
