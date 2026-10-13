@@ -81,6 +81,17 @@ M.default = {
          end
       end,
    },
+   send = {
+      enabled = false,
+      targets = {}, -- Base dirs to send the compiled file to (e.g. '~/VPS/shared/ea')
+      ---@param ctx mql_compile.ResultCtx
+      ---@param target string  A dir in `send.targets` ('~' is expanded)
+      ---@return string?       Path to send the compiled file to. (nil: skip this target)
+      to = function(ctx, target)
+         local relpath = vim.fs.relpath(ctx.root, ctx.dest_path) or vim.fs.basename(ctx.dest_path)
+         return vim.fs.joinpath(target, ctx.project, relpath) -- <target>/<project>/mt5/myea.ex5
+      end,
+   },
    hooks = {
       -- pre = function(ctx) end, -- Called before compiling. Return false to abort. (ctx: mql_compile.Ctx)
       -- post = function(ctx) end, -- Called after compiling (and renaming). (ctx: mql_compile.ResultCtx)
@@ -110,6 +121,10 @@ M.default = {
          on_mkdir = false,
          on_version = false,
          on_renamed = true,
+      },
+      send = {
+         on_mkdir = false,
+         on_sent = true,
       },
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...

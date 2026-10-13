@@ -76,6 +76,7 @@ This enables switching wine path between mql5 and mql4.
 - Customizable target path (place compiled files wherever you prefer)
 - Version management
 - Project specific options
+- Send compiled files to other directories (e.g. VPS shared folder, MT4/MT5 apps)
 - Hooks (`pre` / `post` compiling)
 - Works on `macOS + WineSkin` and `macOS + Sikarugir` for now
 
@@ -197,6 +198,11 @@ opts = {
          end
       end,
    },
+   send = { -- See '# Send' section
+      enabled = false,
+      targets = {}, -- Base dirs to send the compiled file to
+      to = nil, -- function(ctx, target) ... end
+   },
    hooks = { -- See '# Hooks' section
       pre = nil, -- function(ctx) ... end
       post = nil, -- function(ctx) ... end
@@ -226,6 +232,10 @@ opts = {
          on_mkdir = false,
          on_version = false,
          on_renamed = true,
+      },
+      send = {
+         on_mkdir = false,
+         on_sent = true,
       },
       levels = { -- Color to notify if compiling was ...
          succeeded = { -- with type ...
@@ -393,6 +403,58 @@ return string.format(root .. '/../../archive/%s.%s', fname, ext)
 return string.format('/path/to/archive/%s.%s', fname, ext)
 ```
 
+## Send
+
+Send (copy) the compiled `*.ex[45]` file to other directories after compiling successfully.  
+(e.g. A shared folder for VPS, `MQL5/Experts` dirs of your MT4/MT5 apps)
+
+- `send.targets`: The base dirs to send to (`~` is expanded)
+- `send.to(ctx, target)`: Called for each target, and returns the final path to send to. Return `nil` to skip the target.
+
+Default:
+```lua
+opts = {
+   send = {
+      enabled = false,
+      targets = {},
+      ---@param ctx mql_compile.ResultCtx
+      ---@param target string
+      ---@return string?
+      to = function(ctx, target)
+         local relpath = vim.fs.relpath(ctx.root, ctx.dest_path) or vim.fs.basename(ctx.dest_path)
+         return vim.fs.joinpath(target, ctx.project, relpath) -- <target>/<project>/mt5/myea.ex5
+      end,
+   },
+},
+```
+
+Usually, set `send` in [Project Specific Options](#project-specific-options).
+
+`<project_root>/.mql-compile.lua`:
+```lua
+return {
+   send = {
+      enabled = true,
+      targets = {
+         '~/VPS/shared/ea/yourname',
+         '~/Applications/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/MQL4/Experts/yourname',
+         '~/Applications/MT5.app/drive_c/Program Files/MetaTrader 5/MQL5/Experts/yourname',
+      },
+      -- (Optional) Don't send *.ex5 to MT4
+      to = function(ctx, target)
+         if ctx.ext == 'ex5' and target:find('MetaTrader 4') then return nil end
+         return vim.fs.joinpath(target, ctx.project, vim.fs.relpath(ctx.root, ctx.dest_path))
+      end,
+   },
+}
+```
+
+Then, compiling `<project_root>/mt5/myea.mq5` sends `myea.ex5` to:
+- `~/VPS/shared/ea/yourname/<project>/mt5/myea.ex5`
+- `~/Applications/MT5.app/.../MQL5/Experts/yourname/<project>/mt5/myea.ex5`
+
+The sending runs after renaming, and before `hooks.post`.
+
 ## Hooks
 
 Run your own functions before / after compiling.
@@ -424,7 +486,7 @@ Errors in hooks are caught and notified. (An error in `pre` also aborts compilin
 
 ## Ctx
 
-The `ctx` table passed to user functions (`rename.to`, `hooks.*`, etc.).
+The `ctx` table passed to user functions (`rename.to`, `send.to`, `hooks.*`).
 
 ```lua
 ---@class mql_compile.Ctx

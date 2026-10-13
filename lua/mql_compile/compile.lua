@@ -166,9 +166,14 @@ local function run_compile(wine_path, metaeditor_path, source_path, log_path, co
                if opts.notify.rename.on_renamed then fn.notify("Renamed to: '" .. target_path .. "'", vim.log.levels.INFO) end
             end
 
-            -- Run post hook
+            -- Set compile result to ctx
             ctx.ok = qf_cnt.error == nil
             ctx.counts = qf_cnt
+
+            -- Send compiled file to `send.targets`
+            require('mql_compile.send').send(opts, ctx)
+
+            -- Run post hook
             run_hook(opts, 'post', ctx)
 
             -- Open quickfix
