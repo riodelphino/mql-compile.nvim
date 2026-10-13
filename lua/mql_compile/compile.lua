@@ -216,8 +216,11 @@ function M.compile(src_path)
    -- Get compiled_path
    local compiled_path = fn.get_compiled_path(src_path)
 
+   -- Build ctx (passed to user functions like `rename.to`)
+   local ctx = M.get_ctx(src_path, filetype)
+
    -- Get dest_path (The compiled *.ex[4|5] executables are finally placed here)
-   local dest_path = M.get_dest_path(src_path)
+   local dest_path = M.get_dest_path(ctx)
 
    -- Check dest_path exists
    if fn.file_exists(dest_path) and not mql.overwrite then
@@ -230,21 +233,32 @@ function M.compile(src_path)
    return compile_shell_error
 end
 
--- Get destination path (= compiled *.ex[4|5] path)
-function M.get_dest_path(src_path)
+-- Build ctx from source path
+---@param src_path string
+---@param ft string?
+---@return mql_compile.Ctx
+function M.get_ctx(src_path, ft)
    local ctx = {}
-   local opts = opt.get_opts()
+   ctx.src_path = src_path
+   ctx.ft = ft or fn.get_filetype(src_path)
    ctx.dir, ctx.base, ctx.fname, ctx.ext_src = fn.split_path(src_path)
    ctx.ext = fn.get_compiled_extension(src_path)
+   ctx.root = fn.get_root(src_path) or vim.fn.getcwd()
+   ctx.project = vim.fs.basename(ctx.root)
+   ctx.ver, ctx.major, ctx.minor = fn.get_version(src_path)
+   return ctx
+end
 
+-- Get destination path (= compiled *.ex[4|5] path)
+---@param ctx mql_compile.Ctx
+function M.get_dest_path(ctx)
+   local opts = opt.get_opts()
    if opts.rename.enabled then
       -- Return custom destination path
-      ctx.root = fn.get_root(src_path)
-      ctx.ver, ctx.major, ctx.minor = fn.get_version(src_path)
       return opts.rename.to(ctx)
    else
       -- Return default destination path
-      return fn.get_compiled_path(src_path)
+      return fn.get_compiled_path(ctx.src_path)
    end
 end
 

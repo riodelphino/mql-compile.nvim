@@ -187,8 +187,8 @@ opts = {
    },
    rename = {
       enabled = true,
-      ---@param ctx mql_compile.RenameCtx
-      to = function(ctx) -- ctx: root, dir, base, fname, ext, ext_src, ver, major, minor
+      ---@param ctx mql_compile.Ctx
+      to = function(ctx) -- See '# Ctx' section
          if ctx.ver == nil or ctx.ver == '' then
             return string.format('archive/%s.%s', ctx.fname, ctx.ext) -- archive/myea.ex5
          else
@@ -342,7 +342,7 @@ Default:
 opts = {
    rename = {
      enabled = true, -- set false for using default path by metaeditor
-     ---@param ctx mql_compile.RenameCtx
+     ---@param ctx mql_compile.Ctx
      to = function(ctx)
        if ctx.ver == nil or ctx.ver == '' then
          return string.format('archive/%s.%s', ctx.fname, ctx.ext) -- archive/myea.ex5
@@ -353,19 +353,7 @@ opts = {
    },
 },
 ```
-`Renamectx` class:
-```lua
----@class mql_compile.RenameCtx
----@field root string      Abs path of project root
----@field dir string       Parent dir of the source file
----@field base string      Basename with source ext (e.g. 'myea.mq5')
----@field fname string     Filename without ext (e.g. 'myea')
----@field ext string       Compiled ext (e.g. 'ex5')
----@field ext_src string   Source ext (e.g. 'mq5')
----@field ver string?      '#property version' value (e.g. '1.10' or nil)
----@field major string?    Major version (e.g. '1')
----@field minor string?    Minor version (e.g. '10')
-```
+`rename.to` receives a `ctx` table. See [Ctx](#ctx) section.
 
 #### Rename Example
 
@@ -376,17 +364,20 @@ source file: `/Users/username/projects/ea/myea.mq5`
 ```
 
 Then, `rename.to` callback recieves following args in ctx table.
-| Name    | Content                | Example                         |
-| ------- | ---------------------- | ------------------------------- |
-| root    | project root (.git)    | . (/Users/username/projects/ea) |
-| dir     | dir                    | src                             |
-| base    | basename (with ext)    | myea.mq5                        |
-| fname   | filename (without ext) | myea                            |
-| ext     | compiled extension     | ex5                             |
-| ext_src | source extension       | mq5                             |
-| ver     | version                | 1.23                            |
-| major   | major version          | 1                               |
-| minor   | minor version          | 23                              |
+| Name     | Content                | Example                         |
+| -------- | ---------------------- | ------------------------------- |
+| root     | project root (.git)    | /Users/username/projects/ea     |
+| project  | project name           | ea                              |
+| ft       | filetype               | mql5                            |
+| src_path | source path            | src/myea.mq5                    |
+| dir      | dir                    | src                             |
+| base     | basename (with ext)    | myea.mq5                        |
+| fname    | filename (without ext) | myea                            |
+| ext      | compiled extension     | ex5                             |
+| ext_src  | source extension       | mq5                             |
+| ver      | version                | 1.23                            |
+| major    | major version          | 1                               |
+| minor    | minor version          | 23                              |
 
 
 The paths out of project-root are also available.
@@ -396,6 +387,29 @@ return string.format(root .. '/../../archive/%s.%s', fname, ext)
 -- Absolute path
 return string.format('/path/to/archive/%s.%s', fname, ext)
 ```
+
+## Ctx
+
+The `ctx` table passed to user functions (`rename.to`, etc.).
+
+```lua
+---@class mql_compile.Ctx
+---@field root string      Abs path of project root
+---@field project string   Project name (= basename of root, e.g. 'myproject')
+---@field ft string        Filetype ('mql5' | 'mql4')
+---@field src_path string  Source file path (relative to cwd)
+---@field dir string       Parent dir of the source file
+---@field base string      Basename with source ext (e.g. 'myea.mq5')
+---@field fname string     Filename without ext (e.g. 'myea')
+---@field ext string       Compiled ext (e.g. 'ex5')
+---@field ext_src string   Source ext (e.g. 'mq5')
+---@field ver string?      '#property version' value (e.g. '1.10' or nil)
+---@field major string?    Major version (e.g. '1')
+---@field minor string?    Minor version (e.g. '10')
+```
+
+> [!Note]
+> `mql_compile.RenameCtx` is deprecated. Use `mql_compile.Ctx` instead.
 
 ## Usage
 

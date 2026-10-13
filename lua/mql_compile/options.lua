@@ -72,7 +72,7 @@ M.default = {
    },
    rename = {
       enabled = true,
-      ---@param ctx mql_compile.RenameCtx
+      ---@param ctx mql_compile.Ctx
       to = function(ctx)
          if ctx.ver == nil or ctx.ver == '' then
             return string.format('archive/%s.%s', ctx.fname, ctx.ext) -- archive/myea.ex5
