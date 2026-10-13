@@ -191,7 +191,7 @@ end
 -- Detect MQL program type from the source file
 ---@param source_path string
 ---@return 'expert'|'indicator'|'script'|'library'|'service'|nil
-function M.get_program_type(source_path)
+function M.get_kind(source_path)
    if not M.file_exists(source_path) then return nil end
    local found = {}
    for line in io.lines(source_path) do

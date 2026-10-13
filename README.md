@@ -379,21 +379,21 @@ source file: `/Users/username/projects/ea/myea.mq5`
 ```
 
 Then, `rename.to` callback recieves following args in ctx table.
-| Name         | Content                | Example                     |
-| ------------ | ---------------------- | --------------------------- |
-| root         | project root (.git)    | /Users/username/projects/ea |
-| project      | project name           | ea                          |
-| ft           | filetype               | mql5                        |
-| src_path     | source path            | src/myea.mq5                |
-| dir          | dir                    | src                         |
-| base         | basename (with ext)    | myea.mq5                    |
-| fname        | filename (without ext) | myea                        |
-| ext          | compiled extension     | ex5                         |
-| ext_src      | source extension       | mq5                         |
-| ver          | version                | 1.23                        |
-| major        | major version          | 1                           |
-| minor        | minor version          | 23                          |
-| program_type | program type           | expert                      |
+| Name     | Content                | Example                     |
+| -------- | ---------------------- | --------------------------- |
+| root     | project root (.git)    | /Users/username/projects/ea |
+| project  | project name           | ea                          |
+| ft       | filetype               | mql5                        |
+| src_path | source path            | src/myea.mq5                |
+| dir      | dir                    | src                         |
+| base     | basename (with ext)    | myea.mq5                    |
+| fname    | filename (without ext) | myea                        |
+| ext      | compiled extension     | ex5                         |
+| ext_src  | source extension       | mq5                         |
+| ver      | version                | 1.23                        |
+| major    | major version          | 1                           |
+| minor    | minor version          | 23                          |
+| kind     | program type           | expert                      |
 
 
 The paths out of project-root are also available.
@@ -451,7 +451,7 @@ return {
 ```
 
 To keep your environment-specific paths out of the repository, set `send.targets` / `send.to` in your global config, and only `send = { enabled = true }` in each project's `.mql-compile.lua`.  
-Use `ctx.program_type` to send each type to its own dir:
+Use `ctx.kind` to send each type to its own dir:
 ```lua
 -- Global config
 send = {
@@ -460,7 +460,7 @@ send = {
    },
    to = function(ctx, target)
       local dirs = { expert = 'Experts', indicator = 'Indicators', script = 'Scripts' }
-      local dir = dirs[ctx.program_type]
+      local dir = dirs[ctx.kind]
       if not dir then return nil end -- Skip unknown types
       return vim.fs.joinpath(target, dir, 'yourname', ctx.project, vim.fs.basename(ctx.dest_path))
    end,
@@ -520,7 +520,7 @@ The `ctx` table passed to user functions (`rename.to`, `send.to`, `hooks.*`).
 ---@field ver string?      '#property version' value (e.g. '1.10' or nil)
 ---@field major string?    Major version (e.g. '1')
 ---@field minor string?    Minor version (e.g. '10')
----@field program_type 'expert'|'indicator'|'script'|'library'|'service'|nil  Detected from the source (e.g. '#property indicator_*', 'OnTick()')
+---@field kind 'expert'|'indicator'|'script'|'library'|'service'|nil  Detected from the source (e.g. '#property indicator_*', 'OnTick()')
 ---@field dest_path string? Abs path of the compiled file finally placed (Not set in `rename.to`)
 
 ---@class mql_compile.ResultCtx : mql_compile.Ctx
@@ -529,15 +529,15 @@ The `ctx` table passed to user functions (`rename.to`, `send.to`, `hooks.*`).
 ---@field counts table     Counts of each quickfix type (e.g. { error = 1, warning = 2 })
 ```
 
-`program_type` is detected from the source file (not from included files):
+`kind` (MQL program type) is detected from the source file (not from included files):
 
-| program_type | Detected by                                 |
-| ------------ | ------------------------------------------- |
-| `library`    | `#property library`                         |
-| `service`    | `#property service`                         |
-| `indicator`  | `#property indicator_*` or `OnCalculate()`  |
-| `script`     | `#property script_*`, or `OnStart()` only   |
-| `expert`     | `OnTick()`                                  |
+| kind        | Detected by                                |
+| ----------- | ------------------------------------------ |
+| `library`   | `#property library`                        |
+| `service`   | `#property service`                        |
+| `indicator` | `#property indicator_*` or `OnCalculate()` |
+| `script`    | `#property script_*`, or `OnStart()` only  |
+| `expert`    | `OnTick()`                                 |
 
 > [!Note]
 > `mql_compile.RenameCtx` is deprecated. Use `mql_compile.Ctx` instead.
