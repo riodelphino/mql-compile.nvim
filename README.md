@@ -409,8 +409,8 @@ return string.format('/path/to/archive/%s.%s', fname, ext)
 
 ## Send
 
-Send (copy) the compiled `*.ex[45]` file to other directories after compiling successfully.  
-(e.g. A shared folder for VPS, `MQL5/Experts` dirs of your MT4/MT5 apps)
+Send (copy) the compiled `*.ex[45]` file to one or more directories after compiling successfully.  
+(e.g. Copy a compiled EA to `MQL4/Experts` or `MQL5/Experts` dirs of your MT4/MT5 apps)
 
 - `send.enabled`: Enable sending
 - `send.to(ctx)`: Returns the path (string) or paths (table) to send to. (`~` is expanded) Return `nil` to send nothing.
@@ -432,8 +432,8 @@ To keep your environment-specific paths out of the repository, set `send.to` in 
 Global config:
 ```lua
 local send_dirs = {
-   mql4 = { '~/VPS/shared/MQL4', '~/Applications/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/MQL4' },
-   mql5 = { '~/VPS/shared/MQL5', '~/Applications/MT5.app/drive_c/Program Files/MetaTrader 5/MQL5' },
+   mql4 = { '~/Applications/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/MQL4' },
+   mql5 = { '~/Applications/MT5.app/drive_c/Program Files/MetaTrader 5/MQL5' },
 }
 
 opts = {
@@ -442,8 +442,8 @@ opts = {
          if not ctx.kind_dirname then return nil end -- Skip unknown kinds
          local paths = {}
          for _, dir in ipairs(send_dirs[ctx.ft]) do
-            -- e.g. <dir>/Experts/yourname/myea.ex5
-            table.insert(paths, vim.fs.joinpath(dir, ctx.kind_dirname, 'yourname', vim.fs.basename(ctx.dest_path)))
+            -- e.g. <dir>/Experts/myea.ex5
+            table.insert(paths, vim.fs.joinpath(dir, ctx.kind_dirname, vim.fs.basename(ctx.dest_path)))
          end
          return paths
       end,
@@ -459,10 +459,9 @@ return {
 ```
 
 Then, compiling `<project_root>/mt5/myea.mq5` (an EA) sends `myea.ex5` to:
-- `~/VPS/shared/MQL5/Experts/yourname/myea.ex5`
-- `~/Applications/MT5.app/.../MQL5/Experts/yourname/myea.ex5`
+- `~/Applications/MT5.app/.../MQL5/Experts/myea.ex5`
 
-The sending runs after renaming, and before `hooks.post`.
+Calling order: Renaming -> Sending -> `hooks.post`
 
 ## Hooks
 
