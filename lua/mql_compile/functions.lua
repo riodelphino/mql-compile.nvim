@@ -188,6 +188,37 @@ function M.get_extension_list()
    return ext_list
 end
 
+-- Detect MQL program type from the source file
+---@param source_path string
+---@return 'expert'|'indicator'|'script'|'library'|'service'|nil
+function M.get_program_type(source_path)
+   if not M.file_exists(source_path) then return nil end
+   local found = {}
+   for line in io.lines(source_path) do
+      line = line:gsub('//.*$', '') -- Remove comments
+      if line:match('#property%s+library') then
+         found.library = true
+      elseif line:match('#property%s+service') then
+         found.service = true
+      elseif line:match('#property%s+indicator_') or line:match('OnCalculate%s*%(') then
+         found.indicator = true
+      elseif line:match('#property%s+script_') then
+         found.script = true
+      elseif line:match('OnTick%s*%(') then
+         found.expert = true
+      elseif line:match('OnStart%s*%(') then
+         found.on_start = true
+      end
+   end
+   if found.library then return 'library' end
+   if found.service then return 'service' end
+   if found.indicator then return 'indicator' end
+   if found.script then return 'script' end
+   if found.expert then return 'expert' end
+   if found.on_start then return 'script' end
+   return nil
+end
+
 function M.get_version(source_path)
    local ver, major, minor
    if fn.file_exists(source_path) then
