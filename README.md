@@ -25,6 +25,9 @@ Please test & [create issues](https://github.com/riodelphino/mql-compile.nvim/is
 
 ## Breaking Changes
 
+### v0.8.0
+- Removed `send.targets` option. Return the path(s) from `send.to(ctx)` instead. (See [Send](#send))
+
 ### v0.6.0
 - Deprecate `rename.get_custom_path()` option, use `rename.to()` with `ctx` table arg instead.
 
@@ -200,8 +203,7 @@ opts = {
    },
    send = { -- See '# Send' section
       enabled = false,
-      targets = {}, -- Base dirs to send the compiled file to
-      to = nil, -- function(ctx, target) ... end
+      to = function(ctx) return nil end, -- Return path(s) to send to
    },
    hooks = { -- See '# Hooks' section
       pre = nil, -- function(ctx) ... end
@@ -379,21 +381,22 @@ source file: `/Users/username/projects/ea/myea.mq5`
 ```
 
 Then, `rename.to` callback recieves following args in ctx table.
-| Name     | Content                | Example                     |
-| -------- | ---------------------- | --------------------------- |
-| root     | project root (.git)    | /Users/username/projects/ea |
-| project  | project name           | ea                          |
-| ft       | filetype               | mql5                        |
-| src_path | source path            | src/myea.mq5                |
-| dir      | dir                    | src                         |
-| base     | basename (with ext)    | myea.mq5                    |
-| fname    | filename (without ext) | myea                        |
-| ext      | compiled extension     | ex5                         |
-| ext_src  | source extension       | mq5                         |
-| ver      | version                | 1.23                        |
-| major    | major version          | 1                           |
-| minor    | minor version          | 23                          |
-| kind     | program type           | expert                      |
+| Name         | Content                | Example                     |
+| ------------ | ---------------------- | --------------------------- |
+| root         | project root (.git)    | /Users/username/projects/ea |
+| project      | project name           | ea                          |
+| ft           | filetype               | mql5                        |
+| src_path     | source path            | src/myea.mq5                |
+| dir          | dir                    | src                         |
+| base         | basename (with ext)    | myea.mq5                    |
+| fname        | filename (without ext) | myea                        |
+| ext          | compiled extension     | ex5                         |
+| ext_src      | source extension       | mq5                         |
+| ver          | version                | 1.23                        |
+| major        | major version          | 1                           |
+| minor        | minor version          | 23                          |
+| kind         | program type           | expert                      |
+| kind_dirname | kind's directory name  | Experts                     |
 
 
 The paths out of project-root are also available.
@@ -409,67 +412,55 @@ return string.format('/path/to/archive/%s.%s', fname, ext)
 Send (copy) the compiled `*.ex[45]` file to other directories after compiling successfully.  
 (e.g. A shared folder for VPS, `MQL5/Experts` dirs of your MT4/MT5 apps)
 
-- `send.targets`: The base dirs to send to (`~` is expanded)
-- `send.to(ctx, target)`: Called for each target, and returns the final path to send to. Return `nil` to skip the target.
+- `send.enabled`: Enable sending
+- `send.to(ctx)`: Returns the path (string) or paths (table) to send to. (`~` is expanded) Return `nil` to send nothing.
 
 Default:
 ```lua
 opts = {
    send = {
       enabled = false,
-      targets = {},
       ---@param ctx mql_compile.ResultCtx
-      ---@param target string
-      ---@return string?
-      to = function(ctx, target)
-         local relpath = vim.fs.relpath(ctx.root, ctx.dest_path) or vim.fs.basename(ctx.dest_path)
-         return vim.fs.joinpath(target, ctx.project, relpath) -- <target>/<project>/mt5/myea.ex5
-      end,
+      ---@return string|string[]|nil
+      to = function(ctx) return nil end,
    },
 },
 ```
 
-Usually, set `send` in [Project Specific Options](#project-specific-options).
+To keep your environment-specific paths out of the repository, set `send.to` in your global config, and only `send = { enabled = true }` in each project's `.mql-compile.lua`.
 
-`<project_root>/.mql-compile.lua`:
+Global config:
 ```lua
-return {
+local send_dirs = {
+   mql4 = { '~/VPS/shared/MQL4', '~/Applications/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/MQL4' },
+   mql5 = { '~/VPS/shared/MQL5', '~/Applications/MT5.app/drive_c/Program Files/MetaTrader 5/MQL5' },
+}
+
+opts = {
    send = {
-      enabled = true,
-      targets = {
-         '~/VPS/shared/ea/yourname',
-         '~/Applications/MT4.app/drive_c/Program Files (x86)/MetaTrader 4/MQL4/Experts/yourname',
-         '~/Applications/MT5.app/drive_c/Program Files/MetaTrader 5/MQL5/Experts/yourname',
-      },
-      -- (Optional) Don't send *.ex5 to MT4
-      to = function(ctx, target)
-         if ctx.ext == 'ex5' and target:find('MetaTrader 4') then return nil end
-         return vim.fs.joinpath(target, ctx.project, vim.fs.relpath(ctx.root, ctx.dest_path))
+      to = function(ctx)
+         if not ctx.kind_dirname then return nil end -- Skip unknown kinds
+         local paths = {}
+         for _, dir in ipairs(send_dirs[ctx.ft]) do
+            -- e.g. <dir>/Experts/yourname/myea.ex5
+            table.insert(paths, vim.fs.joinpath(dir, ctx.kind_dirname, 'yourname', vim.fs.basename(ctx.dest_path)))
+         end
+         return paths
       end,
    },
 }
 ```
 
-To keep your environment-specific paths out of the repository, set `send.targets` / `send.to` in your global config, and only `send = { enabled = true }` in each project's `.mql-compile.lua`.  
-Use `ctx.kind` to send each type to its own dir:
+`<project_root>/.mql-compile.lua`:
 ```lua
--- Global config
-send = {
-   targets = {
-      '~/Applications/MT5.app/drive_c/Program Files/MetaTrader 5/MQL5',
-   },
-   to = function(ctx, target)
-      local dirs = { expert = 'Experts', indicator = 'Indicators', script = 'Scripts' }
-      local dir = dirs[ctx.kind]
-      if not dir then return nil end -- Skip unknown types
-      return vim.fs.joinpath(target, dir, 'yourname', ctx.project, vim.fs.basename(ctx.dest_path))
-   end,
-},
+return {
+   send = { enabled = true },
+}
 ```
 
-With the project example above, compiling `<project_root>/mt5/myea.mq5` sends `myea.ex5` to:
-- `~/VPS/shared/ea/yourname/<project>/mt5/myea.ex5`
-- `~/Applications/MT5.app/.../MQL5/Experts/yourname/<project>/mt5/myea.ex5`
+Then, compiling `<project_root>/mt5/myea.mq5` (an EA) sends `myea.ex5` to:
+- `~/VPS/shared/MQL5/Experts/yourname/myea.ex5`
+- `~/Applications/MT5.app/.../MQL5/Experts/yourname/myea.ex5`
 
 The sending runs after renaming, and before `hooks.post`.
 
@@ -521,6 +512,7 @@ The `ctx` table passed to user functions (`rename.to`, `send.to`, `hooks.*`).
 ---@field major string?    Major version (e.g. '1')
 ---@field minor string?    Minor version (e.g. '10')
 ---@field kind 'expert'|'indicator'|'script'|'library'|'service'|nil  Detected from the source (e.g. '#property indicator_*', 'OnTick()')
+---@field kind_dirname 'Experts'|'Indicators'|'Scripts'|'Libraries'|'Services'|nil  MQL directory name for the kind (e.g. 'Experts')
 ---@field dest_path string? Abs path of the compiled file finally placed (Not set in `rename.to`)
 
 ---@class mql_compile.ResultCtx : mql_compile.Ctx

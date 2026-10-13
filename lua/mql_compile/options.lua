@@ -83,14 +83,9 @@ M.default = {
    },
    send = {
       enabled = false,
-      targets = {}, -- Base dirs to send the compiled file to (e.g. '~/VPS/shared/ea')
       ---@param ctx mql_compile.ResultCtx
-      ---@param target string  A dir in `send.targets` ('~' is expanded)
-      ---@return string?       Path to send the compiled file to. (nil: skip this target)
-      to = function(ctx, target)
-         local relpath = vim.fs.relpath(ctx.root, ctx.dest_path) or vim.fs.basename(ctx.dest_path)
-         return vim.fs.joinpath(target, ctx.project, relpath) -- <target>/<project>/mt5/myea.ex5
-      end,
+      ---@return string|string[]|nil  Path(s) to send the compiled file to. (nil: send nothing)
+      to = function(ctx) return nil end,
    },
    hooks = {
       -- pre = function(ctx) end, -- Called before compiling. Return false to abort. (ctx: mql_compile.Ctx)
@@ -218,6 +213,11 @@ function M.load_project_config(path)
 end
 
 function M.check_opts()
+   -- Check removed opts
+   if M._opts.send.targets ~= nil then vim.schedule(function()
+      local msg = '`send.targets` option was removed in v0.8.0 and is ignored.\nReturn the path(s) from `send.to(ctx)` instead.'
+      vim.notify(msg, vim.log.levels.WARN, { title = 'mql-compile' })
+   end) end
    -- Check deprecated opts
    if M._opts.rename.get_custom_path ~= nil then vim.schedule(function()
       vim.deprecate('`rename.get_custom_path` option', '`rename.to` option', 'v0.6.0', 'mql-compile.nvim', false)

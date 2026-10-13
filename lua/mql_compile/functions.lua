@@ -245,4 +245,12 @@ function M.get_version(source_path)
    return ver, major, minor
 end
 
+---Get kind directory name by kind (e.g. 'expert' -> 'Experts')
+---@param kind string?
+---@return string? dirname
+function M.get_kind_dirname(kind)
+   local dirnames = { expert = 'Experts', indicator = 'Indicators', script = 'Scripts', library = 'Libraries', service = 'Services' }
+   return dirnames[kind]
+end
+
 return M

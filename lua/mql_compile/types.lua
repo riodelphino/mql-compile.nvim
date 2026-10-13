@@ -14,6 +14,7 @@
 ---@field major string?    Major version (e.g. '1')
 ---@field minor string?    Minor version (e.g. '10')
 ---@field kind 'expert'|'indicator'|'script'|'library'|'service'|nil  Detected from the source (e.g. '#property indicator_*', 'OnTick()')
+---@field kind_dirname 'Experts'|'Indicators'|'Scripts'|'Libraries'|'Services'|nil  MQL directory name for the kind (e.g. 'Experts')
 ---@field dest_path string? Abs path of the compiled file finally placed (Not set in `rename.to`)
 
 ---@class mql_compile.ResultCtx : mql_compile.Ctx

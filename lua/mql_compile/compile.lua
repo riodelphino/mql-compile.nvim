@@ -278,6 +278,7 @@ function M.get_ctx(src_path, ft)
    ctx.project = vim.fs.basename(ctx.root)
    ctx.ver, ctx.major, ctx.minor = fn.get_version(src_path)
    ctx.kind = fn.get_kind(src_path)
+   ctx.kind_dirname = fn.get_kind_dirname(ctx.kind)
    return ctx
 end
 

@@ -162,12 +162,4 @@ function M.pattern_bash_to_lua(bash_pattern)
    return lua_pattern
 end
 
----Get kind directory name by kind (e.g. 'expert' -> 'Experts')
----@param kind string
----@return string|nil kind_dir
-function M.get_kind_dirname(kind)
-   local dirnames = { expert = 'Experts', indicator = 'Indicators', script = 'Scripts', library = 'Libraries', service = 'Services' }
-   return dirnames[kind]
-end
-
 return M
