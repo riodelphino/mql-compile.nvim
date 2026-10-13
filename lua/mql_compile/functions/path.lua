@@ -2,8 +2,6 @@ local M = {}
 
 local opt = require('mql_compile.options')
 
-local sep
-
 function M.get_path_separator()
    local separator = package.config:sub(1, 1) -- "/" or "\\"
    return separator
@@ -171,7 +169,5 @@ function M.get_kind_dirname(kind)
    local dirnames = { expert = 'Experts', indicator = 'Indicators', script = 'Scripts', library = 'Libraries', service = 'Services' }
    return dirnames[kind]
 end
-
-sep = M.get_path_separator()
 
 return M
