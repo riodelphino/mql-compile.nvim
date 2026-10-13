@@ -214,8 +214,9 @@ function M.compile(src_path)
    -- Get filetype's config
    local mql = opts.ft[filetype]
 
-   -- Get wine_path
-   local wine_path = fn.get_absolute_path(mql.wine_path)
+   -- Get wine_path ('' means not using wine. Don't expand it, or it becomes cwd)
+   local wine_path = ''
+   if mql.wine_path ~= nil and mql.wine_path ~= '' then wine_path = fn.get_absolute_path(mql.wine_path) end
 
    -- Get metaeditor_path
    local metaeditor_path = fn.get_absolute_path(mql.metaeditor_path)
